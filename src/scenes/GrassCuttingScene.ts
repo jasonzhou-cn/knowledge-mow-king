@@ -268,6 +268,13 @@ export class GrassCuttingScene extends Phaser.Scene {
 
     this.floaters = new FloatingTextPool(this, this.packed.performance.maxHitTextAlive);
 
+    // 虚拟摇杆只在触屏设备创建：PC 端 joystick 保持 null，观感与操作完全不变
+    if (this.sys.game.device.input.touch) {
+      this.joystick = new TouchJoystick(this, { settings: this.packed.touch });
+      // 底部加成文案右移到摇杆右侧，避免被摇杆压住
+      this.bottomTextX = this.joystick.rightEdge + JOYSTICK_TEXT_GUTTER;
+    }
+
     this.hud = new CombatHud(this, {
       width: this.scale.width,
       height: this.scale.height,
@@ -275,6 +282,7 @@ export class GrassCuttingScene extends Phaser.Scene {
       gameTime: this.timeLeft,
       level: incoming.level,
       levelName: this.packed.levelEntry.name,
+      bottomTextX: this.bottomTextX,
     });
     this.hud.setBonus(bonus.damageMultiplier, bonus.rangeMultiplier, bonus.durationMultiplier);
 
@@ -319,6 +327,12 @@ export class GrassCuttingScene extends Phaser.Scene {
       get timeLeft()      { return self.timeLeft; },
       get elapsed()       { return self.totalTime - self.timeLeft; },
       get projectiles()   { return self.projectiles ? self.projectiles.aliveCount : null; },
+      // 玩家坐标：自动化验证「摇杆拖动是否真的让角色移动」的唯一入口，只读
+      get playerX()       { return self.player ? self.player.x : null; },
+      get playerY()       { return self.player ? self.player.y : null; },
+      // 摇杆状态快照：只读，供自动化验证区分「走位」与「攻击」两条输入通道
+      get joystickActive(){ return self.joystick ? self.joystick.isActive : false; },
+      get joystickVector(){ return self.joystick ? self.joystick.vector : null; },
     };
   }
 
@@ -376,8 +390,10 @@ export class GrassCuttingScene extends Phaser.Scene {
     // 循环切：Q 上一把 / E 下一把
     this.cycleKeys = [KeyCodes.Q, KeyCodes.E].map((code) => keyboard.addKey(code, true, false));
 
-    // 鼠标 / 触屏：点在武器栏上只切换武器，不触发攻击
+    // 鼠标 / 触屏：点在武器栏上只切换武器，不触发攻击；点在摇杆上走位，不触发攻击
     this.input.on('pointerdown', this.onPointerDown);
+    // 摇杆拖动全靠 pointermove，缺了这一行触屏走位完全不工作
+    this.input.on('pointermove', this.onPointerMove);
     this.input.on('pointerup', this.onPointerUp);
   }
 
@@ -431,8 +447,8 @@ export class GrassCuttingScene extends Phaser.Scene {
   }
 
   /**
-   * 读取移动输入向量。
-   * 移动端接入点：把这里改为读取虚拟摇杆的归一化向量即可，其余逻辑无需改动。
+   * 读取移动输入向量：键盘（方向键 + WASD）与虚拟摇杆的向量相加，
+   * 由 updateMovement 统一归一化——两者同时输入时方向合并、速度不叠加。
    */
   private getMoveVector(): MoveVector {
     let x = 0;
@@ -448,6 +464,11 @@ export class GrassCuttingScene extends Phaser.Scene {
       if (this.wasd.D.isDown) x += 1;
       if (this.wasd.W.isDown) y -= 1;
       if (this.wasd.S.isDown) y += 1;
+    }
+    if (this.joystick) {
+      const v = this.joystick.vector;
+      x += v.x;
+      y += v.y;
     }
     return { x, y };
   }
@@ -824,7 +845,12 @@ export class GrassCuttingScene extends Phaser.Scene {
   /** 场景销毁时清理系统资源 */
   shutdown(): void {
     this.input.off('pointerdown', this.onPointerDown);
+    this.input.off('pointermove', this.onPointerMove);
     this.input.off('pointerup', this.onPointerUp);
+    this.joystick?.destroy();
+    this.joystick = null;
+    this.joystickPointerId = null;
+    this.attackPointerId = null;
     this.spawner?.destroy();
     this.combat?.destroy();
     this.projectiles?.destroy();

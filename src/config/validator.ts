@@ -570,22 +570,22 @@ function validateGrassCuttingConfig(raw: unknown): Validator {
   const ts = v.object(root, 'touchSettings', 'grassCuttingConfig.touchSettings');
   v.number(ts, 'joystickCenterX', 'grassCuttingConfig.touchSettings.joystickCenterX', { min: 0 });
   v.number(ts, 'joystickCenterY', 'grassCuttingConfig.touchSettings.joystickCenterY', { min: 0 });
-  v.number(ts, 'joystickBaseRadius', 'grassCuttingConfig.touchSettings.joystickBaseRadius', { min: 10, max: 200 });
-  v.number(ts, 'joystickKnobRadius', 'grassCuttingConfig.touchSettings.joystickKnobRadius', { min: 5, max: 160 });
-  v.number(ts, 'joystickDeadZone', 'grassCuttingConfig.touchSettings.joystickDeadZone', { min: 0 });
+  const joystickBaseRadius = v.number(ts, 'joystickBaseRadius', 'grassCuttingConfig.touchSettings.joystickBaseRadius', { min: 10, max: 200 });
+  const joystickKnobRadius = v.number(ts, 'joystickKnobRadius', 'grassCuttingConfig.touchSettings.joystickKnobRadius', { min: 5, max: 160 });
+  const joystickDeadZone = v.number(ts, 'joystickDeadZone', 'grassCuttingConfig.touchSettings.joystickDeadZone', { min: 0 });
   v.number(ts, 'joystickIdleAlpha', 'grassCuttingConfig.touchSettings.joystickIdleAlpha', { min: 0, max: 1 });
   v.number(ts, 'joystickActiveAlpha', 'grassCuttingConfig.touchSettings.joystickActiveAlpha', { min: 0, max: 1 });
   // 结构红线：摇杆头必须能放进底座，死区必须小于底座半径，否则摇杆不可用
-  if (ts.joystickKnobRadius >= ts.joystickBaseRadius) {
+  if (joystickKnobRadius >= joystickBaseRadius) {
     v.custom(
       'grassCuttingConfig.touchSettings',
-      `摇杆头半径（${ts.joystickKnobRadius}）必须小于底座半径（${ts.joystickBaseRadius}）`,
+      `摇杆头半径（${joystickKnobRadius}）必须小于底座半径（${joystickBaseRadius}）`,
     );
   }
-  if (ts.joystickDeadZone >= ts.joystickBaseRadius) {
+  if (joystickDeadZone >= joystickBaseRadius) {
     v.custom(
       'grassCuttingConfig.touchSettings',
-      `死区半径（${ts.joystickDeadZone}）必须小于底座半径（${ts.joystickBaseRadius}），否则摇杆永远推不动`,
+      `死区半径（${joystickDeadZone}）必须小于底座半径（${joystickBaseRadius}），否则摇杆永远推不动`,
     );
   }
 

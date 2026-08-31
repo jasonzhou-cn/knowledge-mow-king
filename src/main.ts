@@ -26,6 +26,11 @@ const config: Phaser.Types.Core.GameConfig = {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
+  input: {
+    // Phaser 默认只创建 1 个触摸 Pointer，第二根手指会被直接丢弃；
+    // 移动端必须支持「一根手指拖摇杆走位 + 另一根手指点攻击」，所以至少要 2 个
+    activePointers: 2,
+  },
   render: {
     antialias: true,
     powerPreference: 'high-performance',

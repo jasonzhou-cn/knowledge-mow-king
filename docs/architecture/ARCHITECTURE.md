@@ -268,7 +268,16 @@ ResultScene                  ProgressionSystem / RewardSystem 结算
 
 - `subjectCoefficientSettings.<学科>.skillDamageCoefficient` / `skillRangeCoefficient` 现在被当作「武器伤害系数 / 武器射程系数」使用：`resolve.ts:344-345` 取出后传给 `resolveWeapons`（`:406`），落点为 `resolve.ts:235`（伤害）与 `:238`（射程）。
 - 同一份系数还被 `QuestionScene.ts:290` 取用，作为 `computeGrassCuttingBonus` 的 `subjectDamageCoefficient` 入参，直接影响玩家看到的「伤害 ×N」。
-- 即：**字段名还叫 skill，语义已经变成 weapon**。与 6.5 的死字段不同，这两个是活字段，只是名字过期。重命名需要同步改 `subjectConfig.json` / `grassCuttingConfig.json` / `types.ts:249-250` / `validator.ts:651-652` / `resolve.ts:344-345` / `QuestionScene.ts:290` 六处。
+- 即：**字段名还叫 skill，语义已经变成 weapon**。与 6.5 的死字段不同，这两个是活字段，只是名字过期。
+- **⚠️ 读代码时不要被名字误导**：看到 `skillDamageCoefficient` / `skillRangeCoefficient`，请直接理解为「武器伤害系数 / 武器射程系数」。项目里已经没有任何「技能」概念，这两个名字是自动环形 AOE 时代的遗物。
+- **本轮（MVP）决定只记录不改名**：改名要动 `subjectConfig.json` / `grassCuttingConfig.json` / `types.ts:249-250` / `validator.ts:651-652` / `resolve.ts:344-345` / `QuestionScene.ts:290` 六处，风险大于收益。若将来改名，这六处必须一次改完。
+
+### 6.6.1 音效系统已实现但全项目零调用点
+
+- `src/systems/SfxController.ts` 提供了 `sfx.play(name)` 与 6 个程序化合成音效（`stop`/`correct`/`wrong`/`kill`/`hurt`/`levelUp`），但**全项目没有任何 `import` 或调用点**——grep `sfx` / `SfxController` 只在本文件内命中。
+- 后果：**当前游戏是完全静音的**。`SfxController.ts:54` 那句「击杀音在割草场景可能高频触发」的注释描述的是一个并不存在的场景。
+- 该模块的节流能力已在 T-013-A 中实现并实测通过（`scripts/t013-sfx-throttle.mjs`，6/6 PASS），接入点是 `sfx.bind(audioSettings)`（由编排层在配置校验通过后调用，参照 `BootScene.bootstrap` 里 `progression.bind` 的位置）+ 在击杀/受伤/答题回调里调 `sfx.play(...)`。
+- **接入时务必同时做两件事**：① 在 `public/config` 里加音频配置并走完四段式管线，替换掉文件内的 `DEFAULT_MIN_INTERVAL_MS` 兜底常量；② 接入后重跑一次节流实测，确认没有把音效接成「高频叠加」。
 
 ### 6.7 同屏上限存在两个来源，靠 `Math.min` 兜底
 

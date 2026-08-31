@@ -63,7 +63,9 @@ export class WeaponBar {
     const count = Math.max(1, opts.weapons.length);
     const totalW = count * SLOT_W + (count - 1) * SLOT_GAP;
     const startX = Math.round((opts.width - totalW) / 2);
-    const startY = opts.height - BOTTOM_MARGIN - SLOT_H;
+    // 热区要向下外扩 HIT_EXTEND_DOWN，格子必须同步上移同样的距离，
+    // 否则外扩部分落在屏幕外（格子底边 630 + 外扩 32 > 屏幕高 640），实际可点区域被吃掉大半
+    const startY = opts.height - BOTTOM_MARGIN - SLOT_H - HIT_EXTEND_DOWN;
 
     for (let i = 0; i < count; i++) {
       const x = startX + i * (SLOT_W + SLOT_GAP);

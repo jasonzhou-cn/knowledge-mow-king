@@ -17,6 +17,8 @@ export interface CombatHudOptions {
   gameTime: number;
   level: number;
   levelName: string;
+  /** 底部加成文案的左起始 x；触屏有虚拟摇杆时由场景传入避让后的位置，默认 16 */
+  bottomTextX?: number;
 }
 
 /**
@@ -80,11 +82,12 @@ export class CombatHud {
       .setOrigin(1, 0)
       .setDepth(1002);
 
-    // 底部左侧：让武器栏（底部居中）与加成文案互不遮挡
-    // 实测文字底边与武器栏 suppress-bounds 顶边差 2px，与可见 slot 顶边差 8px；
-    // 按需求再向上挪 10px，确保在 weaponBar.rect 之上留出 ≥8px 间隙。
+    // 底部左侧：让武器栏（底部居中）与加成文案互不遮挡。
+    // 几何核对（height=640）：武器栏格子上移后占 542~598，热区/边界顶边 = 542-6 = 536；
+    // 文案底边 = height-116 = 524，与边界顶边留 12px 间隙（要求 ≥8px）。
+    // 触屏时 x 由场景右移到虚拟摇杆右侧，避免被摇杆压住。
     this.bonusText = scene.add
-      .text(16, opts.height - 84, '', textStyle(15, css(Palette.text.hint)))
+      .text(opts.bottomTextX ?? 16, opts.height - 116, '', textStyle(15, css(Palette.text.hint)))
       .setOrigin(0, 1)
       .setDepth(1002);
 
