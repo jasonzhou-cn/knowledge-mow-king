@@ -46,6 +46,8 @@ export class ResultScene extends Phaser.Scene {
     const loader = ConfigLoader.getInstance();
     const rewardConfig = loader.getConfig('rewardConfig');
     const levelConfig = loader.getConfig('levelConfig') as LevelConfig;
+    const questionConfig = loader.getConfig('questionConfig');
+    const isArrowMode = questionConfig.answerSettings.mode === 'arrow';
 
     const w = this.scale.width;
     const h = this.scale.height;
@@ -98,7 +100,7 @@ export class ResultScene extends Phaser.Scene {
       `正确率 ${Math.round(payload.quiz.accuracy * 100)}%`,
       `平均每题 ${formatOneDecimal(payload.quiz.averageAnswerTime)} 秒`,
       `最大连对 ${payload.quiz.maxCombo}`,
-      `没停准 ${payload.quiz.missCount} 次 · 超时 ${payload.quiz.timeoutCount} 次`,
+      this.answerStatsLine(payload.quiz, isArrowMode),
     ]);
 
     // 中栏：割草战果
@@ -154,6 +156,19 @@ export class ResultScene extends Phaser.Scene {
     g.fillRect(0, 0, w, h);
     g.fillStyle(Palette.background.panel, 0.5);
     g.fillRoundedRect(w / 2 - 452, 130, 904, 200, 16);
+  }
+
+  /**
+   * 答题表现的「命中/超时」统计行文案：
+   *  - 箭头模式没有「没停准」概念，改用「答错 N 次」更准确；
+   *  - 轨道模式保留原文案（含 miss 次数）。
+   */
+  private answerStatsLine(quiz: { missCount: number; timeoutCount: number; correctCount: number; totalQuestions: number }, arrowMode: boolean): string {
+    if (arrowMode) {
+      const wrong = quiz.totalQuestions - quiz.correctCount;
+      return `答错 ${wrong} 次 · 超时 ${quiz.timeoutCount} 次`;
+    }
+    return `没停准 ${quiz.missCount} 次 · 超时 ${quiz.timeoutCount} 次`;
   }
 
   /** 绘制一个三栏数据卡片 */

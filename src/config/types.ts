@@ -100,7 +100,17 @@ export interface QuestionSettings {
 
 export type MovementType = 'circular' | 'linear';
 
+/**
+ * 答题交互模式：
+ *  - 'arrow'：答案固定不动，高亮框在选项间循环跳转，玩家在目标选项高亮时确认
+ *             （降低儿童认知负荷：只需追踪一个移动箭头，不用盯 4 个移动答案）
+ *  - 'track'：原「Stop the Cloud」式移动轨道，玩家点击停住做重叠判定
+ */
+export type AnswerMode = 'arrow' | 'track';
+
 export interface AnswerSettings {
+  /** 交互模式：arrow=固定答案+箭头循环选择（默认）；track=移动轨道+停住判定 */
+  mode: AnswerMode;
   movementType: MovementType;
   movementEasing: 'linear';
   stopThreshold: number;
@@ -121,6 +131,10 @@ export interface AnswerSettings {
   feedbackHoldDuration: number;
   /** 解析说明的停留时长（秒），教育价值的体现，给玩家读懂错因的时间 */
   explanationHoldDuration: number;
+  /** 箭头模式：高亮框跳转到下一个选项的间隔（秒） */
+  arrowInterval: number;
+  /** 箭头模式：选项布局——row=一行 4 个（箭头左右扫掠）；grid=2×2 网格 */
+  arrowLayout: 'row' | 'grid';
 }
 
 export interface SubjectDifficultyEntry {

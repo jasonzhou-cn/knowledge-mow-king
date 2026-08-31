@@ -17,6 +17,7 @@ import type { QuizResult, ResolvedLevelPackage } from '../config/resolve';
 import type { GrassCuttingBonus, QuestionConfig, SubjectConfig } from '../config/types';
 import { pickDifficultyWeights, questionBank, type DrawnQuestion } from '../data/QuestionBank';
 import { AnswerTrack } from '../systems/AnswerTrack';
+import { ArrowSelector } from '../systems/ArrowSelector';
 import { QuizEngine } from '../systems/QuizEngine';
 import { progression } from '../systems/ProgressionSystem';
 import { resolveComboTier } from '../systems/RewardSystem';
@@ -44,6 +45,7 @@ export class QuestionScene extends Phaser.Scene {
   private questionConfig!: QuestionConfig;
   private engine: QuizEngine | null = null;
   private track: AnswerTrack | null = null;
+  private selector: ArrowSelector | null = null;
   private hud: QuizHud | null = null;
 
   private questionText!: Phaser.GameObjects.Text;
@@ -98,23 +100,36 @@ export class QuestionScene extends Phaser.Scene {
     });
 
     const a = this.questionConfig.answerSettings;
-    this.track = new AnswerTrack(this, {
-      movementType: a.movementType,
-      centerX: a.trackCenterX,
-      centerY: a.trackCenterY,
-      radiusX: a.trackRadiusX,
-      radiusY: a.trackRadiusY,
-      linearSpan: a.linearTrackSpan,
-      cardWidth: a.optionCardWidth,
-      cardHeight: a.optionCardHeight,
-      zoneWidth: a.selectionZoneWidth,
-      zoneHeight: a.selectionZoneHeight,
-      speed: this.packed.answerSpeed,
-      overlapThreshold: a.overlapThreshold,
-      stopSettleDuration: a.stopSettleDuration,
-      bounceVelocity: a.bounceVelocity,
-      dragDamping: a.dragDamping,
-    });
+    if (a.mode === 'arrow') {
+      // 箭头模式：答案固定，高亮框循环跳转（默认，儿童友好）
+      this.selector = new ArrowSelector(this, {
+        centerX: a.trackCenterX,
+        centerY: a.trackCenterY,
+        cardWidth: a.optionCardWidth,
+        cardHeight: a.optionCardHeight,
+        interval: a.arrowInterval,
+        layout: a.arrowLayout,
+      });
+    } else {
+      // 轨道模式：原「Stop the Cloud」式移动轨道 + 停住判定
+      this.track = new AnswerTrack(this, {
+        movementType: a.movementType,
+        centerX: a.trackCenterX,
+        centerY: a.trackCenterY,
+        radiusX: a.trackRadiusX,
+        radiusY: a.trackRadiusY,
+        linearSpan: a.linearTrackSpan,
+        cardWidth: a.optionCardWidth,
+        cardHeight: a.optionCardHeight,
+        zoneWidth: a.selectionZoneWidth,
+        zoneHeight: a.selectionZoneHeight,
+        speed: this.packed.answerSpeed,
+        overlapThreshold: a.overlapThreshold,
+        stopSettleDuration: a.stopSettleDuration,
+        bounceVelocity: a.bounceVelocity,
+        dragDamping: a.dragDamping,
+      });
+    }
 
     this.registerInput();
     this.presentQuestion();
@@ -123,11 +138,11 @@ export class QuestionScene extends Phaser.Scene {
   override update(_time: number, delta: number): void {
     const dt = Math.min(delta, 100) / 1000;
     const engine = this.engine;
-    const track = this.track;
-    if (!engine || !track) return;
+    if (!engine) return;
 
     if (this.state === 'moving') {
-      track.update(dt);
+      if (this.selector) this.selector.update(dt);
+      else this.track?.update(dt);
       const timeout = engine.update(dt);
       this.hud?.setTimeLeft(engine.remainingTime, engine.limit);
       if (timeout === 'timeout') this.handleTimeout();
@@ -136,10 +151,15 @@ export class QuestionScene extends Phaser.Scene {
       if (this.stateTimer >= this.stateDuration) {
         if (this.pendingAdvance) this.advanceQuestion();
         else {
-          // 未命中：回到移动状态继续本题
+          // 未命中：回到移动状态继续本题（仅轨道模式会走到这里）
           this.state = 'moving';
-          track.reset();
-          track.start();
+          if (this.selector) {
+            this.selector.reset();
+            this.selector.start();
+          } else {
+            this.track?.reset();
+            this.track?.start();
+          }
         }
       }
     }
@@ -147,18 +167,23 @@ export class QuestionScene extends Phaser.Scene {
 
   // ───────────────────────── 流程控制 ─────────────────────────
 
-  /** 展示当前题目并启动轨道 */
+  /** 展示当前题目并启动答题组件（轨道/箭头模式二选一） */
   private presentQuestion(): void {
     const engine = this.engine;
-    const track = this.track;
-    if (!engine || !track) return;
+    if (!engine) return;
+    if (!this.track && !this.selector) return;
 
     this.questionText.setText(engine.current.question);
     this.explanationText.setText('');
     this.resultText.setText('');
     this.hintText.setVisible(true);
-    track.setOptions(engine.current.options);
-    track.start();
+    if (this.selector) {
+      this.selector.setOptions(engine.current.options);
+      this.selector.start();
+    } else {
+      this.track?.setOptions(engine.current.options);
+      this.track?.start();
+    }
     this.state = 'moving';
     this.pendingAdvance = false;
 
@@ -167,27 +192,40 @@ export class QuestionScene extends Phaser.Scene {
     this.hud?.setTimeLeft(engine.remainingTime, engine.limit);
   }
 
-  /** 玩家点击 / 空格触发停住判定 */
+  /** 玩家点击 / 空格触发停住/确认判定 */
   private handleStop(pointerX: number, pointerY: number): void {
     const engine = this.engine;
-    const track = this.track;
-    if (!engine || !track || this.state !== 'moving') return;
+    if (!engine || this.state !== 'moving') return;
 
-    // 点击瞬间的扩散反馈，让「我停下了」这件事立刻可见
+    // 点击瞬间的扩散反馈，让「我停下了/确认了」这件事立刻可见
     ripple(this, pointerX, pointerY, Palette.accent.secondary, 110, 420);
 
-    const result = track.stop();
-    sfx.play('stop');
-    if (!result.hit) {
-      this.handleMiss();
+    let index: number;
+    if (this.selector) {
+      // 箭头模式：直接确认当前高亮；没有「未命中」概念
+      sfx.play('stop');
+      index = this.selector.confirm();
+    } else if (this.track) {
+      // 轨道模式：停住 + 重叠面积判定
+      const result = this.track.stop();
+      sfx.play('stop');
+      if (!result.hit) {
+        this.handleMiss();
+        return;
+      }
+      index = result.index;
+    } else {
       return;
     }
 
-    const { outcome, record } = engine.submit(result.index);
+    const { outcome, record } = engine.submit(index);
     const correct = outcome === 'correct';
-    track.setState(result.index, correct ? 'correct' : 'wrong');
+    if (this.selector) this.selector.setState(index, correct ? 'correct' : 'wrong');
+    else this.track?.setState(index, correct ? 'correct' : 'wrong');
 
-    const pos = track.getCardPosition(result.index);
+    const pos = this.selector
+      ? this.selector.getCardPosition(index)
+      : this.track!.getCardPosition(index);
     this.hintText.setVisible(false);
     if (correct) {
       sfx.play('correct');
@@ -196,7 +234,8 @@ export class QuestionScene extends Phaser.Scene {
     } else {
       // 答错时同时高亮正确答案，形成「我选了什么 / 正确是什么」的对照
       sfx.play('wrong');
-      track.setState(engine.current.answerIndex, 'correct');
+      if (this.selector) this.selector.setState(engine.current.answerIndex, 'correct');
+      else this.track?.setState(engine.current.answerIndex, 'correct');
       shake(this, this.resultText, 7, 260);
       ripple(this, pos.x, pos.y, Palette.status.wrong, 130, 420);
       this.resultText.setText('✕ 答错了').setColor(css(Palette.status.wrong));
@@ -231,12 +270,13 @@ export class QuestionScene extends Phaser.Scene {
   /** 超时：算答错并进入下一题 */
   private handleTimeout(): void {
     const engine = this.engine;
-    const track = this.track;
-    if (!engine || !track) return;
+    if (!engine) return;
+    if (!this.track && !this.selector) return;
 
     engine.registerTimeout();
     sfx.play('wrong');
-    track.setState(engine.current.answerIndex, 'correct');
+    if (this.selector) this.selector.setState(engine.current.answerIndex, 'correct');
+    else this.track!.setState(engine.current.answerIndex, 'correct');
     this.resultText.setText('⏰ 超时了').setColor(css(Palette.status.warning));
     this.explanationText.setText(
       `正确答案：${engine.current.correctText}　|　${engine.current.explanation}`,
@@ -447,7 +487,9 @@ export class QuestionScene extends Phaser.Scene {
       .text(
         w / 2,
         628,
-        '点击屏幕任意位置 或 按空格 —— 让正确选项停在金色判定框里',
+        this.questionConfig.answerSettings.mode === 'arrow'
+          ? '点击屏幕任意位置 或 按空格 —— 让高亮箭头停在正确选项上'
+          : '点击屏幕任意位置 或 按空格 —— 让正确选项停在金色判定框里',
         textStyle(16, css(Palette.text.hint)),
       )
       .setOrigin(0.5, 1);
@@ -473,8 +515,10 @@ export class QuestionScene extends Phaser.Scene {
     this.summaryContainer?.destroy();
     this.summaryContainer = null;
     this.track?.destroy();
+    this.selector?.destroy();
     this.hud?.destroy();
     this.track = null;
+    this.selector = null;
     this.hud = null;
     this.engine = null;
   }
