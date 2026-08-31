@@ -1,13 +1,18 @@
 {
   "version": "1.0.0",
-  "description": "数学题库：difficulty 1=小学算术，2=初中代数几何，3=高中基础。answerIndex 为 options 数组中正确项的索引，运行时会随机打乱选项位置以保证答题公平。",
+  "description": "题库：difficulty 1=入门，2=进阶，3=挑战。math 为小学算术到高中基础；english 为词汇/语法基础；science 为常识/理化生基础。answerIndex 为 options 数组中正确项的索引，运行时会随机打乱选项位置以保证答题公平。",
   "questions": [
     {
       "id": "math-001",
       "subject": "math",
       "difficulty": 1,
       "question": "计算：25 + 37 = ?",
-      "options": ["62", "52", "58", "61"],
+      "options": [
+        "62",
+        "52",
+        "58",
+        "61"
+      ],
       "answerIndex": 0,
       "explanation": "25 + 37 = 62。个位 5+7=12 进 1，十位 2+3+1=6。"
     },
@@ -16,7 +21,12 @@
       "subject": "math",
       "difficulty": 1,
       "question": "计算：8 × 7 = ?",
-      "options": ["56", "54", "63", "48"],
+      "options": [
+        "56",
+        "54",
+        "63",
+        "48"
+      ],
       "answerIndex": 0,
       "explanation": "七八五十六，8 × 7 = 56。"
     },
@@ -25,7 +35,12 @@
       "subject": "math",
       "difficulty": 1,
       "question": "计算：100 − 38 = ?",
-      "options": ["62", "72", "58", "68"],
+      "options": [
+        "62",
+        "72",
+        "58",
+        "68"
+      ],
       "answerIndex": 0,
       "explanation": "100 − 38 = 62。可以想成 100 − 40 + 2 = 62。"
     },
@@ -34,7 +49,12 @@
       "subject": "math",
       "difficulty": 1,
       "question": "计算：144 ÷ 12 = ?",
-      "options": ["12", "11", "14", "16"],
+      "options": [
+        "12",
+        "11",
+        "14",
+        "16"
+      ],
       "answerIndex": 0,
       "explanation": "12 × 12 = 144，所以 144 ÷ 12 = 12。"
     },
@@ -43,7 +63,12 @@
       "subject": "math",
       "difficulty": 1,
       "question": "一个长方形长 9 厘米，宽 4 厘米，面积是多少平方厘米？",
-      "options": ["36", "26", "13", "40"],
+      "options": [
+        "36",
+        "26",
+        "13",
+        "40"
+      ],
       "answerIndex": 0,
       "explanation": "长方形面积 = 长 × 宽 = 9 × 4 = 36（平方厘米）。"
     },
@@ -52,7 +77,12 @@
       "subject": "math",
       "difficulty": 1,
       "question": "计算：3/4 + 1/4 = ?",
-      "options": ["1", "1/2", "3/4", "2"],
+      "options": [
+        "1",
+        "1/2",
+        "3/4",
+        "2"
+      ],
       "answerIndex": 0,
       "explanation": "同分母相加，3/4 + 1/4 = 4/4 = 1。"
     },
@@ -61,7 +91,12 @@
       "subject": "math",
       "difficulty": 1,
       "question": "小明有 5 盒铅笔，每盒 12 支，一共有多少支？",
-      "options": ["60", "50", "65", "72"],
+      "options": [
+        "60",
+        "50",
+        "65",
+        "72"
+      ],
       "answerIndex": 0,
       "explanation": "5 × 12 = 60（支）。"
     },
@@ -70,7 +105,12 @@
       "subject": "math",
       "difficulty": 1,
       "question": "计算：0.5 + 0.25 = ?",
-      "options": ["0.75", "0.3", "0.7", "0.8"],
+      "options": [
+        "0.75",
+        "0.3",
+        "0.7",
+        "0.8"
+      ],
       "answerIndex": 0,
       "explanation": "0.5 + 0.25 = 0.75。"
     },
@@ -79,7 +119,12 @@
       "subject": "math",
       "difficulty": 1,
       "question": "一个数除以 9，余数最大是几？",
-      "options": ["8", "9", "7", "6"],
+      "options": [
+        "8",
+        "9",
+        "7",
+        "6"
+      ],
       "answerIndex": 0,
       "explanation": "余数必须小于除数，除数是 9，所以余数最大是 8。"
     },
@@ -88,7 +133,12 @@
       "subject": "math",
       "difficulty": 1,
       "question": "计算：15 × 4 + 20 = ?",
-      "options": ["80", "70", "90", "100"],
+      "options": [
+        "80",
+        "70",
+        "90",
+        "100"
+      ],
       "answerIndex": 0,
       "explanation": "先乘后加：15 × 4 = 60，60 + 20 = 80。"
     },
@@ -97,7 +147,12 @@
       "subject": "math",
       "difficulty": 1,
       "question": "正方形边长 6 厘米，周长是多少厘米？",
-      "options": ["24", "36", "12", "18"],
+      "options": [
+        "24",
+        "36",
+        "12",
+        "18"
+      ],
       "answerIndex": 0,
       "explanation": "正方形周长 = 边长 × 4 = 6 × 4 = 24（厘米）。"
     },
@@ -106,7 +161,12 @@
       "subject": "math",
       "difficulty": 1,
       "question": "计算：1 − 3/8 = ?",
-      "options": ["5/8", "3/8", "1/8", "1/2"],
+      "options": [
+        "5/8",
+        "3/8",
+        "1/8",
+        "1/2"
+      ],
       "answerIndex": 0,
       "explanation": "1 = 8/8，8/8 − 3/8 = 5/8。"
     },
@@ -115,7 +175,12 @@
       "subject": "math",
       "difficulty": 1,
       "question": "把 0.6 化成最简分数是？",
-      "options": ["3/5", "6/10", "2/3", "3/10"],
+      "options": [
+        "3/5",
+        "6/10",
+        "2/3",
+        "3/10"
+      ],
       "answerIndex": 0,
       "explanation": "0.6 = 6/10 = 3/5（分子分母同除以 2）。"
     },
@@ -124,7 +189,12 @@
       "subject": "math",
       "difficulty": 1,
       "question": "计算：99 × 5 = ?",
-      "options": ["495", "505", "485", "450"],
+      "options": [
+        "495",
+        "505",
+        "485",
+        "450"
+      ],
       "answerIndex": 0,
       "explanation": "99 × 5 = (100 − 1) × 5 = 500 − 5 = 495。"
     },
@@ -133,7 +203,12 @@
       "subject": "math",
       "difficulty": 1,
       "question": "计算：7.2 ÷ 0.8 = ?",
-      "options": ["9", "0.9", "8", "90"],
+      "options": [
+        "9",
+        "0.9",
+        "8",
+        "90"
+      ],
       "answerIndex": 0,
       "explanation": "被除数除数同乘 10：72 ÷ 8 = 9。"
     },
@@ -142,7 +217,12 @@
       "subject": "math",
       "difficulty": 1,
       "question": "三角形两个角分别是 50° 和 60°，第三个角是？",
-      "options": ["70°", "60°", "80°", "90°"],
+      "options": [
+        "70°",
+        "60°",
+        "80°",
+        "90°"
+      ],
       "answerIndex": 0,
       "explanation": "三角形内角和 180°，180 − 50 − 60 = 70°。"
     },
@@ -151,7 +231,12 @@
       "subject": "math",
       "difficulty": 1,
       "question": "计算：(12 + 8) × 3 = ?",
-      "options": ["60", "48", "36", "20"],
+      "options": [
+        "60",
+        "48",
+        "36",
+        "20"
+      ],
       "answerIndex": 0,
       "explanation": "先算括号：12 + 8 = 20，20 × 3 = 60。"
     },
@@ -160,7 +245,12 @@
       "subject": "math",
       "difficulty": 1,
       "question": "1 小时 45 分钟等于多少分钟？",
-      "options": ["105", "145", "75", "115"],
+      "options": [
+        "105",
+        "145",
+        "75",
+        "115"
+      ],
       "answerIndex": 0,
       "explanation": "1 小时 = 60 分钟，60 + 45 = 105（分钟）。"
     },
@@ -169,7 +259,12 @@
       "subject": "math",
       "difficulty": 1,
       "question": "计算：2/5 × 15 = ?",
-      "options": ["6", "5", "10", "3"],
+      "options": [
+        "6",
+        "5",
+        "10",
+        "3"
+      ],
       "answerIndex": 0,
       "explanation": "2/5 × 15 = 30/5 = 6。"
     },
@@ -178,7 +273,12 @@
       "subject": "math",
       "difficulty": 1,
       "question": "甲数是 24，乙数比甲数多 1/3，乙数是多少？",
-      "options": ["32", "28", "36", "30"],
+      "options": [
+        "32",
+        "28",
+        "36",
+        "30"
+      ],
       "answerIndex": 0,
       "explanation": "24 × (1 + 1/3) = 24 + 8 = 32。"
     },
@@ -187,7 +287,12 @@
       "subject": "math",
       "difficulty": 2,
       "question": "解方程：2x + 6 = 14，x = ?",
-      "options": ["4", "10", "8", "2"],
+      "options": [
+        "4",
+        "10",
+        "8",
+        "2"
+      ],
       "answerIndex": 0,
       "explanation": "2x = 14 − 6 = 8，x = 4。"
     },
@@ -196,7 +301,12 @@
       "subject": "math",
       "difficulty": 2,
       "question": "计算：(−3)² = ?",
-      "options": ["9", "−9", "6", "−6"],
+      "options": [
+        "9",
+        "−9",
+        "6",
+        "−6"
+      ],
       "answerIndex": 0,
       "explanation": "(−3)² = (−3) × (−3) = 9，负负得正。"
     },
@@ -205,7 +315,12 @@
       "subject": "math",
       "difficulty": 2,
       "question": "化简：3a + 5a − 2a = ?",
-      "options": ["6a", "10a", "8a", "4a"],
+      "options": [
+        "6a",
+        "10a",
+        "8a",
+        "4a"
+      ],
       "answerIndex": 0,
       "explanation": "合并同类项：(3 + 5 − 2)a = 6a。"
     },
@@ -214,7 +329,12 @@
       "subject": "math",
       "difficulty": 2,
       "question": "直角三角形两条直角边为 3 和 4，斜边长是？",
-      "options": ["5", "6", "7", "√7"],
+      "options": [
+        "5",
+        "6",
+        "7",
+        "√7"
+      ],
       "answerIndex": 0,
       "explanation": "勾股定理：√(3² + 4²) = √25 = 5。"
     },
@@ -223,7 +343,12 @@
       "subject": "math",
       "difficulty": 2,
       "question": "计算：x² · x³ = ?",
-      "options": ["x⁵", "x⁶", "x⁸", "x⁹"],
+      "options": [
+        "x⁵",
+        "x⁶",
+        "x⁸",
+        "x⁹"
+      ],
       "answerIndex": 0,
       "explanation": "同底数幂相乘，指数相加：x^(2+3) = x⁵。"
     },
@@ -232,7 +357,12 @@
       "subject": "math",
       "difficulty": 2,
       "question": "(2x − 1)(x + 3) 展开后，x 的一次项系数是？",
-      "options": ["5", "6", "−1", "1"],
+      "options": [
+        "5",
+        "6",
+        "−1",
+        "1"
+      ],
       "answerIndex": 0,
       "explanation": "展开得 2x² + 6x − x − 3 = 2x² + 5x − 3，一次项系数为 5。"
     },
@@ -241,7 +371,12 @@
       "subject": "math",
       "difficulty": 2,
       "question": "解方程 x² = 16，x 的正值解是？",
-      "options": ["4", "8", "16", "2"],
+      "options": [
+        "4",
+        "8",
+        "16",
+        "2"
+      ],
       "answerIndex": 0,
       "explanation": "x = ±4，正值解为 4。"
     },
@@ -250,7 +385,12 @@
       "subject": "math",
       "difficulty": 2,
       "question": "半径为 5 的圆，面积是多少？",
-      "options": ["25π", "10π", "5π", "50π"],
+      "options": [
+        "25π",
+        "10π",
+        "5π",
+        "50π"
+      ],
       "answerIndex": 0,
       "explanation": "圆面积 = πr² = π × 5² = 25π。"
     },
@@ -259,7 +399,12 @@
       "subject": "math",
       "difficulty": 2,
       "question": "计算：√49 + √25 = ?",
-      "options": ["12", "74", "2", "14"],
+      "options": [
+        "12",
+        "74",
+        "2",
+        "14"
+      ],
       "answerIndex": 0,
       "explanation": "√49 = 7，√25 = 5，7 + 5 = 12。"
     },
@@ -268,7 +413,12 @@
       "subject": "math",
       "difficulty": 2,
       "question": "一次函数 y = 2x + 1，当 x = 3 时 y = ?",
-      "options": ["7", "6", "5", "9"],
+      "options": [
+        "7",
+        "6",
+        "5",
+        "9"
+      ],
       "answerIndex": 0,
       "explanation": "y = 2 × 3 + 1 = 7。"
     },
@@ -277,7 +427,12 @@
       "subject": "math",
       "difficulty": 2,
       "question": "分解因式：x² − 9 = ?",
-      "options": ["(x+3)(x−3)", "(x−3)²", "(x+9)(x−1)", "(x+3)²"],
+      "options": [
+        "(x+3)(x−3)",
+        "(x−3)²",
+        "(x+9)(x−1)",
+        "(x+3)²"
+      ],
       "answerIndex": 0,
       "explanation": "平方差公式：x² − 3² = (x + 3)(x − 3)。"
     },
@@ -286,7 +441,12 @@
       "subject": "math",
       "difficulty": 2,
       "question": "计算：2⁻² = ?",
-      "options": ["1/4", "−4", "4", "−1/4"],
+      "options": [
+        "1/4",
+        "−4",
+        "4",
+        "−1/4"
+      ],
       "answerIndex": 0,
       "explanation": "负指数取倒数：2⁻² = 1 / 2² = 1/4。"
     },
@@ -295,7 +455,12 @@
       "subject": "math",
       "difficulty": 2,
       "question": "某数的 3 倍减去 5 等于 16，这个数是？",
-      "options": ["7", "5", "9", "21"],
+      "options": [
+        "7",
+        "5",
+        "9",
+        "21"
+      ],
       "answerIndex": 0,
       "explanation": "3x − 5 = 16 → 3x = 21 → x = 7。"
     },
@@ -304,7 +469,12 @@
       "subject": "math",
       "difficulty": 2,
       "question": "(a + b)² 展开后共有几项？",
-      "options": ["3", "2", "4", "5"],
+      "options": [
+        "3",
+        "2",
+        "4",
+        "5"
+      ],
       "answerIndex": 0,
       "explanation": "(a + b)² = a² + 2ab + b²，共 3 项。"
     },
@@ -313,7 +483,12 @@
       "subject": "math",
       "difficulty": 2,
       "question": "数据 2, 4, 6, 8, 10 的平均数是？",
-      "options": ["6", "5", "7", "8"],
+      "options": [
+        "6",
+        "5",
+        "7",
+        "8"
+      ],
       "answerIndex": 0,
       "explanation": "(2+4+6+8+10) / 5 = 30 / 5 = 6。"
     },
@@ -322,7 +497,12 @@
       "subject": "math",
       "difficulty": 2,
       "question": "sin 30° 的值是？",
-      "options": ["1/2", "√3/2", "√2/2", "1"],
+      "options": [
+        "1/2",
+        "√3/2",
+        "√2/2",
+        "1"
+      ],
       "answerIndex": 0,
       "explanation": "特殊角三角函数：sin 30° = 1/2。"
     },
@@ -331,7 +511,12 @@
       "subject": "math",
       "difficulty": 2,
       "question": "已知 x + y = 10，x − y = 4，则 x = ?",
-      "options": ["7", "6", "3", "14"],
+      "options": [
+        "7",
+        "6",
+        "3",
+        "14"
+      ],
       "answerIndex": 0,
       "explanation": "两式相加：2x = 14，x = 7。"
     },
@@ -340,7 +525,12 @@
       "subject": "math",
       "difficulty": 2,
       "question": "计算：|−5| + |3| = ?",
-      "options": ["8", "2", "−2", "15"],
+      "options": [
+        "8",
+        "2",
+        "−2",
+        "15"
+      ],
       "answerIndex": 0,
       "explanation": "|−5| = 5，|3| = 3，5 + 3 = 8。"
     },
@@ -349,7 +539,12 @@
       "subject": "math",
       "difficulty": 2,
       "question": "梯形上底 4，下底 8，高 5，面积是？",
-      "options": ["30", "20", "60", "40"],
+      "options": [
+        "30",
+        "20",
+        "60",
+        "40"
+      ],
       "answerIndex": 0,
       "explanation": "梯形面积 = (上底 + 下底) × 高 ÷ 2 = (4 + 8) × 5 ÷ 2 = 30。"
     },
@@ -358,7 +553,12 @@
       "subject": "math",
       "difficulty": 2,
       "question": "计算：(3x²y) ÷ (xy) = ?",
-      "options": ["3x", "3y", "3xy", "3x²"],
+      "options": [
+        "3x",
+        "3y",
+        "3xy",
+        "3x²"
+      ],
       "answerIndex": 0,
       "explanation": "系数 3 ÷ 1 = 3，x² ÷ x = x，y ÷ y = 1，结果为 3x。"
     },
@@ -367,7 +567,12 @@
       "subject": "math",
       "difficulty": 3,
       "question": "计算：log₂ 8 = ?",
-      "options": ["3", "2", "4", "8"],
+      "options": [
+        "3",
+        "2",
+        "4",
+        "8"
+      ],
       "answerIndex": 0,
       "explanation": "2³ = 8，所以 log₂ 8 = 3。"
     },
@@ -376,7 +581,12 @@
       "subject": "math",
       "difficulty": 3,
       "question": "函数 f(x) = x² − 4x + 3 的最小值是？",
-      "options": ["−1", "3", "0", "−4"],
+      "options": [
+        "−1",
+        "3",
+        "0",
+        "−4"
+      ],
       "answerIndex": 0,
       "explanation": "配方得 (x − 2)² − 1，当 x = 2 时最小值为 −1。"
     },
@@ -385,7 +595,12 @@
       "subject": "math",
       "difficulty": 3,
       "question": "sin²θ + cos²θ = ?",
-      "options": ["1", "0", "2", "sin2θ"],
+      "options": [
+        "1",
+        "0",
+        "2",
+        "sin2θ"
+      ],
       "answerIndex": 0,
       "explanation": "同角三角函数基本恒等式：sin²θ + cos²θ = 1。"
     },
@@ -394,7 +609,12 @@
       "subject": "math",
       "difficulty": 3,
       "question": "等差数列 2, 5, 8, 11, ... 的第 10 项是？",
-      "options": ["29", "32", "26", "30"],
+      "options": [
+        "29",
+        "32",
+        "26",
+        "30"
+      ],
       "answerIndex": 0,
       "explanation": "公差 d = 3，a₁₀ = 2 + (10 − 1) × 3 = 2 + 27 = 29。"
     },
@@ -403,7 +623,12 @@
       "subject": "math",
       "difficulty": 3,
       "question": "计算：C(5, 2) = ?",
-      "options": ["10", "20", "5", "15"],
+      "options": [
+        "10",
+        "20",
+        "5",
+        "15"
+      ],
       "answerIndex": 0,
       "explanation": "C(5,2) = 5! / (2! × 3!) = (5 × 4) / 2 = 10。"
     },
@@ -412,7 +637,12 @@
       "subject": "math",
       "difficulty": 3,
       "question": "解不等式 2x − 3 > 5，结果是 x > ?",
-      "options": ["4", "1", "8", "2"],
+      "options": [
+        "4",
+        "1",
+        "8",
+        "2"
+      ],
       "answerIndex": 0,
       "explanation": "2x > 8，两边同除以正数 2，方向不变：x > 4。"
     },
@@ -421,7 +651,12 @@
       "subject": "math",
       "difficulty": 3,
       "question": "极限 lim(x→0) sin x / x = ?",
-      "options": ["1", "0", "∞", "不存在"],
+      "options": [
+        "1",
+        "0",
+        "∞",
+        "不存在"
+      ],
       "answerIndex": 0,
       "explanation": "重要极限：lim(x→0) sin x / x = 1。"
     },
@@ -430,7 +665,12 @@
       "subject": "math",
       "difficulty": 3,
       "question": "函数 y = 2ˣ 在 x = 3 时的值是？",
-      "options": ["8", "6", "9", "4"],
+      "options": [
+        "8",
+        "6",
+        "9",
+        "4"
+      ],
       "answerIndex": 0,
       "explanation": "2³ = 8。"
     },
@@ -439,7 +679,12 @@
       "subject": "math",
       "difficulty": 3,
       "question": "i² = ?（i 为虚数单位）",
-      "options": ["−1", "1", "i", "−i"],
+      "options": [
+        "−1",
+        "1",
+        "i",
+        "−i"
+      ],
       "answerIndex": 0,
       "explanation": "虚数单位的定义：i² = −1。"
     },
@@ -448,7 +693,12 @@
       "subject": "math",
       "difficulty": 3,
       "question": "抛均匀硬币 3 次，恰好 2 次正面的概率是？",
-      "options": ["3/8", "1/2", "1/8", "3/4"],
+      "options": [
+        "3/8",
+        "1/2",
+        "1/8",
+        "3/4"
+      ],
       "answerIndex": 0,
       "explanation": "共 2³ = 8 种等可能结果，恰 2 次正面有 C(3,2) = 3 种，概率 3/8。"
     },
@@ -457,7 +707,12 @@
       "subject": "math",
       "difficulty": 3,
       "question": "计算：lg 100 + lg 0.1 = ?",
-      "options": ["1", "3", "−1", "0"],
+      "options": [
+        "1",
+        "3",
+        "−1",
+        "0"
+      ],
       "answerIndex": 0,
       "explanation": "lg 100 = 2，lg 0.1 = −1，2 + (−1) = 1。"
     },
@@ -466,7 +721,12 @@
       "subject": "math",
       "difficulty": 3,
       "question": "等比数列 3, 6, 12, ... 的前 4 项和是？",
-      "options": ["45", "24", "48", "21"],
+      "options": [
+        "45",
+        "24",
+        "48",
+        "21"
+      ],
       "answerIndex": 0,
       "explanation": "公比 q = 2，前 4 项为 3, 6, 12, 24，和为 45。"
     },
@@ -475,7 +735,12 @@
       "subject": "math",
       "difficulty": 3,
       "question": "求导数：d/dx (x³) = ?",
-      "options": ["3x²", "x²", "3x", "x⁴/4"],
+      "options": [
+        "3x²",
+        "x²",
+        "3x",
+        "x⁴/4"
+      ],
       "answerIndex": 0,
       "explanation": "幂函数求导公式：(xⁿ)′ = n·xⁿ⁻¹，所以 (x³)′ = 3x²。"
     },
@@ -484,7 +749,12 @@
       "subject": "math",
       "difficulty": 3,
       "question": "cos 60° 的值是？",
-      "options": ["1/2", "√3/2", "1", "√2/2"],
+      "options": [
+        "1/2",
+        "√3/2",
+        "1",
+        "√2/2"
+      ],
       "answerIndex": 0,
       "explanation": "特殊角三角函数：cos 60° = 1/2。"
     },
@@ -493,7 +763,12 @@
       "subject": "math",
       "difficulty": 3,
       "question": "方程 x² − 5x + 6 = 0 的两根之和是？",
-      "options": ["5", "6", "−5", "1"],
+      "options": [
+        "5",
+        "6",
+        "−5",
+        "1"
+      ],
       "answerIndex": 0,
       "explanation": "韦达定理：两根之和 = −b/a = 5。（两根为 2 和 3）"
     },
@@ -502,7 +777,12 @@
       "subject": "math",
       "difficulty": 3,
       "question": "计算定积分：∫₀¹ 2x dx = ?",
-      "options": ["1", "2", "1/2", "0"],
+      "options": [
+        "1",
+        "2",
+        "1/2",
+        "0"
+      ],
       "answerIndex": 0,
       "explanation": "原函数为 x²，代入上下限得 1² − 0² = 1。"
     },
@@ -511,7 +791,12 @@
       "subject": "math",
       "difficulty": 3,
       "question": "A = {1, 2, 3}，B = {3, 4, 5}，A ∩ B = ?",
-      "options": ["{3}", "{1,2,3,4,5}", "{1,2}", "空集"],
+      "options": [
+        "{3}",
+        "{1,2,3,4,5}",
+        "{1,2}",
+        "空集"
+      ],
       "answerIndex": 0,
       "explanation": "交集取两集合公共元素，只有 3，即 {3}。"
     },
@@ -520,7 +805,12 @@
       "subject": "math",
       "difficulty": 3,
       "question": "tan 45° 的值是？",
-      "options": ["1", "√3", "√3/3", "0"],
+      "options": [
+        "1",
+        "√3",
+        "√3/3",
+        "0"
+      ],
       "answerIndex": 0,
       "explanation": "tan 45° = sin 45° / cos 45° = 1。"
     },
@@ -529,7 +819,12 @@
       "subject": "math",
       "difficulty": 3,
       "question": "若 f(x) = 3x − 1，则 f⁻¹(5) = ?",
-      "options": ["2", "5", "14", "4/3"],
+      "options": [
+        "2",
+        "5",
+        "14",
+        "4/3"
+      ],
       "answerIndex": 0,
       "explanation": "令 3x − 1 = 5，得 3x = 6，x = 2，即 f⁻¹(5) = 2。"
     },
@@ -538,9 +833,434 @@
       "subject": "math",
       "difficulty": 3,
       "question": "极限 lim(n→∞) (1 + 1/n)ⁿ = ?",
-      "options": ["e", "1", "∞", "0"],
+      "options": [
+        "e",
+        "1",
+        "∞",
+        "0"
+      ],
       "answerIndex": 0,
       "explanation": "这是自然常数 e 的定义式，极限为 e ≈ 2.718。"
+    },
+    {
+      "id": "english-001",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "“apple” 的中文意思是？",
+      "options": [
+        "苹果",
+        "香蕉",
+        "橘子",
+        "葡萄"
+      ],
+      "answerIndex": 0,
+      "explanation": "apple 是「苹果」，banana 是「香蕉」。"
+    },
+    {
+      "id": "english-002",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "下列哪个单词表示「狗」？",
+      "options": [
+        "dog",
+        "cat",
+        "bird",
+        "fish"
+      ],
+      "answerIndex": 0,
+      "explanation": "dog 是「狗」，cat 是「猫」，bird 是「鸟」。"
+    },
+    {
+      "id": "english-003",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "选择正确的英文：早上好",
+      "options": [
+        "Good morning!",
+        "Good night!",
+        "Good bye!",
+        "Good afternoon!"
+      ],
+      "answerIndex": 0,
+      "explanation": "早上好是 Good morning!，晚上见面用 Good evening!。"
+    },
+    {
+      "id": "english-004",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "下列哪个是「书」的英文？",
+      "options": [
+        "book",
+        "pen",
+        "desk",
+        "bag"
+      ],
+      "answerIndex": 0,
+      "explanation": "book 是「书」，pen 是「钢笔」，desk 是「课桌」。"
+    },
+    {
+      "id": "english-005",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "“I am ten years old.” 中 “old” 的意思是？",
+      "options": [
+        "岁数",
+        "旧的",
+        "老的",
+        "高的"
+      ],
+      "answerIndex": 0,
+      "explanation": "years old 表示「…岁」，整句意思是「我十岁了」。"
+    },
+    {
+      "id": "english-006",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "选择正确的复数形式：one cat, two ____",
+      "options": [
+        "cats",
+        "cat",
+        "cates",
+        "caties"
+      ],
+      "answerIndex": 0,
+      "explanation": "多数名词在词尾加 s 构成复数，cat → cats。"
+    },
+    {
+      "id": "english-007",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "“I ___ a student.” 应填入？",
+      "options": [
+        "am",
+        "is",
+        "are",
+        "be"
+      ],
+      "answerIndex": 0,
+      "explanation": "主语是 I 时，be 动词用 am。"
+    },
+    {
+      "id": "english-008",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "与 “big” 意思相反的单词是？",
+      "options": [
+        "small",
+        "tall",
+        "fast",
+        "slow"
+      ],
+      "answerIndex": 0,
+      "explanation": "big（大的）的反义词是 small（小的）。"
+    },
+    {
+      "id": "english-009",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "“She ___ to school every day.” 应填入？",
+      "options": [
+        "goes",
+        "go",
+        "going",
+        "gone"
+      ],
+      "answerIndex": 0,
+      "explanation": "主语 she 是第三人称单数，一般现在时动词加 es → goes。"
+    },
+    {
+      "id": "english-010",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "下列哪个单词表示「星期一」？",
+      "options": [
+        "Monday",
+        "Sunday",
+        "Saturday",
+        "Friday"
+      ],
+      "answerIndex": 0,
+      "explanation": "Monday 是星期一，Sunday 是星期日。"
+    },
+    {
+      "id": "english-011",
+      "subject": "english",
+      "difficulty": 3,
+      "question": "“I have lived here ___ 2015.” 应填入？",
+      "options": [
+        "since",
+        "for",
+        "from",
+        "at"
+      ],
+      "answerIndex": 0,
+      "explanation": "现在完成时与时间点连用用 since，与时间段连用用 for（如 for three years）。"
+    },
+    {
+      "id": "english-012",
+      "subject": "english",
+      "difficulty": 3,
+      "question": "下列哪个单词表示「机会」？",
+      "options": [
+        "opportunity",
+        "community",
+        "university",
+        "authority"
+      ],
+      "answerIndex": 0,
+      "explanation": "opportunity 是「机会」，community 是「社区」。"
+    },
+    {
+      "id": "english-013",
+      "subject": "english",
+      "difficulty": 3,
+      "question": "“The book ___ I bought yesterday is interesting.” 应填入？",
+      "options": [
+        "which",
+        "who",
+        "whose",
+        "whom"
+      ],
+      "answerIndex": 0,
+      "explanation": "先行词 book 指物，定语从句引导词用 which；who 指人。"
+    },
+    {
+      "id": "english-014",
+      "subject": "english",
+      "difficulty": 3,
+      "question": "下列哪个短语表示「取得进步」？",
+      "options": [
+        "make progress",
+        "take care",
+        "break down",
+        "come across"
+      ],
+      "answerIndex": 0,
+      "explanation": "make progress 是「取得进步」，take care 是「当心」。"
+    },
+    {
+      "id": "english-015",
+      "subject": "english",
+      "difficulty": 3,
+      "question": "下列哪组反义词配对正确？",
+      "options": [
+        "happy ↔ sad",
+        "happy ↔ angry",
+        "happy ↔ tired",
+        "happy ↔ hungry"
+      ],
+      "answerIndex": 0,
+      "explanation": "happy（开心的）反义词是 sad（难过的）。"
+    },
+    {
+      "id": "science-001",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "标准大气压下，水的沸点是多少摄氏度？",
+      "options": [
+        "100",
+        "0",
+        "50",
+        "200"
+      ],
+      "answerIndex": 0,
+      "explanation": "标准大气压下纯水沸腾的温度是 100℃，结冰是 0℃。"
+    },
+    {
+      "id": "science-002",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "植物进行光合作用，主要需要下列哪一组条件？",
+      "options": [
+        "阳光、水和二氧化碳",
+        "氧气、水和泥土",
+        "月光、空气和肥料",
+        "灯光、土壤和氧气"
+      ],
+      "answerIndex": 0,
+      "explanation": "光合作用需要光、水和二氧化碳，产出有机物并释放氧气。"
+    },
+    {
+      "id": "science-003",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "人体最大的器官是？",
+      "options": [
+        "皮肤",
+        "心脏",
+        "肝脏",
+        "大脑"
+      ],
+      "answerIndex": 0,
+      "explanation": "皮肤覆盖全身，是人体面积最大、质量最大的器官。"
+    },
+    {
+      "id": "science-004",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "地球绕太阳公转一周大约需要多长时间？",
+      "options": [
+        "一年",
+        "一个月",
+        "一天",
+        "一小时"
+      ],
+      "answerIndex": 0,
+      "explanation": "地球公转一周约 365 天，即一年；自转一周是一天。"
+    },
+    {
+      "id": "science-005",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "下列哪一种是可再生能源？",
+      "options": [
+        "太阳能",
+        "煤炭",
+        "石油",
+        "天然气"
+      ],
+      "answerIndex": 0,
+      "explanation": "太阳能取之不尽、可以再生；煤、石油、天然气是不可再生的化石能源。"
+    },
+    {
+      "id": "science-006",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "声音在下列哪种介质中传播最快？",
+      "options": [
+        "固体",
+        "液体",
+        "气体",
+        "真空"
+      ],
+      "answerIndex": 0,
+      "explanation": "声速固体 > 液体 > 气体；真空中没有介质，声音无法传播。"
+    },
+    {
+      "id": "science-007",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "化学元素符号 O 代表哪种元素？",
+      "options": [
+        "氧",
+        "氢",
+        "氮",
+        "碳"
+      ],
+      "answerIndex": 0,
+      "explanation": "O 是氧元素，H 是氢、N 是氮、C 是碳。"
+    },
+    {
+      "id": "science-008",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "一个质量为 2 千克的物体带到月球上，它的质量是多少？",
+      "options": [
+        "2千克",
+        "约0.33千克",
+        "约12千克",
+        "无法确定"
+      ],
+      "answerIndex": 0,
+      "explanation": "质量是物质本身的属性，不随位置改变；月球上改变的是重力（约变为 1/6）。"
+    },
+    {
+      "id": "science-009",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "下列哪种材料是良好的电导体？",
+      "options": [
+        "铜",
+        "橡胶",
+        "塑料",
+        "玻璃"
+      ],
+      "answerIndex": 0,
+      "explanation": "金属（如铜、铝）是导体；橡胶、塑料、玻璃是绝缘体。"
+    },
+    {
+      "id": "science-010",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "人体大约由多少个细胞组成？",
+      "options": [
+        "约40万亿个",
+        "约400个",
+        "约4000个",
+        "约40万个"
+      ],
+      "answerIndex": 0,
+      "explanation": "成人体内的细胞总数约为 40 万亿个（4×10¹³）。"
+    },
+    {
+      "id": "science-011",
+      "subject": "science",
+      "difficulty": 3,
+      "question": "根据牛顿第一定律（惯性定律），物体不受外力时会怎样？",
+      "options": [
+        "保持静止或匀速直线运动",
+        "立即停下来",
+        "越来越快",
+        "沿曲线运动"
+      ],
+      "answerIndex": 0,
+      "explanation": "惯性定律：物体不受外力时保持原有的静止或匀速直线运动状态。"
+    },
+    {
+      "id": "science-012",
+      "subject": "science",
+      "difficulty": 3,
+      "question": "下列哪种物质的水溶液呈酸性？",
+      "options": [
+        "醋酸",
+        "氢氧化钠",
+        "食盐",
+        "石灰水"
+      ],
+      "answerIndex": 0,
+      "explanation": "醋酸是酸，其溶液呈酸性；氢氧化钠和石灰水是碱，食盐溶液呈中性。"
+    },
+    {
+      "id": "science-013",
+      "subject": "science",
+      "difficulty": 3,
+      "question": "光发生折射的条件是？",
+      "options": [
+        "从一种透明介质斜射入另一种透明介质",
+        "在真空中传播",
+        "被不透明物体挡住",
+        "沿直线传播"
+      ],
+      "answerIndex": 0,
+      "explanation": "光从一种透明介质斜射入另一种介质时，传播方向发生偏折，即折射。"
+    },
+    {
+      "id": "science-014",
+      "subject": "science",
+      "difficulty": 3,
+      "question": "在生态系统中，生产者主要是指？",
+      "options": [
+        "绿色植物",
+        "草食动物",
+        "肉食动物",
+        "腐生细菌"
+      ],
+      "answerIndex": 0,
+      "explanation": "生产者通过光合作用把无机物合成有机物，主要是绿色植物。"
+    },
+    {
+      "id": "science-015",
+      "subject": "science",
+      "difficulty": 3,
+      "question": "下列哪个公式表示物体的动能？",
+      "options": [
+        "Ek = 1/2mv²",
+        "E = mc²",
+        "F = ma",
+        "W = Fs"
+      ],
+      "answerIndex": 0,
+      "explanation": "动能 Ek = ½mv²，与质量成正比、与速度的平方成正比。"
     }
   ]
 }
