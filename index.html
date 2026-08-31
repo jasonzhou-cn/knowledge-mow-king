@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#0d1b2a" />
+    <title>知识割草王</title>
+    <style>
+      /* 零外部素材约束：不引入任何字体文件，使用系统字体栈并带中文 fallback */
+      :root {
+        --font-stack: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+          'Source Han Sans CN', 'Noto Sans CJK SC', 'WenQuanYi Micro Hei',
+          system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #0d1b2a;
+        font-family: var(--font-stack);
+        -webkit-tap-highlight-color: transparent;
+        -webkit-user-select: none;
+        user-select: none;
+        touch-action: none;
+      }
+      #game-root {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      canvas {
+        display: block;
+      }
+      /* 配置校验失败时的阻断提示层：不允许脏配置进入游戏 */
+      #fatal-error {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 32px;
+        background: #1a0f14;
+        color: #ffd7de;
+        font-family: var(--font-stack);
+        text-align: left;
+      }
+      #fatal-error h1 {
+        font-size: 22px;
+        color: #ff6b81;
+        margin-bottom: 16px;
+      }
+      #fatal-error pre {
+        max-width: 720px;
+        white-space: pre-wrap;
+        line-height: 1.7;
+        font-size: 14px;
+        color: #ffd7de;
+        background: rgba(255, 107, 129, 0.08);
+        border-left: 4px solid #ff6b81;
+        padding: 16px;
+        border-radius: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="game-root"></div>
+    <div id="fatal-error">
+      <h1>配置校验失败，游戏已阻断启动</h1>
+      <pre id="fatal-error-msg"></pre>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

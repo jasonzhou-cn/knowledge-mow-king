@@ -1,0 +1,21 @@
+# 依赖
+node_modules/
+
+# 构建产物
+dist/
+dist-*/
+
+# 验证脚本产生的临时构建目录
+dist-cdp*/
+
+# 验证截图与测量记录
+reports/
+
+# Vite 临时文件
+*.timestamp-*.mjs
+
+# 类型检查临时目录
+.tmp-tsc/
+
+# 工作区私有数据（含 memory 与凭证，切勿提交）
+.workbuddy/

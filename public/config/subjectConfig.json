@@ -1,0 +1,29 @@
+{
+  "version": "1.0.0",
+  "subjects": {
+    "math": {
+      "displayName": "数学",
+      "unlockLevel": 1,
+      "themeColor": "#3d7ea6",
+      "accentColor": "#7fd8ff",
+      "skillName": "数理环",
+      "description": "用算式撕开草丛，答得越准，环越大。"
+    },
+    "english": {
+      "displayName": "英语",
+      "unlockLevel": 5,
+      "themeColor": "#7a5ea8",
+      "accentColor": "#c8a8ff",
+      "skillName": "单词刃",
+      "description": "用词汇斩出弧线，拼写得越快，刃越锋利。"
+    },
+    "science": {
+      "displayName": "科学",
+      "unlockLevel": 10,
+      "themeColor": "#2f8f6f",
+      "accentColor": "#8affd0",
+      "skillName": "反应场",
+      "description": "用实验现象引爆范围伤害，判断越准，场越广。"
+    }
+  }
+}

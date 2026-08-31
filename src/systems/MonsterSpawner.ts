@@ -1,0 +1,448 @@
+/**
+ * 小怪生成器（src/systems/MonsterSpawner.ts）
+ * 职责：按「时间驱动难度曲线」从屏幕四边外围持续刷怪、驱动其追向玩家，
+ *      并在击杀后让小怪沿命中方向飞散，全部精灵走对象池复用。
+ *
+ * 改造说明：原实现是「按波次刷怪、刷完 waveCount 波就结束」，
+ *      现按生存关形态改为「整关持续涌来 + 难度随 t = 已用时间/总时长 连续爬升」，
+ *      刷怪间隔、每批数量、血量倍率、移速倍率四项全部在 [start, end] 之间插值。
+ *
+ * 性能红线（GDD 1.2）：
+ *  - 同屏存活数硬上限 maxAlive，超出即暂停生成，绝不无限创建；
+ *  - 精灵（含尸体）全部预分配进对象池，运行期零 GC 压力；
+ *  - 移动只做「归一化方向 × 速度」，不做任何物理碰撞。
+ */
+
+import Phaser from 'phaser';
+import type { DifficultySettings } from '../config/types';
+import { Palette } from '../ui/Palette';
+import { clamp01, lerp } from '../utils/MathUtil';
+
+/** 单只小怪的运行时数据 */
+export interface Monster {
+  sprite: Phaser.GameObjects.Image;
+  hp: number;
+  maxHp: number;
+  damage: number;
+  speed: number;
+  score: number;
+  radius: number;
+  alive: boolean;
+  /** 击退速度（像素/秒） */
+  knockbackX: number;
+  knockbackY: number;
+  /** 击退剩余时间（秒） */
+  knockbackTime: number;
+  /** 受击闪白剩余时间（秒），0 表示未在闪白 */
+  flashTime: number;
+  /** 尸体飞散剩余时间（秒），> 0 表示已死亡但仍在飞 */
+  corpseTime: number;
+  /** 尸体自转角速度（弧度/秒） */
+  corpseSpin: number;
+}
+
+/** 生成器参数（成长与难度曲线的原始数值全部来自 config，本文件只做插值） */
+export interface MonsterSpawnerOptions {
+  hp: number;
+  damage: number;
+  moveSpeed: number;
+  /** 同屏存活上限（性能红线） */
+  maxAlive: number;
+  radius: number;
+  scorePerKill: number;
+  /** 接触击退速度（像素/秒） */
+  knockback: number;
+  /** 接触击退持续时长（秒） */
+  knockbackDuration: number;
+  /** 生成点距视口边缘的外扩距离（像素） */
+  spawnMargin: number;
+  poolSize: number;
+  viewWidth: number;
+  viewHeight: number;
+  /** 时间驱动难度曲线的起止值 */
+  difficulty: DifficultySettings;
+  /** 击杀后尸体飞散的同屏上限，0 = 关闭尸体飞散 */
+  corpsePoolSize: number;
+  corpseLife: number;
+  corpseSpin: number;
+  corpseDrag: number;
+}
+
+export class MonsterSpawner {
+  private readonly scene: Phaser.Scene;
+  private readonly opts: MonsterSpawnerOptions;
+  private readonly pool: Monster[] = [];
+  private readonly activeList: Monster[] = [];
+  private readonly corpses: Monster[] = [];
+
+  private spawnTimer = 0;
+  private running = false;
+
+  /** 由 setProgress 计算出的当前难度值 */
+  private spawnInterval = 1;
+  private batchSize = 1;
+  private hpMultiplier = 1;
+  private moveSpeedMultiplier = 1;
+
+  constructor(scene: Phaser.Scene, opts: MonsterSpawnerOptions) {
+    this.scene = scene;
+    this.opts = opts;
+    this.spawnInterval = opts.difficulty.spawnIntervalStart;
+    this.batchSize = opts.difficulty.batchSizeStart;
+    this.hpMultiplier = opts.difficulty.hpMultiplierStart;
+    this.moveSpeedMultiplier = opts.difficulty.moveSpeedMultiplierStart;
+    this.preallocate();
+  }
+
+  /** 当前存活的小怪列表（只读引用，勿在外部增删） */
+  get monsters(): readonly Monster[] {
+    return this.activeList;
+  }
+
+  /** 当前存活数量 */
+  get aliveCount(): number {
+    return this.activeList.length;
+  }
+
+  /** 当前正在飞散的尸体数量 */
+  get corpseCount(): number {
+    return this.corpses.length;
+  }
+
+  /** 当前刷怪间隔（秒），HUD 与调试用 */
+  get currentSpawnInterval(): number {
+    return this.spawnInterval;
+  }
+
+  /** 当前每批刷怪数量 */
+  get currentBatchSize(): number {
+    return this.batchSize;
+  }
+
+  /** 当前血量倍率 */
+  get currentHpMultiplier(): number {
+    return this.hpMultiplier;
+  }
+
+  /** 当前移速倍率 */
+  get currentMoveSpeedMultiplier(): number {
+    return this.moveSpeedMultiplier;
+  }
+
+  /** 开始刷怪 */
+  start(): void {
+    this.running = true;
+    this.spawnTimer = 0;
+  }
+
+  /** 停止刷怪（关卡结束时调用） */
+  stop(): void {
+    this.running = false;
+  }
+
+  /**
+   * 按生存进度刷新难度。
+   * @param t 已用时间 / 本关总时长，自动钳制到 [0, 1]
+   */
+  setProgress(t: number): void {
+    const d = this.opts.difficulty;
+    const k = d.interpolation === 'smoothstep' ? smoothstep(clamp01(t)) : clamp01(t);
+    this.spawnInterval = lerp(d.spawnIntervalStart, d.spawnIntervalEnd, k);
+    this.batchSize = lerp(d.batchSizeStart, d.batchSizeEnd, k);
+    this.hpMultiplier = lerp(d.hpMultiplierStart, d.hpMultiplierEnd, k);
+    this.moveSpeedMultiplier = lerp(d.moveSpeedMultiplierStart, d.moveSpeedMultiplierEnd, k);
+  }
+
+  /**
+   * 推进生成与小怪移动。
+   * @param dt 帧间隔（秒）
+   * @param playerX 玩家 X
+   * @param playerY 玩家 Y
+   */
+  update(dt: number, playerX: number, playerY: number): void {
+    if (this.running) this.updateSpawning(dt);
+    this.updateMonsters(dt, playerX, playerY);
+    this.updateCorpses(dt);
+  }
+
+  /**
+   * 对小怪造成伤害。
+   * @returns 若本次伤害导致死亡则返回 true
+   */
+  applyDamage(monster: Monster, amount: number): boolean {
+    if (!monster.alive) return false;
+    monster.hp -= amount;
+    if (monster.hp <= 0) {
+      this.kill(monster);
+      return true;
+    }
+    // 血量越低颜色越暗，给玩家「快死了」的即时反馈（无需额外血条对象）
+    if (monster.flashTime <= 0) this.refreshTint(monster);
+    return false;
+  }
+
+  /**
+   * 沿单位方向击退小怪，避免贴脸糊成一团。
+   * @param strength 击退速度（像素/秒）；缺省用配置的接触击退值
+   */
+  knockback(monster: Monster, dirX: number, dirY: number, strength?: number): void {
+    monster.knockbackX = dirX * (strength ?? this.opts.knockback);
+    monster.knockbackY = dirY * (strength ?? this.opts.knockback);
+    monster.knockbackTime = this.opts.knockbackDuration;
+  }
+
+  /** 受击闪白：短暂整块填白，是「我打中了」最廉价也最直接的反馈 */
+  flash(monster: Monster, duration: number): void {
+    monster.flashTime = duration;
+    monster.sprite.setTintFill(Palette.combat.monsterHurt);
+  }
+
+  /** 回收全部小怪与尸体（关卡切换时调用） */
+  reset(): void {
+    for (const m of this.activeList) this.release(m);
+    this.activeList.length = 0;
+    for (const c of this.corpses) this.release(c);
+    this.corpses.length = 0;
+    this.running = false;
+    this.spawnTimer = 0;
+  }
+
+  /** 销毁对象池 */
+  destroy(): void {
+    this.reset();
+    for (const m of this.pool) m.sprite.destroy();
+    this.pool.length = 0;
+  }
+
+  // ───────────────────────── 内部实现 ─────────────────────────
+
+  /** 预分配对象池，运行期不再 new 任何精灵 */
+  private preallocate(): void {
+    for (let i = 0; i < this.opts.poolSize; i++) {
+      const sprite = this.scene.add.image(0, 0, 'monster');
+      sprite.setActive(false).setVisible(false).setDepth(100);
+      const size = this.opts.radius * 2;
+      sprite.setDisplaySize(size, size);
+      this.pool.push({
+        sprite,
+        hp: 0,
+        maxHp: 1,
+        damage: 0,
+        speed: 0,
+        score: 0,
+        radius: this.opts.radius,
+        alive: false,
+        knockbackX: 0,
+        knockbackY: 0,
+        knockbackTime: 0,
+        flashTime: 0,
+        corpseTime: 0,
+        corpseSpin: 0,
+      });
+    }
+  }
+
+  /** 按当前刷怪间隔成批生成，直到达到同屏上限 */
+  private updateSpawning(dt: number): void {
+    this.spawnTimer += dt;
+
+    // 上限保护：单帧最多补 8 批，避免长卡顿后一次性涌入造成掉帧
+    let guard = 0;
+    while (this.spawnTimer >= this.spawnInterval && guard < 8) {
+      this.spawnTimer -= this.spawnInterval;
+      guard++;
+
+      const count = Math.max(1, Math.round(this.batchSize));
+      for (let i = 0; i < count; i++) {
+        // 同屏上限是硬红线：满了就等下一批，绝不超量生成
+        if (this.activeList.length >= this.opts.maxAlive) return;
+        this.spawnOne();
+      }
+    }
+  }
+
+  /** 从池里取一只，放到屏幕四边外围并初始化属性 */
+  private spawnOne(): void {
+    const monster = this.pool.find((m) => !m.alive && m.corpseTime <= 0);
+    if (!monster) return;
+
+    const { viewWidth, viewHeight, spawnMargin, radius } = this.opts;
+    const edge = Phaser.Math.Between(0, 3);
+    let x = 0;
+    let y = 0;
+    if (edge === 0) {
+      // 上边：从视野上方走进来
+      x = Phaser.Math.Between(-spawnMargin, viewWidth + spawnMargin);
+      y = -spawnMargin - radius;
+    } else if (edge === 1) {
+      // 右边
+      x = viewWidth + spawnMargin + radius;
+      y = Phaser.Math.Between(-spawnMargin, viewHeight + spawnMargin);
+    } else if (edge === 2) {
+      // 下边
+      x = Phaser.Math.Between(-spawnMargin, viewWidth + spawnMargin);
+      y = viewHeight + spawnMargin + radius;
+    } else {
+      // 左边
+      x = -spawnMargin - radius;
+      y = Phaser.Math.Between(-spawnMargin, viewHeight + spawnMargin);
+    }
+
+    monster.sprite.setPosition(x, y);
+    monster.sprite.setActive(true).setVisible(true);
+    monster.sprite.setRotation(0);
+    monster.sprite.setAlpha(1);
+    monster.sprite.setDisplaySize(radius * 2, radius * 2);
+    this.refreshTint(monster);
+
+    // 难度曲线的即时产物：新生成的小怪直接吃到当前的血量与移速倍率
+    monster.hp = this.opts.hp * this.hpMultiplier;
+    monster.maxHp = monster.hp;
+    monster.damage = this.opts.damage;
+    monster.speed = this.opts.moveSpeed * this.moveSpeedMultiplier;
+    monster.score = this.opts.scorePerKill;
+    monster.alive = true;
+    monster.knockbackTime = 0;
+    monster.knockbackX = 0;
+    monster.knockbackY = 0;
+    monster.flashTime = 0;
+    monster.corpseTime = 0;
+    monster.corpseSpin = 0;
+
+    this.activeList.push(monster);
+  }
+
+  /** 驱动所有小怪追向玩家 */
+  private updateMonsters(dt: number, playerX: number, playerY: number): void {
+    for (let i = this.activeList.length - 1; i >= 0; i--) {
+      const m = this.activeList[i];
+
+      if (m.flashTime > 0) {
+        m.flashTime -= dt;
+        if (m.flashTime <= 0) {
+          m.flashTime = 0;
+          this.refreshTint(m);
+        }
+      }
+
+      if (m.knockbackTime > 0) {
+        m.knockbackTime -= dt;
+        m.sprite.x += m.knockbackX * dt;
+        m.sprite.y += m.knockbackY * dt;
+      } else {
+        const dx = playerX - m.sprite.x;
+        const dy = playerY - m.sprite.y;
+        const len = Math.sqrt(dx * dx + dy * dy);
+        if (len > 0.001) {
+          const step = m.speed * dt;
+          m.sprite.x += (dx / len) * step;
+          m.sprite.y += (dy / len) * step;
+        }
+      }
+    }
+  }
+
+  /** 推进尸体飞散：带阻尼地飞出、自转、缩小淡出 */
+  private updateCorpses(dt: number): void {
+    if (this.corpses.length === 0) return;
+    const drag = Math.exp(-this.opts.corpseDrag * dt);
+
+    for (let i = this.corpses.length - 1; i >= 0; i--) {
+      const c = this.corpses[i];
+      c.corpseTime -= dt;
+      if (c.corpseTime <= 0) {
+        this.corpses.splice(i, 1);
+        this.release(c);
+        continue;
+      }
+
+      c.knockbackX *= drag;
+      c.knockbackY *= drag;
+      c.sprite.x += c.knockbackX * dt;
+      c.sprite.y += c.knockbackY * dt;
+      c.sprite.setRotation(c.sprite.rotation + c.corpseSpin * dt);
+
+      // 用 displaySize 而不是 scale 缩放：小怪精灵是按 radius 拉伸显示的，
+      // 直接用 setScale 会让尸体在死亡瞬间跳回贴图原始尺寸
+      const t = c.corpseTime / this.opts.corpseLife;
+      const size = c.radius * 2 * Math.max(0.1, 0.5 + 0.5 * t);
+      c.sprite.setAlpha(Math.max(0, t));
+      c.sprite.setDisplaySize(size, size);
+    }
+  }
+
+  /** 击杀并回收一只小怪；开启尸体飞散时改为沿当前击退速度飞出去 */
+  private kill(monster: Monster): void {
+    const index = this.activeList.indexOf(monster);
+    if (index >= 0) this.activeList.splice(index, 1);
+    monster.alive = false;
+    monster.hp = 0;
+
+    const canCorpse =
+      this.opts.corpseLife > 0 &&
+      this.opts.corpsePoolSize > 0 &&
+      (monster.knockbackX !== 0 || monster.knockbackY !== 0);
+
+    if (canCorpse) {
+      // 尸体数量受 corpsePoolSize 硬上限约束；满了就先回收最老的一具（FIFO），
+      // 让「刚刚这一刀」一定有飞散反馈，而不是被旧的尸体占着名额
+      while (this.corpses.length >= this.opts.corpsePoolSize) {
+        const oldest = this.corpses.shift();
+        if (oldest) this.release(oldest);
+        else break;
+      }
+
+      monster.corpseTime = this.opts.corpseLife;
+      monster.corpseSpin = this.opts.corpseSpin;
+      monster.flashTime = 0;
+      // 尸体用最亮的颜色，让「被打飞」这一下看得清
+      monster.sprite.setTint(Palette.combat.monsterElite);
+      this.corpses.push(monster);
+      return;
+    }
+
+    this.release(monster);
+  }
+
+  /** 回收到对象池 */
+  private release(monster: Monster): void {
+    monster.alive = false;
+    monster.hp = 0;
+    monster.knockbackTime = 0;
+    monster.knockbackX = 0;
+    monster.knockbackY = 0;
+    monster.flashTime = 0;
+    monster.corpseTime = 0;
+    monster.corpseSpin = 0;
+    monster.sprite.setRotation(0);
+    monster.sprite.setAlpha(1);
+    monster.sprite.setDisplaySize(monster.radius * 2, monster.radius * 2);
+    monster.sprite.setActive(false).setVisible(false);
+  }
+
+  /** 按当前血量比例刷新颜色：血越少越接近精英色 */
+  private refreshTint(monster: Monster): void {
+    const ratio = Math.max(0.25, monster.maxHp > 0 ? monster.hp / monster.maxHp : 1);
+    monster.sprite.setTint(mixColor(Palette.combat.monster, Palette.combat.monsterElite, 1 - ratio));
+  }
+}
+
+/** 难度曲线的缓入缓出插值：两端平缓、中段爬升快，避免开局就吃满压力 */
+function smoothstep(t: number): number {
+  return t * t * (3 - 2 * t);
+}
+
+/** 在两个颜色之间线性插值，用于小怪受伤变色 */
+function mixColor(from: number, to: number, t: number): number {
+  const k = Math.max(0, Math.min(1, t));
+  const fr = (from >> 16) & 0xff;
+  const fg = (from >> 8) & 0xff;
+  const fb = from & 0xff;
+  const tr = (to >> 16) & 0xff;
+  const tg = (to >> 8) & 0xff;
+  const tb = to & 0xff;
+  const r = Math.round(fr + (tr - fr) * k);
+  const g = Math.round(fg + (tg - fg) * k);
+  const b = Math.round(fb + (tb - fb) * k);
+  return (r << 16) | (g << 8) | b;
+}

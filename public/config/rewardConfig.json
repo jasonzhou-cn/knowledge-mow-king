@@ -1,0 +1,39 @@
+{
+  "version": "1.0.0",
+  "comboRewards": [
+    {
+      "combo": 3,
+      "rewardTime": 5,
+      "rewardSkillDuration": 1
+    },
+    {
+      "combo": 5,
+      "rewardTime": 10,
+      "rewardSkillDuration": 2
+    },
+    {
+      "combo": 10,
+      "rewardTime": 20,
+      "rewardSkillDuration": 3
+    }
+  ],
+  "otherRewards": {
+    "perfectAnswerReward": 10,
+    "fastAnswerReward": 5,
+    "fastAnswerTimeThreshold": 4,
+    "noDamageReward": 15
+  },
+  "scoreSettings": {
+    "scorePerKill": 10,
+    "scorePerCorrectAnswer": 50,
+    "scoreComboBonusPerCombo": 5,
+    "expPerKill": 2,
+    "expPerCorrectAnswer": 5,
+    "expLevelClearBonus": 20
+  },
+  "rewardLimits": {
+    "dailyRewardTimeMax": 300,
+    "singleRewardTimeMax": 60,
+    "comboRewardTimeMax": 120
+  }
+}

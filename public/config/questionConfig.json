@@ -1,0 +1,73 @@
+{
+  "version": "1.0.0",
+  "speedSettings": {
+    "curveType": "hybrid",
+    "baseSpeed": 800,
+    "minSpeedLimit": 200,
+    "maxSpeedLimit": 1200,
+    "speedReductionPerLevel": 50,
+    "speedReductionGrowth": 0.9
+  },
+  "questionSettings": {
+    "questionCountPerRound": 5,
+    "questionTimeLimit": 10,
+    "timeLimitGrowth": 1.1,
+    "maxTimeLimit": 20,
+    "minTimeLimit": 5,
+    "correctBonusTime": 2,
+    "consecutiveCorrectThreshold": 3
+  },
+  "answerSettings": {
+    "movementType": "circular",
+    "movementEasing": "linear",
+    "stopThreshold": 0.5,
+    "overlapThreshold": 0.3,
+    "bounceVelocity": 0.8,
+    "dragDamping": 0.7,
+    "optionCardWidth": 200,
+    "optionCardHeight": 76,
+    "trackCenterX": 480,
+    "trackCenterY": 435,
+    "trackRadiusX": 230,
+    "trackRadiusY": 125,
+    "linearTrackSpan": 900,
+    "selectionZoneWidth": 260,
+    "selectionZoneHeight": 100,
+    "stopSettleDuration": 0.25,
+    "feedbackHoldDuration": 0.7,
+    "explanationHoldDuration": 1.9
+  },
+  "subjectDifficulty": {
+    "math": {
+      "difficultyCoefficient": 1.0,
+      "speedCoefficient": 1.0
+    },
+    "english": {
+      "difficultyCoefficient": 1.1,
+      "speedCoefficient": 1.05
+    },
+    "science": {
+      "difficultyCoefficient": 1.2,
+      "speedCoefficient": 1.1
+    }
+  },
+  "difficultySelection": {
+    "lowLevelMax": 3,
+    "midLevelMax": 6,
+    "weightsLow": {
+      "1": 0.8,
+      "2": 0.2,
+      "3": 0
+    },
+    "weightsMid": {
+      "1": 0.2,
+      "2": 0.6,
+      "3": 0.2
+    },
+    "weightsHigh": {
+      "1": 0,
+      "2": 0.4,
+      "3": 0.6
+    }
+  }
+}

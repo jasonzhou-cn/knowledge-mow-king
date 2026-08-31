@@ -1,0 +1,22 @@
+{
+  "name": "knowledge-mow-king",
+  "private": true,
+  "version": "0.1.0",
+  "description": "《知识割草王》—— 面向 9-18 岁的答题 + 割草闭环游戏（Phaser3 + TypeScript + Vite）",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "validate-config": "node scripts/validate-config.mjs",
+    "smoke": "node scripts/run-smoke.mjs"
+  },
+  "dependencies": {
+    "phaser": "^3.80.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4",
+    "vite": "^5.4.8"
+  }
+}

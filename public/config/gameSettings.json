@@ -1,0 +1,48 @@
+{
+  "version": "1.0.0",
+  "levelSettings": {
+    "maxLevel": 50,
+    "levelUpGradeBase": 100,
+    "levelUpGradeGrowth": 1.2,
+    "levelUpGradeGrowthType": "exponential"
+  },
+  "rewardSettings": {
+    "dailyRewardLimit": 300,
+    "singleRewardLimit": 60,
+    "consecutiveRewardBase": 5,
+    "consecutiveRewardGrowth": 1.5
+  },
+  "otherSettings": {
+    "defaultGameTime": 60,
+    "maxGameTimeLimit": 300,
+    "minGameTimeLimit": 30,
+    "subjectUnlockLevel": {
+      "math": 1,
+      "english": 5,
+      "science": 10
+    }
+  },
+  "grassCuttingBonusSettings": {
+    "baseBonusGrowthPerLevel": 0.1,
+    "accuracyBaseline": 0.5,
+    "accuracyWeight": 1,
+    "accuracyTermMin": 0.4,
+    "accuracyTermMax": 1.6,
+    "speedFactorBase": 1,
+    "speedFactorWeight": 0.5,
+    "speedFactorMin": 0.8,
+    "speedFactorMax": 1.5,
+    "comboFactorPerCombo": 0.05,
+    "comboFactorMax": 1.5,
+    "multiplierFloor": {
+      "damage": 0.6,
+      "range": 0.6,
+      "duration": 0.6
+    },
+    "multiplierCeiling": {
+      "damage": 3,
+      "range": 3,
+      "duration": 3
+    }
+  }
+}

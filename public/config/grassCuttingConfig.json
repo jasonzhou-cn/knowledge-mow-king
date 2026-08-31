@@ -1,0 +1,94 @@
+{
+  "version": "1.1.0",
+  "touchSettings": {
+    "joystickCenterX": 110,
+    "joystickCenterY": 530,
+    "joystickBaseRadius": 70,
+    "joystickKnobRadius": 30,
+    "joystickDeadZone": 12,
+    "joystickIdleAlpha": 0.35,
+    "joystickActiveAlpha": 0.75
+  },
+  "playerSettings": {
+    "playerHpBase": 100,
+    "playerMoveSpeed": 260,
+    "playerRadius": 16,
+    "invulnerableDuration": 0.6,
+    "playerContactDamageCooldown": 0.5
+  },
+  "playerSkillSettings": {
+    "skillType": "ring",
+    "skillScaleCoefficient": 1,
+    "skillDamageBase": 10,
+    "skillDamageGrowthPerLevel": 0.2,
+    "skillCooldownBase": 3,
+    "skillCooldownGrowthPerLevel": 0.9,
+    "skillDurationBase": 5,
+    "skillDurationGrowthPerLevel": 0.1,
+    "skillRangeBase": 90,
+    "skillRangeGrowthPerLevel": 0.1,
+    "skillSectorAngle": 120,
+    "skillTickInterval": 0.5
+  },
+  "monsterSettings": {
+    "monsterCountPerWave": 10,
+    "monsterCountGrowth": 1.2,
+    "monsterHpBase": 10,
+    "monsterHpGrowthPerLevel": 1.25,
+    "monsterDamageBase": 0.7,
+    "monsterDamageGrowthPerLevel": 0.1,
+    "monsterMoveSpeedBase": 100,
+    "monsterMoveSpeedGrowthPerLevel": 0.05,
+    "monsterSpawnDelayBase": 2,
+    "monsterSpawnDelayGrowth": 0.9,
+    "monsterSpawnIntervalWithinWave": 0.15,
+    "monsterRadius": 14,
+    "monsterMaxAlive": 45,
+    "monsterSpawnMargin": 40,
+    "monsterScoreBase": 10,
+    "monsterKnockback": 340,
+    "monsterKnockbackDuration": 0.12
+  },
+  "comboSettings": {
+    "comboTimeWindow": 2,
+    "comboDamageGrowth": 0.1,
+    "comboSkillDurationGrowth": 0.2,
+    "comboMaxDamageMultiplier": 3
+  },
+  "difficultySettings": {
+    "interpolation": "linear",
+    "spawnIntervalStart": 1.05,
+    "spawnIntervalEnd": 0.4,
+    "batchSizeStart": 2,
+    "batchSizeEnd": 3.6,
+    "hpMultiplierStart": 0.32,
+    "hpMultiplierEnd": 4.6,
+    "moveSpeedMultiplierStart": 1.4,
+    "moveSpeedMultiplierEnd": 1.45
+  },
+  "performanceSettings": {
+    "maxAliveMonsters": 45,
+    "damageCheckFrameInterval": 2,
+    "maxHitTextAlive": 12,
+    "maxActiveSkillZones": 4,
+    "monsterPoolSize": 96,
+    "projectilePoolSize": 120,
+    "shardPoolSize": 60,
+    "ringPoolSize": 18,
+    "corpsePoolSize": 12
+  },
+  "subjectCoefficientSettings": {
+    "math": {
+      "skillDamageCoefficient": 1,
+      "skillRangeCoefficient": 1
+    },
+    "english": {
+      "skillDamageCoefficient": 1.1,
+      "skillRangeCoefficient": 1.05
+    },
+    "science": {
+      "skillDamageCoefficient": 1.2,
+      "skillRangeCoefficient": 1.1
+    }
+  }
+}

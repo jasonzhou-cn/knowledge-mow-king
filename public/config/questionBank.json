@@ -1,0 +1,546 @@
+{
+  "version": "1.0.0",
+  "description": "数学题库：difficulty 1=小学算术，2=初中代数几何，3=高中基础。answerIndex 为 options 数组中正确项的索引，运行时会随机打乱选项位置以保证答题公平。",
+  "questions": [
+    {
+      "id": "math-001",
+      "subject": "math",
+      "difficulty": 1,
+      "question": "计算：25 + 37 = ?",
+      "options": ["62", "52", "58", "61"],
+      "answerIndex": 0,
+      "explanation": "25 + 37 = 62。个位 5+7=12 进 1，十位 2+3+1=6。"
+    },
+    {
+      "id": "math-002",
+      "subject": "math",
+      "difficulty": 1,
+      "question": "计算：8 × 7 = ?",
+      "options": ["56", "54", "63", "48"],
+      "answerIndex": 0,
+      "explanation": "七八五十六，8 × 7 = 56。"
+    },
+    {
+      "id": "math-003",
+      "subject": "math",
+      "difficulty": 1,
+      "question": "计算：100 − 38 = ?",
+      "options": ["62", "72", "58", "68"],
+      "answerIndex": 0,
+      "explanation": "100 − 38 = 62。可以想成 100 − 40 + 2 = 62。"
+    },
+    {
+      "id": "math-004",
+      "subject": "math",
+      "difficulty": 1,
+      "question": "计算：144 ÷ 12 = ?",
+      "options": ["12", "11", "14", "16"],
+      "answerIndex": 0,
+      "explanation": "12 × 12 = 144，所以 144 ÷ 12 = 12。"
+    },
+    {
+      "id": "math-005",
+      "subject": "math",
+      "difficulty": 1,
+      "question": "一个长方形长 9 厘米，宽 4 厘米，面积是多少平方厘米？",
+      "options": ["36", "26", "13", "40"],
+      "answerIndex": 0,
+      "explanation": "长方形面积 = 长 × 宽 = 9 × 4 = 36（平方厘米）。"
+    },
+    {
+      "id": "math-006",
+      "subject": "math",
+      "difficulty": 1,
+      "question": "计算：3/4 + 1/4 = ?",
+      "options": ["1", "1/2", "3/4", "2"],
+      "answerIndex": 0,
+      "explanation": "同分母相加，3/4 + 1/4 = 4/4 = 1。"
+    },
+    {
+      "id": "math-007",
+      "subject": "math",
+      "difficulty": 1,
+      "question": "小明有 5 盒铅笔，每盒 12 支，一共有多少支？",
+      "options": ["60", "50", "65", "72"],
+      "answerIndex": 0,
+      "explanation": "5 × 12 = 60（支）。"
+    },
+    {
+      "id": "math-008",
+      "subject": "math",
+      "difficulty": 1,
+      "question": "计算：0.5 + 0.25 = ?",
+      "options": ["0.75", "0.3", "0.7", "0.8"],
+      "answerIndex": 0,
+      "explanation": "0.5 + 0.25 = 0.75。"
+    },
+    {
+      "id": "math-009",
+      "subject": "math",
+      "difficulty": 1,
+      "question": "一个数除以 9，余数最大是几？",
+      "options": ["8", "9", "7", "6"],
+      "answerIndex": 0,
+      "explanation": "余数必须小于除数，除数是 9，所以余数最大是 8。"
+    },
+    {
+      "id": "math-010",
+      "subject": "math",
+      "difficulty": 1,
+      "question": "计算：15 × 4 + 20 = ?",
+      "options": ["80", "70", "90", "100"],
+      "answerIndex": 0,
+      "explanation": "先乘后加：15 × 4 = 60，60 + 20 = 80。"
+    },
+    {
+      "id": "math-011",
+      "subject": "math",
+      "difficulty": 1,
+      "question": "正方形边长 6 厘米，周长是多少厘米？",
+      "options": ["24", "36", "12", "18"],
+      "answerIndex": 0,
+      "explanation": "正方形周长 = 边长 × 4 = 6 × 4 = 24（厘米）。"
+    },
+    {
+      "id": "math-012",
+      "subject": "math",
+      "difficulty": 1,
+      "question": "计算：1 − 3/8 = ?",
+      "options": ["5/8", "3/8", "1/8", "1/2"],
+      "answerIndex": 0,
+      "explanation": "1 = 8/8，8/8 − 3/8 = 5/8。"
+    },
+    {
+      "id": "math-013",
+      "subject": "math",
+      "difficulty": 1,
+      "question": "把 0.6 化成最简分数是？",
+      "options": ["3/5", "6/10", "2/3", "3/10"],
+      "answerIndex": 0,
+      "explanation": "0.6 = 6/10 = 3/5（分子分母同除以 2）。"
+    },
+    {
+      "id": "math-014",
+      "subject": "math",
+      "difficulty": 1,
+      "question": "计算：99 × 5 = ?",
+      "options": ["495", "505", "485", "450"],
+      "answerIndex": 0,
+      "explanation": "99 × 5 = (100 − 1) × 5 = 500 − 5 = 495。"
+    },
+    {
+      "id": "math-015",
+      "subject": "math",
+      "difficulty": 1,
+      "question": "计算：7.2 ÷ 0.8 = ?",
+      "options": ["9", "0.9", "8", "90"],
+      "answerIndex": 0,
+      "explanation": "被除数除数同乘 10：72 ÷ 8 = 9。"
+    },
+    {
+      "id": "math-016",
+      "subject": "math",
+      "difficulty": 1,
+      "question": "三角形两个角分别是 50° 和 60°，第三个角是？",
+      "options": ["70°", "60°", "80°", "90°"],
+      "answerIndex": 0,
+      "explanation": "三角形内角和 180°，180 − 50 − 60 = 70°。"
+    },
+    {
+      "id": "math-017",
+      "subject": "math",
+      "difficulty": 1,
+      "question": "计算：(12 + 8) × 3 = ?",
+      "options": ["60", "48", "36", "20"],
+      "answerIndex": 0,
+      "explanation": "先算括号：12 + 8 = 20，20 × 3 = 60。"
+    },
+    {
+      "id": "math-018",
+      "subject": "math",
+      "difficulty": 1,
+      "question": "1 小时 45 分钟等于多少分钟？",
+      "options": ["105", "145", "75", "115"],
+      "answerIndex": 0,
+      "explanation": "1 小时 = 60 分钟，60 + 45 = 105（分钟）。"
+    },
+    {
+      "id": "math-019",
+      "subject": "math",
+      "difficulty": 1,
+      "question": "计算：2/5 × 15 = ?",
+      "options": ["6", "5", "10", "3"],
+      "answerIndex": 0,
+      "explanation": "2/5 × 15 = 30/5 = 6。"
+    },
+    {
+      "id": "math-020",
+      "subject": "math",
+      "difficulty": 1,
+      "question": "甲数是 24，乙数比甲数多 1/3，乙数是多少？",
+      "options": ["32", "28", "36", "30"],
+      "answerIndex": 0,
+      "explanation": "24 × (1 + 1/3) = 24 + 8 = 32。"
+    },
+    {
+      "id": "math-021",
+      "subject": "math",
+      "difficulty": 2,
+      "question": "解方程：2x + 6 = 14，x = ?",
+      "options": ["4", "10", "8", "2"],
+      "answerIndex": 0,
+      "explanation": "2x = 14 − 6 = 8，x = 4。"
+    },
+    {
+      "id": "math-022",
+      "subject": "math",
+      "difficulty": 2,
+      "question": "计算：(−3)² = ?",
+      "options": ["9", "−9", "6", "−6"],
+      "answerIndex": 0,
+      "explanation": "(−3)² = (−3) × (−3) = 9，负负得正。"
+    },
+    {
+      "id": "math-023",
+      "subject": "math",
+      "difficulty": 2,
+      "question": "化简：3a + 5a − 2a = ?",
+      "options": ["6a", "10a", "8a", "4a"],
+      "answerIndex": 0,
+      "explanation": "合并同类项：(3 + 5 − 2)a = 6a。"
+    },
+    {
+      "id": "math-024",
+      "subject": "math",
+      "difficulty": 2,
+      "question": "直角三角形两条直角边为 3 和 4，斜边长是？",
+      "options": ["5", "6", "7", "√7"],
+      "answerIndex": 0,
+      "explanation": "勾股定理：√(3² + 4²) = √25 = 5。"
+    },
+    {
+      "id": "math-025",
+      "subject": "math",
+      "difficulty": 2,
+      "question": "计算：x² · x³ = ?",
+      "options": ["x⁵", "x⁶", "x⁸", "x⁹"],
+      "answerIndex": 0,
+      "explanation": "同底数幂相乘，指数相加：x^(2+3) = x⁵。"
+    },
+    {
+      "id": "math-026",
+      "subject": "math",
+      "difficulty": 2,
+      "question": "(2x − 1)(x + 3) 展开后，x 的一次项系数是？",
+      "options": ["5", "6", "−1", "1"],
+      "answerIndex": 0,
+      "explanation": "展开得 2x² + 6x − x − 3 = 2x² + 5x − 3，一次项系数为 5。"
+    },
+    {
+      "id": "math-027",
+      "subject": "math",
+      "difficulty": 2,
+      "question": "解方程 x² = 16，x 的正值解是？",
+      "options": ["4", "8", "16", "2"],
+      "answerIndex": 0,
+      "explanation": "x = ±4，正值解为 4。"
+    },
+    {
+      "id": "math-028",
+      "subject": "math",
+      "difficulty": 2,
+      "question": "半径为 5 的圆，面积是多少？",
+      "options": ["25π", "10π", "5π", "50π"],
+      "answerIndex": 0,
+      "explanation": "圆面积 = πr² = π × 5² = 25π。"
+    },
+    {
+      "id": "math-029",
+      "subject": "math",
+      "difficulty": 2,
+      "question": "计算：√49 + √25 = ?",
+      "options": ["12", "74", "2", "14"],
+      "answerIndex": 0,
+      "explanation": "√49 = 7，√25 = 5，7 + 5 = 12。"
+    },
+    {
+      "id": "math-030",
+      "subject": "math",
+      "difficulty": 2,
+      "question": "一次函数 y = 2x + 1，当 x = 3 时 y = ?",
+      "options": ["7", "6", "5", "9"],
+      "answerIndex": 0,
+      "explanation": "y = 2 × 3 + 1 = 7。"
+    },
+    {
+      "id": "math-031",
+      "subject": "math",
+      "difficulty": 2,
+      "question": "分解因式：x² − 9 = ?",
+      "options": ["(x+3)(x−3)", "(x−3)²", "(x+9)(x−1)", "(x+3)²"],
+      "answerIndex": 0,
+      "explanation": "平方差公式：x² − 3² = (x + 3)(x − 3)。"
+    },
+    {
+      "id": "math-032",
+      "subject": "math",
+      "difficulty": 2,
+      "question": "计算：2⁻² = ?",
+      "options": ["1/4", "−4", "4", "−1/4"],
+      "answerIndex": 0,
+      "explanation": "负指数取倒数：2⁻² = 1 / 2² = 1/4。"
+    },
+    {
+      "id": "math-033",
+      "subject": "math",
+      "difficulty": 2,
+      "question": "某数的 3 倍减去 5 等于 16，这个数是？",
+      "options": ["7", "5", "9", "21"],
+      "answerIndex": 0,
+      "explanation": "3x − 5 = 16 → 3x = 21 → x = 7。"
+    },
+    {
+      "id": "math-034",
+      "subject": "math",
+      "difficulty": 2,
+      "question": "(a + b)² 展开后共有几项？",
+      "options": ["3", "2", "4", "5"],
+      "answerIndex": 0,
+      "explanation": "(a + b)² = a² + 2ab + b²，共 3 项。"
+    },
+    {
+      "id": "math-035",
+      "subject": "math",
+      "difficulty": 2,
+      "question": "数据 2, 4, 6, 8, 10 的平均数是？",
+      "options": ["6", "5", "7", "8"],
+      "answerIndex": 0,
+      "explanation": "(2+4+6+8+10) / 5 = 30 / 5 = 6。"
+    },
+    {
+      "id": "math-036",
+      "subject": "math",
+      "difficulty": 2,
+      "question": "sin 30° 的值是？",
+      "options": ["1/2", "√3/2", "√2/2", "1"],
+      "answerIndex": 0,
+      "explanation": "特殊角三角函数：sin 30° = 1/2。"
+    },
+    {
+      "id": "math-037",
+      "subject": "math",
+      "difficulty": 2,
+      "question": "已知 x + y = 10，x − y = 4，则 x = ?",
+      "options": ["7", "6", "3", "14"],
+      "answerIndex": 0,
+      "explanation": "两式相加：2x = 14，x = 7。"
+    },
+    {
+      "id": "math-038",
+      "subject": "math",
+      "difficulty": 2,
+      "question": "计算：|−5| + |3| = ?",
+      "options": ["8", "2", "−2", "15"],
+      "answerIndex": 0,
+      "explanation": "|−5| = 5，|3| = 3，5 + 3 = 8。"
+    },
+    {
+      "id": "math-039",
+      "subject": "math",
+      "difficulty": 2,
+      "question": "梯形上底 4，下底 8，高 5，面积是？",
+      "options": ["30", "20", "60", "40"],
+      "answerIndex": 0,
+      "explanation": "梯形面积 = (上底 + 下底) × 高 ÷ 2 = (4 + 8) × 5 ÷ 2 = 30。"
+    },
+    {
+      "id": "math-040",
+      "subject": "math",
+      "difficulty": 2,
+      "question": "计算：(3x²y) ÷ (xy) = ?",
+      "options": ["3x", "3y", "3xy", "3x²"],
+      "answerIndex": 0,
+      "explanation": "系数 3 ÷ 1 = 3，x² ÷ x = x，y ÷ y = 1，结果为 3x。"
+    },
+    {
+      "id": "math-041",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "计算：log₂ 8 = ?",
+      "options": ["3", "2", "4", "8"],
+      "answerIndex": 0,
+      "explanation": "2³ = 8，所以 log₂ 8 = 3。"
+    },
+    {
+      "id": "math-042",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "函数 f(x) = x² − 4x + 3 的最小值是？",
+      "options": ["−1", "3", "0", "−4"],
+      "answerIndex": 0,
+      "explanation": "配方得 (x − 2)² − 1，当 x = 2 时最小值为 −1。"
+    },
+    {
+      "id": "math-043",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "sin²θ + cos²θ = ?",
+      "options": ["1", "0", "2", "sin2θ"],
+      "answerIndex": 0,
+      "explanation": "同角三角函数基本恒等式：sin²θ + cos²θ = 1。"
+    },
+    {
+      "id": "math-044",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "等差数列 2, 5, 8, 11, ... 的第 10 项是？",
+      "options": ["29", "32", "26", "30"],
+      "answerIndex": 0,
+      "explanation": "公差 d = 3，a₁₀ = 2 + (10 − 1) × 3 = 2 + 27 = 29。"
+    },
+    {
+      "id": "math-045",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "计算：C(5, 2) = ?",
+      "options": ["10", "20", "5", "15"],
+      "answerIndex": 0,
+      "explanation": "C(5,2) = 5! / (2! × 3!) = (5 × 4) / 2 = 10。"
+    },
+    {
+      "id": "math-046",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "解不等式 2x − 3 > 5，结果是 x > ?",
+      "options": ["4", "1", "8", "2"],
+      "answerIndex": 0,
+      "explanation": "2x > 8，两边同除以正数 2，方向不变：x > 4。"
+    },
+    {
+      "id": "math-047",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "极限 lim(x→0) sin x / x = ?",
+      "options": ["1", "0", "∞", "不存在"],
+      "answerIndex": 0,
+      "explanation": "重要极限：lim(x→0) sin x / x = 1。"
+    },
+    {
+      "id": "math-048",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "函数 y = 2ˣ 在 x = 3 时的值是？",
+      "options": ["8", "6", "9", "4"],
+      "answerIndex": 0,
+      "explanation": "2³ = 8。"
+    },
+    {
+      "id": "math-049",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "i² = ?（i 为虚数单位）",
+      "options": ["−1", "1", "i", "−i"],
+      "answerIndex": 0,
+      "explanation": "虚数单位的定义：i² = −1。"
+    },
+    {
+      "id": "math-050",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "抛均匀硬币 3 次，恰好 2 次正面的概率是？",
+      "options": ["3/8", "1/2", "1/8", "3/4"],
+      "answerIndex": 0,
+      "explanation": "共 2³ = 8 种等可能结果，恰 2 次正面有 C(3,2) = 3 种，概率 3/8。"
+    },
+    {
+      "id": "math-051",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "计算：lg 100 + lg 0.1 = ?",
+      "options": ["1", "3", "−1", "0"],
+      "answerIndex": 0,
+      "explanation": "lg 100 = 2，lg 0.1 = −1，2 + (−1) = 1。"
+    },
+    {
+      "id": "math-052",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "等比数列 3, 6, 12, ... 的前 4 项和是？",
+      "options": ["45", "24", "48", "21"],
+      "answerIndex": 0,
+      "explanation": "公比 q = 2，前 4 项为 3, 6, 12, 24，和为 45。"
+    },
+    {
+      "id": "math-053",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "求导数：d/dx (x³) = ?",
+      "options": ["3x²", "x²", "3x", "x⁴/4"],
+      "answerIndex": 0,
+      "explanation": "幂函数求导公式：(xⁿ)′ = n·xⁿ⁻¹，所以 (x³)′ = 3x²。"
+    },
+    {
+      "id": "math-054",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "cos 60° 的值是？",
+      "options": ["1/2", "√3/2", "1", "√2/2"],
+      "answerIndex": 0,
+      "explanation": "特殊角三角函数：cos 60° = 1/2。"
+    },
+    {
+      "id": "math-055",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "方程 x² − 5x + 6 = 0 的两根之和是？",
+      "options": ["5", "6", "−5", "1"],
+      "answerIndex": 0,
+      "explanation": "韦达定理：两根之和 = −b/a = 5。（两根为 2 和 3）"
+    },
+    {
+      "id": "math-056",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "计算定积分：∫₀¹ 2x dx = ?",
+      "options": ["1", "2", "1/2", "0"],
+      "answerIndex": 0,
+      "explanation": "原函数为 x²，代入上下限得 1² − 0² = 1。"
+    },
+    {
+      "id": "math-057",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "A = {1, 2, 3}，B = {3, 4, 5}，A ∩ B = ?",
+      "options": ["{3}", "{1,2,3,4,5}", "{1,2}", "空集"],
+      "answerIndex": 0,
+      "explanation": "交集取两集合公共元素，只有 3，即 {3}。"
+    },
+    {
+      "id": "math-058",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "tan 45° 的值是？",
+      "options": ["1", "√3", "√3/3", "0"],
+      "answerIndex": 0,
+      "explanation": "tan 45° = sin 45° / cos 45° = 1。"
+    },
+    {
+      "id": "math-059",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "若 f(x) = 3x − 1，则 f⁻¹(5) = ?",
+      "options": ["2", "5", "14", "4/3"],
+      "answerIndex": 0,
+      "explanation": "令 3x − 1 = 5，得 3x = 6，x = 2，即 f⁻¹(5) = 2。"
+    },
+    {
+      "id": "math-060",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "极限 lim(n→∞) (1 + 1/n)ⁿ = ?",
+      "options": ["e", "1", "∞", "0"],
+      "answerIndex": 0,
+      "explanation": "这是自然常数 e 的定义式，极限为 e ≈ 2.718。"
+    }
+  ]
+}

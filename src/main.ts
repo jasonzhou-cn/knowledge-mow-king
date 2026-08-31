@@ -1,0 +1,38 @@
+/**
+ * 游戏入口（src/main.ts）
+ * 职责：创建 Phaser.Game 实例、注册全部场景、配置缩放策略与渲染参数。
+ * 约定：逻辑分辨率固定 960×640，使用 Scale.FIT 自适应任意窗口 / 手机屏幕，
+ *      保证不同设备上的判定区与选项尺寸比例完全一致（答题公平原则的前提）。
+ */
+
+import Phaser from 'phaser';
+import { BootScene } from './scenes/BootScene';
+import { GrassCuttingScene } from './scenes/GrassCuttingScene';
+import { MenuScene } from './scenes/MenuScene';
+import { QuestionScene } from './scenes/QuestionScene';
+import { ResultScene } from './scenes/ResultScene';
+
+/** 逻辑分辨率（所有配置里的坐标都基于这个尺寸） */
+export const GAME_WIDTH = 960;
+export const GAME_HEIGHT = 640;
+
+const config: Phaser.Types.Core.GameConfig = {
+  type: Phaser.AUTO,
+  parent: 'game-root',
+  width: GAME_WIDTH,
+  height: GAME_HEIGHT,
+  backgroundColor: '#0b1622',
+  scale: {
+    mode: Phaser.Scale.FIT,
+    autoCenter: Phaser.Scale.CENTER_BOTH,
+  },
+  render: {
+    antialias: true,
+    powerPreference: 'high-performance',
+  },
+  // 关闭 Phaser 的居中问候语，保持界面干净
+  banner: false,
+  scene: [BootScene, MenuScene, QuestionScene, GrassCuttingScene, ResultScene],
+};
+
+new Phaser.Game(config);

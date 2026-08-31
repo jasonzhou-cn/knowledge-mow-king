@@ -1,0 +1,123 @@
+{
+  "version": "1.0.0",
+  "levels": [
+    {
+      "level": 1,
+      "name": "初入草原",
+      "subject": "math",
+      "unlockCondition": "none",
+      "questionCount": 5,
+      "monsterWaveCount": 3,
+      "bossLevel": false,
+      "breatherLevel": false,
+      "difficultyScale": 1,
+      "gameTime": 60,
+      "primaryDimension": "monsterHp",
+      "nextLevelUnlockCondition": "none"
+    },
+    {
+      "level": 2,
+      "name": "数字林道",
+      "subject": "math",
+      "unlockCondition": "level >= 1",
+      "questionCount": 5,
+      "monsterWaveCount": 4,
+      "bossLevel": false,
+      "breatherLevel": false,
+      "difficultyScale": 1.15,
+      "gameTime": 60,
+      "primaryDimension": "monsterCount",
+      "nextLevelUnlockCondition": "none"
+    },
+    {
+      "level": 3,
+      "name": "公式丘陵",
+      "subject": "math",
+      "unlockCondition": "level >= 2",
+      "questionCount": 5,
+      "monsterWaveCount": 4,
+      "bossLevel": false,
+      "breatherLevel": false,
+      "difficultyScale": 1.3,
+      "gameTime": 60,
+      "primaryDimension": "monsterSpeed",
+      "nextLevelUnlockCondition": "none"
+    },
+    {
+      "level": 4,
+      "name": "喘息营地",
+      "subject": "math",
+      "unlockCondition": "level >= 3",
+      "questionCount": 5,
+      "monsterWaveCount": 3,
+      "bossLevel": false,
+      "breatherLevel": true,
+      "difficultyScale": 0.85,
+      "gameTime": 65,
+      "primaryDimension": "none",
+      "nextLevelUnlockCondition": "none"
+    },
+    {
+      "level": 5,
+      "name": "几何峡谷",
+      "subject": "math",
+      "unlockCondition": "level >= 4",
+      "questionCount": 6,
+      "monsterWaveCount": 5,
+      "bossLevel": false,
+      "breatherLevel": false,
+      "difficultyScale": 1.45,
+      "gameTime": 60,
+      "primaryDimension": "answerSpeed",
+      "nextLevelUnlockCondition": "none"
+    },
+    {
+      "level": 6,
+      "name": "函数沼泽",
+      "subject": "math",
+      "unlockCondition": "level >= 5",
+      "questionCount": 8,
+      "monsterWaveCount": 5,
+      "bossLevel": false,
+      "breatherLevel": false,
+      "difficultyScale": 1.6,
+      "gameTime": 60,
+      "primaryDimension": "monsterHp",
+      "nextLevelUnlockCondition": "none"
+    },
+    {
+      "level": 7,
+      "name": "数列峭壁",
+      "subject": "math",
+      "unlockCondition": "level >= 6",
+      "questionCount": 10,
+      "monsterWaveCount": 6,
+      "bossLevel": false,
+      "breatherLevel": false,
+      "difficultyScale": 1.75,
+      "gameTime": 60,
+      "primaryDimension": "monsterCount",
+      "nextLevelUnlockCondition": "none"
+    },
+    {
+      "level": 8,
+      "name": "微风高地",
+      "subject": "math",
+      "unlockCondition": "level >= 7",
+      "questionCount": 6,
+      "monsterWaveCount": 4,
+      "bossLevel": false,
+      "breatherLevel": true,
+      "difficultyScale": 1,
+      "gameTime": 70,
+      "primaryDimension": "none",
+      "nextLevelUnlockCondition": "none"
+    }
+  ],
+  "levelDifficultyGrowth": {
+    "questionCountGrowth": 1.1,
+    "monsterWaveCountGrowth": 1.2,
+    "difficultyScaleStep": 0.15,
+    "breatherInterval": 3
+  }
+}
