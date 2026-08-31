@@ -173,6 +173,11 @@ export class GrassCuttingScene extends Phaser.Scene {
       return;
     }
 
+    // 场景单例复用：每次重进关卡必须重置全部运行状态，
+    // 否则上一局的 ended/score/kills 等会残留——update() 会被 ended=true 短路，
+    // 表现为「完全一动不动、时间静止、但武器还能切」（武器切换走 input 事件不依赖 update）。
+    this.resetRunState();
+
     // 答题加成在这里落地到三把武器上（GDD 1.3 核心绑定原则）
     this.packed = resolveLevel(incoming.level, incoming.bonus);
     const bonus = incoming.bonus;
@@ -338,6 +343,29 @@ export class GrassCuttingScene extends Phaser.Scene {
         get joystickVector(){ return self.joystick ? self.joystick.vector : null; },
       };
     }
+  }
+
+  /**
+   * 重置本局运行状态。
+   * Phaser 场景默认单例：scene.start 重进关卡复用同一实例，
+   * 若不重置，上一局的 ended/score/kills/elapsed 等会跨局残留，
+   * 轻则难度错乱（elapsed 不归零直接满难度），重则 update 被 ended=true 短路（整局静止）。
+   * 必须与字段声明处的初始值保持一致。
+   */
+  private resetRunState(): void {
+    this.ended = false;
+    this.score = 0;
+    this.kills = 0;
+    this.tookDamage = false;
+    this.frameCounter = 0;
+    this.elapsed = 0;
+    this.moveFacing = 0;
+    this.facing = 0;
+    this.invulnerableTimer = 0;
+    this.contactCooldown = 0;
+    this.pointerDown = false;
+    this.joystickPointerId = null;
+    this.attackPointerId = null;
   }
 
   override update(_time: number, delta: number): void {

@@ -35,9 +35,15 @@ const config: Phaser.Types.Core.GameConfig = {
     antialias: true,
     powerPreference: 'high-performance',
   },
-  // 关闭 Phaser 的居中问候语，保持界面干净
-  banner: false,
-  scene: [BootScene, MenuScene, QuestionScene, GrassCuttingScene, ResultScene],
+// 关闭 Phaser 的居中问候语，保持界面干净
+banner: false,
+scene: [BootScene, MenuScene, QuestionScene, GrassCuttingScene, ResultScene],
 };
 
-new Phaser.Game(config);
+const game = new Phaser.Game(config);
+
+// 供无头浏览器（CDP）自动化验证读取游戏实例（当前活跃场景等）。
+// 仅在开发模式暴露；生产构建时 import.meta.env.DEV 为 false，整行被 tree-shaking 剔除。
+if (import.meta.env.DEV) {
+  (window as unknown as { __KB_GAME__?: Phaser.Game }).__KB_GAME__ = game;
+}
