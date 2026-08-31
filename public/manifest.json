@@ -1,0 +1,19 @@
+{
+  "name": "知识割草王",
+  "short_name": "知识割草王",
+  "description": "答题 + 无双割草的儿童学习游戏",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#0b1622",
+  "theme_color": "#0b1622",
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

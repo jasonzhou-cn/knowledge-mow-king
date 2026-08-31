@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="104" fill="#0b1622"/>
+  <!-- 书本（答题） -->
+  <rect x="150" y="88" width="212" height="336" rx="18" fill="#7ec8ff"/>
+  <rect x="150" y="88" width="106" height="336" rx="18" fill="#5aa9e6"/>
+  <line x1="256" y1="88" x2="256" y2="424" stroke="#0b1622" stroke-width="14"/>
+  <!-- 金色横线（割草的大刀 / 答题判定线） -->
+  <rect x="96" y="246" width="320" height="20" rx="10" fill="#ffd166"/>
+</svg>

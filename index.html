@@ -6,7 +6,15 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
     />
-    <meta name="theme-color" content="#0d1b2a" />
+    <meta name="theme-color" content="#0b1622" />
+    <!-- PWA：添加到主屏幕后以 standalone 全屏运行（无浏览器 UI，横屏锁定） -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="知识割草王" />
+    <link rel="icon" href="/icons/icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/icons/icon.svg" />
     <title>知识割草王</title>
     <style>
       /* 零外部素材约束：不引入任何字体文件，使用系统字体栈并带中文 fallback */
@@ -33,11 +41,16 @@
         touch-action: none;
       }
       #game-root {
-        width: 100%;
-        height: 100%;
+        /* 极限占满：即使父容器有 padding/margin 或不是 0 起点，
+           也强制覆盖整个可视区域（覆盖父页面 header/footer/侧栏） */
+        position: fixed;
+        inset: 0;
+        width: 100vw;
+        height: 100vh;
         display: flex;
         align-items: center;
         justify-content: center;
+        z-index: 1;
       }
       canvas {
         display: block;
