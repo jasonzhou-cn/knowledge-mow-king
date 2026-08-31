@@ -42,6 +42,23 @@ scene: [BootScene, MenuScene, QuestionScene, GrassCuttingScene, ResultScene],
 
 const game = new Phaser.Game(config);
 
+// 移动端横屏锁定（尽力而为）：竖屏提示遮罩（index.html 的 #rotate-overlay）负责引导，
+// 这里在用户首次交互时尝试把屏幕锁定为横屏——Android Chrome 直接生效，
+// iOS 16.4+ 支持但需要用户手势上下文；旧版本或未授权时静默失败，不阻断游戏。
+// 注：本 TS 版本的 ScreenOrientation 类型未声明 lock，用类型断言兼容运行时能力检测。
+const orient = screen.orientation as
+  | (ScreenOrientation & { lock?: (orientation: string) => Promise<void> })
+  | null;
+if (orient && typeof orient.lock === 'function') {
+  const tryLockLandscape = (): void => {
+    orient.lock?.('landscape')?.catch(() => {
+      /* 不支持 / 已被浏览器拒绝：交给 CSS 旋转提示兜底 */
+    });
+  };
+  window.addEventListener('pointerdown', tryLockLandscape, { once: true });
+  window.addEventListener('touchstart', tryLockLandscape, { once: true });
+}
+
 // 供无头浏览器（CDP）自动化验证读取游戏实例（当前活跃场景等）。
 // 仅在开发模式暴露；生产构建时 import.meta.env.DEV 为 false，整行被 tree-shaking 剔除。
 if (import.meta.env.DEV) {

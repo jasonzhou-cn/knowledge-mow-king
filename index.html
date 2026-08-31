@@ -73,14 +73,101 @@
         padding: 16px;
         border-radius: 4px;
       }
+      /* ── 移动端横屏适配：竖屏 + 触屏设备时全屏提示旋转，横屏自动消失 ── */
+      #rotate-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 9998;
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 18px;
+        background: #0b1622;
+        color: #ffffff;
+        font-family: var(--font-stack);
+        text-align: center;
+        padding: 32px;
+      }
+      /* 只在「竖屏 + 触屏主设备」时出现：桌面浏览器竖窗口不会被遮挡 */
+      @media (orientation: portrait) and (pointer: coarse) {
+        #rotate-overlay {
+          display: flex;
+        }
+      }
+      .rotate-phone {
+        position: relative;
+        width: 76px;
+        height: 114px;
+        border: 4px solid #7ec8ff;
+        border-radius: 18px;
+        background: rgba(126, 200, 255, 0.08);
+        animation: kb-rotate-hint 1.6s ease-in-out infinite;
+      }
+      /* 手机屏幕内的迷你游戏画面示意 */
+      .rotate-phone::after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 46px;
+        height: 26px;
+        transform: translate(-50%, -50%);
+        border: 3px solid #ffd166;
+        border-radius: 6px;
+        background: rgba(255, 209, 102, 0.12);
+      }
+      @keyframes kb-rotate-hint {
+        0%,
+        15% {
+          transform: rotate(0deg);
+        }
+        50%,
+        70% {
+          transform: rotate(90deg);
+        }
+        100% {
+          transform: rotate(90deg);
+        }
+      }
+      .rotate-title {
+        font-size: 26px;
+        font-weight: 700;
+        color: #7ec8ff;
+      }
+      .rotate-sub {
+        font-size: 15px;
+        color: rgba(255, 255, 255, 0.62);
+        line-height: 1.6;
+      }
     </style>
   </head>
   <body>
     <div id="game-root"></div>
+    <div id="rotate-overlay">
+      <div class="rotate-phone"></div>
+      <div class="rotate-title">请横屏游玩</div>
+      <div class="rotate-sub">旋转手机以获得最佳体验</div>
+    </div>
     <div id="fatal-error">
       <h1>配置校验失败，游戏已阻断启动</h1>
       <pre id="fatal-error-msg"></pre>
     </div>
     <script type="module" src="/src/main.ts"></script>
+    <script>
+      // 横屏适配的 JS 兜底（与 CSS 媒体查询双保险）：
+      // 部分 WebView / 嵌入式浏览器对 (pointer: coarse) 判定不准，
+      // 这里用 navigator.maxTouchPoints 补充检测，并在方向变化时同步遮罩。
+      var syncRotateOverlay = function () {
+        var el = document.getElementById('rotate-overlay');
+        if (!el) return;
+        var coarse = window.matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0;
+        var portrait = window.matchMedia('(orientation: portrait)').matches;
+        el.style.display = coarse && portrait ? 'flex' : 'none';
+      };
+      syncRotateOverlay();
+      window.addEventListener('resize', syncRotateOverlay);
+      window.addEventListener('orientationchange', syncRotateOverlay);
+    </script>
   </body>
 </html>
