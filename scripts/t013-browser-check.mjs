@@ -19,7 +19,9 @@ fs.mkdirSync(OUT_DIR, { recursive: true });
 
 const server = await serveDir(path.resolve(DIST));
 const browser = await launchBrowser({ port: 9361 });
-const page = await newPage(9361, server.url);
+// 先开空白页，等 addScriptToEvaluateOnNewDocument 挂好之后再导航，
+// 否则振荡器计数器 patch 不会对游戏文档生效，__osc 恒为 0（误报「音效没接上」）。
+const page = await newPage(9361, 'about:blank');
 
 const errors = [];
 await page.send('Runtime.enable');
@@ -48,6 +50,9 @@ await page.send('Page.addScriptToEvaluateOnNewDocument', {
     }
   `,
 });
+
+// 计数器 patch 已就位，此时才导航到游戏，确保新文档被 patch
+await page.send('Page.navigate', { url: server.url });
 
 await page.send('Emulation.setDeviceMetricsOverride', {
   width: 960,
