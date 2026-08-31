@@ -120,27 +120,12 @@ export interface ResolvedLevelPackage {
     invulnerableDuration: number;
     contactDamageCooldown: number;
   };
-  skill: {
-    type: 'ring' | 'sector';
-    damage: number;
-    cooldown: number;
-    duration: number;
-    range: number;
-    sectorAngle: number;
-    tickInterval: number;
-  };
   monster: {
     hp: number;
     damage: number;
     moveSpeed: number;
-    /** 每波小怪数量上限 */
-    perWave: number;
-    /** 本关波次数 */
-    waveCount: number;
     /** 同屏存活上限（性能红线） */
     maxAlive: number;
-    /** 波与波之间的间隔（秒） */
-    waveInterval: number;
     /** 同波内逐只生成的间隔（秒） */
     spawnInterval: number;
     radius: number;
@@ -171,7 +156,6 @@ export interface ResolvedLevelPackage {
     maxAliveMonsters: number;
     damageCheckFrameInterval: number;
     maxHitTextAlive: number;
-    maxActiveSkillZones: number;
     monsterPoolSize: number;
     projectilePoolSize: number;
     shardPoolSize: number;
@@ -348,7 +332,6 @@ export function resolveLevelPackage(
   const rangeCoefficient = subjectCoefficient ? subjectCoefficient.skillRangeCoefficient : 1;
 
   const ps = grassCuttingConfig.playerSettings;
-  const sk = grassCuttingConfig.playerSkillSettings;
   const ms = grassCuttingConfig.monsterSettings;
   const cs = grassCuttingConfig.comboSettings;
   const ds = grassCuttingConfig.difficultySettings;
@@ -373,26 +356,12 @@ export function resolveLevelPackage(
       invulnerableDuration: ps.invulnerableDuration,
       contactDamageCooldown: ps.playerContactDamageCooldown,
     },
-    skill: {
-      type: sk.skillType,
-      // 技能伤害：线性百分比成长 × 学科伤害系数
-      damage: growthLinearPercent(sk.skillDamageBase, sk.skillDamageGrowthPerLevel, level) * damageCoefficient,
-      // 冷却：指数衰减（等级越高冷却越短）
-      cooldown: growthExponential(sk.skillCooldownBase, sk.skillCooldownGrowthPerLevel, level),
-      duration: growthLinearPercent(sk.skillDurationBase, sk.skillDurationGrowthPerLevel, level),
-      range: growthLinearPercent(sk.skillRangeBase, sk.skillRangeGrowthPerLevel, level) * rangeCoefficient,
-      sectorAngle: sk.skillSectorAngle,
-      tickInterval: sk.skillTickInterval,
-    },
     monster: {
       // 小怪属性：指数成长 × 关卡难度缩放（呼吸关通过 scale 回落）
       hp: growthExponential(ms.monsterHpBase, ms.monsterHpGrowthPerLevel, level) * scale,
       damage: growthLinearPercent(ms.monsterDamageBase, ms.monsterDamageGrowthPerLevel, level) * scale,
       moveSpeed: growthLinearPercent(ms.monsterMoveSpeedBase, ms.monsterMoveSpeedGrowthPerLevel, level) * scale,
-      perWave: Math.round(growthExponential(ms.monsterCountPerWave, ms.monsterCountGrowth, level)),
-      waveCount: levelEntry.monsterWaveCount,
       maxAlive,
-      waveInterval: growthExponential(ms.monsterSpawnDelayBase, ms.monsterSpawnDelayGrowth, level),
       spawnInterval: ms.monsterSpawnIntervalWithinWave,
       radius: ms.monsterRadius,
       scorePerKill: ms.monsterScoreBase,
@@ -425,7 +394,6 @@ export function resolveLevelPackage(
       maxAliveMonsters: maxAlive,
       damageCheckFrameInterval: pf.damageCheckFrameInterval,
       maxHitTextAlive: pf.maxHitTextAlive,
-      maxActiveSkillZones: pf.maxActiveSkillZones,
       monsterPoolSize: pf.monsterPoolSize,
       projectilePoolSize: pf.projectilePoolSize,
       shardPoolSize: pf.shardPoolSize,

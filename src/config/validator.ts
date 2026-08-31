@@ -596,31 +596,13 @@ function validateGrassCuttingConfig(raw: unknown): Validator {
   v.number(ps, 'invulnerableDuration', 'grassCuttingConfig.playerSettings.invulnerableDuration', { min: 0 });
   v.number(ps, 'playerContactDamageCooldown', 'grassCuttingConfig.playerSettings.playerContactDamageCooldown', { min: 0 });
 
-  const sk = v.object(root, 'playerSkillSettings', 'grassCuttingConfig.playerSkillSettings');
-  v.string(sk, 'skillType', 'grassCuttingConfig.playerSkillSettings.skillType', ['ring', 'sector']);
-  v.number(sk, 'skillScaleCoefficient', 'grassCuttingConfig.playerSkillSettings.skillScaleCoefficient', { min: 0.1 });
-  v.number(sk, 'skillDamageBase', 'grassCuttingConfig.playerSkillSettings.skillDamageBase', { min: 0.1 });
-  v.number(sk, 'skillDamageGrowthPerLevel', 'grassCuttingConfig.playerSkillSettings.skillDamageGrowthPerLevel', { min: 0 });
-  v.number(sk, 'skillCooldownBase', 'grassCuttingConfig.playerSkillSettings.skillCooldownBase', { min: 0.1 });
-  v.number(sk, 'skillCooldownGrowthPerLevel', 'grassCuttingConfig.playerSkillSettings.skillCooldownGrowthPerLevel', { min: 0.1, max: 2 });
-  v.number(sk, 'skillDurationBase', 'grassCuttingConfig.playerSkillSettings.skillDurationBase', { min: 0.1 });
-  v.number(sk, 'skillDurationGrowthPerLevel', 'grassCuttingConfig.playerSkillSettings.skillDurationGrowthPerLevel', { min: 0 });
-  v.number(sk, 'skillRangeBase', 'grassCuttingConfig.playerSkillSettings.skillRangeBase', { min: 10 });
-  v.number(sk, 'skillRangeGrowthPerLevel', 'grassCuttingConfig.playerSkillSettings.skillRangeGrowthPerLevel', { min: 0 });
-  v.number(sk, 'skillSectorAngle', 'grassCuttingConfig.playerSkillSettings.skillSectorAngle', { min: 10, max: 360 });
-  v.number(sk, 'skillTickInterval', 'grassCuttingConfig.playerSkillSettings.skillTickInterval', { min: 0.05 });
-
   const ms = v.object(root, 'monsterSettings', 'grassCuttingConfig.monsterSettings');
-  v.integer(ms, 'monsterCountPerWave', 'grassCuttingConfig.monsterSettings.monsterCountPerWave', { min: 1 });
-  v.number(ms, 'monsterCountGrowth', 'grassCuttingConfig.monsterSettings.monsterCountGrowth', { min: 1, max: 3 });
   v.number(ms, 'monsterHpBase', 'grassCuttingConfig.monsterSettings.monsterHpBase', { min: 0.1 });
   v.number(ms, 'monsterHpGrowthPerLevel', 'grassCuttingConfig.monsterSettings.monsterHpGrowthPerLevel', { min: 1, max: 3 });
   v.number(ms, 'monsterDamageBase', 'grassCuttingConfig.monsterSettings.monsterDamageBase', { min: 0 });
   v.number(ms, 'monsterDamageGrowthPerLevel', 'grassCuttingConfig.monsterSettings.monsterDamageGrowthPerLevel', { min: 0 });
   v.number(ms, 'monsterMoveSpeedBase', 'grassCuttingConfig.monsterSettings.monsterMoveSpeedBase', { min: 1 });
   v.number(ms, 'monsterMoveSpeedGrowthPerLevel', 'grassCuttingConfig.monsterSettings.monsterMoveSpeedGrowthPerLevel', { min: 0 });
-  v.number(ms, 'monsterSpawnDelayBase', 'grassCuttingConfig.monsterSettings.monsterSpawnDelayBase', { min: 0.1 });
-  v.number(ms, 'monsterSpawnDelayGrowth', 'grassCuttingConfig.monsterSettings.monsterSpawnDelayGrowth', { min: 0.1, max: 2 });
   v.number(ms, 'monsterSpawnIntervalWithinWave', 'grassCuttingConfig.monsterSettings.monsterSpawnIntervalWithinWave', { min: 0.02 });
   v.number(ms, 'monsterRadius', 'grassCuttingConfig.monsterSettings.monsterRadius', { min: 4 });
   v.integer(ms, 'monsterMaxAlive', 'grassCuttingConfig.monsterSettings.monsterMaxAlive', { min: 1, max: 200 });
@@ -650,7 +632,6 @@ function validateGrassCuttingConfig(raw: unknown): Validator {
   v.integer(pf, 'maxAliveMonsters', 'grassCuttingConfig.performanceSettings.maxAliveMonsters', { min: 1, max: 200 });
   v.integer(pf, 'damageCheckFrameInterval', 'grassCuttingConfig.performanceSettings.damageCheckFrameInterval', { min: 1, max: 10 });
   v.integer(pf, 'maxHitTextAlive', 'grassCuttingConfig.performanceSettings.maxHitTextAlive', { min: 0, max: 64 });
-  v.integer(pf, 'maxActiveSkillZones', 'grassCuttingConfig.performanceSettings.maxActiveSkillZones', { min: 1, max: 16 });
   v.integer(pf, 'monsterPoolSize', 'grassCuttingConfig.performanceSettings.monsterPoolSize', { min: 8, max: 400 });
   v.integer(pf, 'projectilePoolSize', 'grassCuttingConfig.performanceSettings.projectilePoolSize', { min: 8, max: 400 });
   v.integer(pf, 'shardPoolSize', 'grassCuttingConfig.performanceSettings.shardPoolSize', { min: 0, max: 400 });
@@ -787,7 +768,6 @@ function validateLevelConfig(raw: unknown): Validator {
     v.string(item, 'subject', `${base}.subject`);
     v.string(item, 'unlockCondition', `${base}.unlockCondition`);
     v.integer(item, 'questionCount', `${base}.questionCount`, { min: 1, max: 50 });
-    v.integer(item, 'monsterWaveCount', `${base}.monsterWaveCount`, { min: 1 });
     v.boolean(item, 'bossLevel', `${base}.bossLevel`);
     v.boolean(item, 'breatherLevel', `${base}.breatherLevel`);
     v.number(item, 'difficultyScale', `${base}.difficultyScale`, { min: 0.1, max: 10 });
@@ -807,7 +787,6 @@ function validateLevelConfig(raw: unknown): Validator {
 
   const lg = v.object(root, 'levelDifficultyGrowth', 'levelConfig.levelDifficultyGrowth');
   v.number(lg, 'questionCountGrowth', 'levelConfig.levelDifficultyGrowth.questionCountGrowth', { min: 1 });
-  v.number(lg, 'monsterWaveCountGrowth', 'levelConfig.levelDifficultyGrowth.monsterWaveCountGrowth', { min: 1 });
   v.number(lg, 'difficultyScaleStep', 'levelConfig.levelDifficultyGrowth.difficultyScaleStep', { min: 0, max: 0.3 });
   v.integer(lg, 'breatherInterval', 'levelConfig.levelDifficultyGrowth.breatherInterval', { min: 2, max: 10 });
   return v;

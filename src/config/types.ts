@@ -152,8 +152,6 @@ export interface QuestionConfig {
 
 // ───────────────────────── grassCuttingConfig.json ─────────────────────────
 
-export type SkillType = 'ring' | 'sector';
-
 export interface PlayerSettings {
   playerHpBase: number;
   playerMoveSpeed: number;
@@ -162,32 +160,13 @@ export interface PlayerSettings {
   playerContactDamageCooldown: number;
 }
 
-export interface PlayerSkillSettings {
-  skillType: SkillType;
-  skillScaleCoefficient: number;
-  skillDamageBase: number;
-  skillDamageGrowthPerLevel: number;
-  skillCooldownBase: number;
-  skillCooldownGrowthPerLevel: number;
-  skillDurationBase: number;
-  skillDurationGrowthPerLevel: number;
-  skillRangeBase: number;
-  skillRangeGrowthPerLevel: number;
-  skillSectorAngle: number;
-  skillTickInterval: number;
-}
-
 export interface MonsterSettings {
-  monsterCountPerWave: number;
-  monsterCountGrowth: number;
   monsterHpBase: number;
   monsterHpGrowthPerLevel: number;
   monsterDamageBase: number;
   monsterDamageGrowthPerLevel: number;
   monsterMoveSpeedBase: number;
   monsterMoveSpeedGrowthPerLevel: number;
-  monsterSpawnDelayBase: number;
-  monsterSpawnDelayGrowth: number;
   monsterSpawnIntervalWithinWave: number;
   monsterRadius: number;
   monsterMaxAlive: number;
@@ -233,7 +212,6 @@ export interface PerformanceSettings {
   maxAliveMonsters: number;
   damageCheckFrameInterval: number;
   maxHitTextAlive: number;
-  maxActiveSkillZones: number;
   monsterPoolSize: number;
   /** 弹丸对象池上限 */
   projectilePoolSize: number;
@@ -275,7 +253,6 @@ export interface GrassCuttingConfig {
   version: string;
   touchSettings: TouchSettings;
   playerSettings: PlayerSettings;
-  playerSkillSettings: PlayerSkillSettings;
   monsterSettings: MonsterSettings;
   comboSettings: ComboSettings;
   difficultySettings: DifficultySettings;
@@ -396,7 +373,6 @@ export interface LevelEntry {
   subject: SubjectKey;
   unlockCondition: string;
   questionCount: number;
-  monsterWaveCount: number;
   bossLevel: boolean;
   breatherLevel: boolean;
   difficultyScale: number;
@@ -407,7 +383,6 @@ export interface LevelEntry {
 
 export interface LevelDifficultyGrowth {
   questionCountGrowth: number;
-  monsterWaveCountGrowth: number;
   difficultyScaleStep: number;
   breatherInterval: number;
 }
