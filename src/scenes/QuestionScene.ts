@@ -20,6 +20,7 @@ import { AnswerTrack } from '../systems/AnswerTrack';
 import { QuizEngine } from '../systems/QuizEngine';
 import { progression } from '../systems/ProgressionSystem';
 import { resolveComboTier } from '../systems/RewardSystem';
+import { sfx } from '../systems/SfxController';
 import { Palette, css, textStyle } from '../ui/Palette';
 import { ripple, shake } from '../ui/Feedback';
 import { QuizHud } from '../ui/Hud';
@@ -176,6 +177,7 @@ export class QuestionScene extends Phaser.Scene {
     ripple(this, pointerX, pointerY, Palette.accent.secondary, 110, 420);
 
     const result = track.stop();
+    sfx.play('stop');
     if (!result.hit) {
       this.handleMiss();
       return;
@@ -188,10 +190,12 @@ export class QuestionScene extends Phaser.Scene {
     const pos = track.getCardPosition(result.index);
     this.hintText.setVisible(false);
     if (correct) {
+      sfx.play('correct');
       ripple(this, pos.x, pos.y, Palette.status.correct, 150, 460);
       this.resultText.setText('✓ 答对了！').setColor(css(Palette.status.correct));
     } else {
       // 答错时同时高亮正确答案，形成「我选了什么 / 正确是什么」的对照
+      sfx.play('wrong');
       track.setState(engine.current.answerIndex, 'correct');
       shake(this, this.resultText, 7, 260);
       ripple(this, pos.x, pos.y, Palette.status.wrong, 130, 420);
@@ -231,6 +235,7 @@ export class QuestionScene extends Phaser.Scene {
     if (!engine || !track) return;
 
     engine.registerTimeout();
+    sfx.play('wrong');
     track.setState(engine.current.answerIndex, 'correct');
     this.resultText.setText('⏰ 超时了').setColor(css(Palette.status.warning));
     this.explanationText.setText(

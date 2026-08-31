@@ -31,6 +31,7 @@ import { ComboSystem } from '../systems/ComboSystem';
 import { KillFxSystem } from '../systems/KillFxSystem';
 import { MonsterSpawner, type Monster } from '../systems/MonsterSpawner';
 import { ProjectileSystem, type ProjectileHitPayload } from '../systems/ProjectileSystem';
+import { sfx } from '../systems/SfxController';
 import { WeaponSystem, type AttackAction } from '../systems/WeaponSystem';
 import { Palette, css, textStyle, weaponTint } from '../ui/Palette';
 import { FloatingTextPool, cameraShake } from '../ui/Feedback';
@@ -653,6 +654,7 @@ export class GrassCuttingScene extends Phaser.Scene {
   private onMonsterKilled(monster: Monster, x: number, y: number, dirX: number, dirY: number): void {
     const gained = monster.score;
     this.kills++;
+    sfx.play('kill');
     this.score += gained;
 
     const nextCombo = this.combo.current + 1;
@@ -707,6 +709,7 @@ export class GrassCuttingScene extends Phaser.Scene {
   /** 玩家受伤处理 */
   private applyDamageToPlayer(amount: number): void {
     this.hp -= amount;
+    sfx.play('hurt');
     this.tookDamage = true;
     this.invulnerableTimer = this.packed.player.invulnerableDuration;
     this.contactCooldown = this.packed.player.contactDamageCooldown;

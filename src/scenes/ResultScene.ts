@@ -13,6 +13,7 @@ import { resolveNextLevel } from '../config/resolve';
 import type { LevelConfig, RewardConfig } from '../config/types';
 import { progression } from '../systems/ProgressionSystem';
 import { applyDailyCap, calculateRewards, calculateScore, formatRewardItems } from '../systems/RewardSystem';
+import { sfx } from '../systems/SfxController';
 import { Palette, css, textStyle } from '../ui/Palette';
 import { popScale, ripple } from '../ui/Feedback';
 import { formatOneDecimal } from '../utils/MathUtil';
@@ -57,6 +58,7 @@ export class ResultScene extends Phaser.Scene {
     );
     const expGain = this.calculateExp(rewardConfig, payload);
     const levelUp = progression.addExp(expGain);
+    if (levelUp) sfx.play('levelUp');
     progression.addScore(score);
     progression.save();
 
