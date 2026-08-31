@@ -311,30 +311,33 @@ export class GrassCuttingScene extends Phaser.Scene {
 
     this.showIntro();
 
-    // 供无头浏览器（CDP）自动化验证读取运行时状态，可安全删除。
+    // 供无头浏览器（CDP）自动化验证读取运行时状态。仅在开发模式（vite dev）暴露，
+    // 生产构建时 import.meta.env.DEV 为 false，整块被 tree-shaking 剔除。
     // 只读 getter，不驱动任何游戏逻辑；取不到就返回 null，不伪造值。
-    const self = this;
-    (window as unknown as { __KB_DEBUG__?: unknown }).__KB_DEBUG__ = {
-      // 关卡结束后返回 Ended，便于验证脚本识别场景已切走（句柄本身是旧场景的闭包）
-      get scene()         { return self.ended ? 'Ended' : 'GrassCuttingScene'; },
-      get weaponId()      { return self.weaponSystem ? self.weaponSystem.current.id : null; },
-      get weaponIndex()   { return self.weaponSystem ? self.weaponSystem.currentIndex : null; },
-      get weaponCount()   { return self.weaponSystem ? self.weaponSystem.count : null; },
-      get kills()         { return self.kills; },
-      get score()         { return self.score; },
-      get combo()         { return self.combo ? self.combo.current : null; },
-      get aliveMonsters() { return self.spawner ? self.spawner.monsters.filter((m) => m.alive).length : null; },
-      get hp()            { return self.hp; },
-      get timeLeft()      { return self.timeLeft; },
-      get elapsed()       { return self.totalTime - self.timeLeft; },
-      get projectiles()   { return self.projectiles ? self.projectiles.aliveCount : null; },
-      // 玩家坐标：自动化验证「摇杆拖动是否真的让角色移动」的唯一入口，只读
-      get playerX()       { return self.player ? self.player.x : null; },
-      get playerY()       { return self.player ? self.player.y : null; },
-      // 摇杆状态快照：只读，供自动化验证区分「走位」与「攻击」两条输入通道
-      get joystickActive(){ return self.joystick ? self.joystick.isActive : false; },
-      get joystickVector(){ return self.joystick ? self.joystick.vector : null; },
-    };
+    if (import.meta.env.DEV) {
+      const self = this;
+      (window as unknown as { __KB_DEBUG__?: unknown }).__KB_DEBUG__ = {
+        // 关卡结束后返回 Ended，便于验证脚本识别场景已切走（句柄本身是旧场景的闭包）
+        get scene()         { return self.ended ? 'Ended' : 'GrassCuttingScene'; },
+        get weaponId()      { return self.weaponSystem ? self.weaponSystem.current.id : null; },
+        get weaponIndex()   { return self.weaponSystem ? self.weaponSystem.currentIndex : null; },
+        get weaponCount()   { return self.weaponSystem ? self.weaponSystem.count : null; },
+        get kills()         { return self.kills; },
+        get score()         { return self.score; },
+        get combo()         { return self.combo ? self.combo.current : null; },
+        get aliveMonsters() { return self.spawner ? self.spawner.monsters.filter((m) => m.alive).length : null; },
+        get hp()            { return self.hp; },
+        get timeLeft()      { return self.timeLeft; },
+        get elapsed()       { return self.totalTime - self.timeLeft; },
+        get projectiles()   { return self.projectiles ? self.projectiles.aliveCount : null; },
+        // 玩家坐标：自动化验证「摇杆拖动是否真的让角色移动」的唯一入口，只读
+        get playerX()       { return self.player ? self.player.x : null; },
+        get playerY()       { return self.player ? self.player.y : null; },
+        // 摇杆状态快照：只读，供自动化验证区分「走位」与「攻击」两条输入通道
+        get joystickActive(){ return self.joystick ? self.joystick.isActive : false; },
+        get joystickVector(){ return self.joystick ? self.joystick.vector : null; },
+      };
+    }
   }
 
   override update(_time: number, delta: number): void {
