@@ -81,7 +81,7 @@
 2. **类型与校验是两份事实来源。** `types.ts` 声明 `hpMultiplierStart: number`，`validator.ts` 里再校验一次 `{ min: 0, max: 100 }`。TypeScript 只能保证形状，区间约束只能靠运行时校验，两者天然不同步。
 3. **错误只能在运行时发现。** 尽管有 `npm run validate-config` 可以提前跑，但它不是 `npm run build` 的一部分（`package.json:9` 只有 `tsc --noEmit && vite build`）。**改完配置不跑校验就直接构建，是可能把非法配置打进产物的。**
 4. **配置热更新与缓存的语义需要小心。** `ConfigLoader` 缓存校验通过的 `cache`（`ConfigLoader.ts:39`），`hotReloadConfig()`（`:96`）用于热更新。**热更新同样会走完整校验**（因为校验在写入 cache 之前），但热更新期间若新配置非法，cache 的替换时机需要调用方自己保证一致性。
-5. **死字段会长期滞留。** 见 `ARCHITECTURE.md` 第 6.5 节：`playerSkillSettings` 等字段在玩法改造后仍完整走完「JSON → 校验 → 解析」三步，却没有任何消费者。**删字段必须四层一起删**（JSON + types + validator + resolve），只删一半会留下最难排查的「幽灵配置」。
+5. **死字段会长期滞留。** 见 `ARCHITECTURE.md` 第 6.5 节：`playerSkillSettings` 等字段在玩法改造后曾长期滞留，完整走完「JSON → 校验 → 解析」三步却没有任何消费者（已于 commit 82a4499 四层删除）。**删字段必须四层一起删**（JSON + types + validator + resolve），只删一半会留下最难排查的「幽灵配置」。
 
 ---
 

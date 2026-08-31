@@ -148,7 +148,7 @@ raw = baseBonus × subjectCoefficient × accuracyTerm × speedFactor × comboFac
    - 连带影响：`subjectCoefficientSettings` 里的 `skillDamageCoefficient` / `skillRangeCoefficient` 实际驱动的是**武器**而非技能（见 `ARCHITECTURE.md` 第 6.6 节）。重命名需要同步改 6 处。
 3. **切换武器无硬直，理论上存在「切换取消后摇」的利用空间。** 当前武器没有后摇动作，所以不构成 exploit；但若将来加入后摇，必须同时加入切枪硬直。
 4. **顿帧会真实消耗玩家的关卡时间。** `timeScale` 影响的是整个 `scene.time`，而关卡倒计时 `updateTimer(dt)` 用的是缩放后的 dt（`GrassCuttingScene.ts:319`），因此**顿帧期间倒计时是暂停的**——这对玩家有利，不会因打得爽而损失时间。
-5. **无双改造留下了死配置。** `playerSkillSettings`、`maxActiveSkillZones`、`monster.perWave/waveCount/waveInterval` 在新模型下无人消费，但仍完整走完「JSON → 校验 → 解析」三步。详见 `ARCHITECTURE.md` 第 6.5 节——**这是本次改造最需要处理的遗留项。**
+5. **无双改造曾留下死配置（已清理）。** `playerSkillSettings`、`maxActiveSkillZones`、`monster.perWave/waveCount/waveInterval` 在新模型下无人消费，曾完整走完「JSON → 校验 → 解析」三步。该遗留项已于 commit 82a4499 从四层（JSON + types + validator + resolve）清理完成，审计记录见 `ARCHITECTURE.md` 第 6.5 节。
 6. **移动端攻击依赖按住屏幕，而按住屏幕也是移动输入的天然载体。** 触屏时代「左手移动、右手攻击」的分工尚未实现，攻击目前只能靠 `pointerDown`（`GrassCuttingScene.ts:84-86`）。真正的移动端适配需要一个独立的攻击按钮。
 
 ---

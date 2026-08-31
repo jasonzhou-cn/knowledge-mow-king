@@ -245,24 +245,26 @@ ResultScene                  ProgressionSystem / RewardSystem 结算
 - 但格子本身的 `startY = 640 - 10 - 56 = 574`，格子底边在 **630**，而逻辑画布高 **640**。因此向下外扩出的 630→662 区间里，**只有 630→640 这 10px 是玩家真正能点到的**，其余 22px（含 `bounds` 底面 668）在画布之外。
 - 结论：功能上达标（实测点 (366,602)、(480,630)、(594,602) 均正确切换，见 `reports/t010/measure.txt`），但扩展收益被画布高度吃掉了 2/3。若要真正提升移动端点击舒适度，正确解法是**整体上移武器栏**或**减小 `BOTTOM_MARGIN`**（`WeaponBar.ts:46`），而不是继续加大 `HIT_EXTEND_DOWN`。
 
-### 6.5 死配置：无双改造后遗留的「技能 / 波次」字段仍在走完整流水线
+### 6.5 死配置：无双改造后遗留的「技能 / 波次」字段（已于 82a4499 清理，本节保留为审计记录）
 
-这是本次写文档过程中核查出来的**最值得处理的一项债务**。以下字段仍在 JSON 里、仍被校验、仍被解析进 `ResolvedLevelPackage`，但**没有任何运行时代码消费它们**：
+> **状态更新（commit 82a4499）**：本节列出的全部字段已从四层（JSON + `types.ts` + `validator.ts` + `resolve.ts`）删除。下表保留为**审计记录**，表中「无消费者」判断为删除前的核查证据。
+
+这是本次写文档过程中核查出来的**最值得处理的一项债务**（现已清理）。以下字段当时仍在 JSON 里、仍被校验、仍被解析进 `ResolvedLevelPackage`，但**没有任何运行时代码消费它们**：
 
 | 字段 | 配置位置 | 校验 | 解析 | 消费方 |
 | --- | --- | --- | --- | --- |
-| `playerSkillSettings`（11 个字段） | `grassCuttingConfig.json:10-23` | `validator.ts:578-589` | `resolve.ts:348` 读取、`:373-383` 产出 `packed.skill` | **无**（全项目无 `packed.skill` 读取点） |
-| `performanceSettings.maxActiveSkillZones` | `grassCuttingConfig.json:64` | `validator.ts:631` | `resolve.ts:424` | **无** |
-| `monster.perWave` | — | — | `resolve.ts:389` | **无**（新刷怪器是连续生成，不再按波次） |
-| `monster.waveCount` | `levelConfig` 的 `monsterWaveCount` | — | `resolve.ts:390` | **无** |
-| `monster.waveInterval` | — | — | `resolve.ts:392` | **无** |
+| `playerSkillSettings`（11 个字段） | `grassCuttingConfig.json:10-23` | `validator.ts:578-589` | `resolve.ts:348` 读取、`:373-383` 产出 `packed.skill` | **无**（全项目无 `packed.skill` 读取点）——✅ 已于 82a4499 清理 |
+| `performanceSettings.maxActiveSkillZones` | `grassCuttingConfig.json:64` | `validator.ts:631` | `resolve.ts:424` | **无**——✅ 已于 82a4499 清理 |
+| `monster.perWave` | — | — | `resolve.ts:389` | **无**（新刷怪器是连续生成，不再按波次）——✅ 已于 82a4499 清理 |
+| `monster.waveCount` | `levelConfig` 的 `monsterWaveCount` | — | `resolve.ts:390` | **无**——✅ 已于 82a4499 清理 |
+| `monster.waveInterval` | — | — | `resolve.ts:392` | **无**——✅ 已于 82a4499 清理 |
 
-- 成因：T-006 无双改造把战斗从「自动施放环形 AOE 技能 + 按波次刷怪」改成了「三武器主动攻击 + 连续刷怪」，但配置与解析链没有同步清理。
-- 实际危害：
-  1. **误导调参**：`tuning-lead` 可能在 `playerSkillSettings` 里调数值，却完全看不到效果。
+- 成因：T-006 无双改造把战斗从「自动施放环形 AOE 技能 + 按波次刷怪」改成了「三武器主动攻击 + 连续刷怪」，但配置与解析链没有同步清理（该债已于 82a4499 清偿）。
+- 实际危害（清理前）：
+  1. **误导调参**：`tuning-lead` 可能在 `playerSkillSettings` 里调数值，却完全看不到效果（该字段已删除，此风险不复存在）。
   2. **校验成本**：11 个字段每帧启动都要校验，虽然开销可忽略，但维护者会误以为它们是活的。
   3. **误导交接**：新人读 `resolve.ts:373-383` 会以为存在「技能系统」，然后去找，找不到。
-- 建议：确认无后续技能计划后，一次性删除 JSON 字段 + `validator` 校验 + `types` 接口 + `resolve` 产出。**在删之前必须先确认 GDD 里没有「后续版本加回主动技能」的规划**。
+- 建议：确认无后续技能计划后，一次性删除 JSON 字段 + `validator` 校验 + `types` 接口 + `resolve` 产出。**已执行**：经确认 GDD 无「后续版本加回主动技能」规划后，上述四层已于 commit 82a4499 一并删除，并经回归验证通过。
 
 ### 6.6 命名债务：`skillXxxCoefficient` 实际驱动的是武器，不是技能
 

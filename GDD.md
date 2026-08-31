@@ -438,31 +438,7 @@
 ```
 {
 
-&#x20; "playerSkillSettings": {
-
-&#x20;   "skillType": "math",
-
-&#x20;   "skillScaleCoefficient": 1.0,
-
-&#x20;   "skillDurationGrowthPerLevel": 0.1,
-
-&#x20;   "skillDurationBase": 5,
-
-&#x20;   "skillCooldownGrowthPerLevel": 0.9,
-
-&#x20;   "skillCooldownBase": 3,
-
-&#x20;   "skillDamageGrowthPerLevel": 0.2,
-
-&#x20;   "skillDamageBase": 10
-
-&#x20; },
-
 &#x20; "monsterSettings": {
-
-&#x20;   "monsterCountPerWave": 10,
-
-&#x20;   "monsterCountGrowth": 1.2,
 
 &#x20;   "monsterHpGrowthPerLevel": 1.5,
 
@@ -476,9 +452,7 @@
 
 &#x20;   "monsterMoveSpeedBase": 100,
 
-&#x20;   "monsterSpawnDelayBase": 2,
-
-&#x20;   "monsterSpawnDelayGrowth": 0.9
+&#x20;   "monsterSpawnIntervalWithinWave": 0.15
 
 &#x20; },
 
@@ -516,8 +490,6 @@
 参数说明：
 
 
-
-* `playerSkillSettings`：割草技能的基础属性，与答题的`level`字段直接关联；
 
 * `monsterSettings`：割草场景中小怪的所有属性，与答题的`level`字段、学科难度系数联动；
 
@@ -650,8 +622,6 @@
 
 &#x20;     "questionCount": 5,
 
-&#x20;     "monsterWaveCount": 3,
-
 &#x20;     "bossLevel": false,
 
 &#x20;     "nextLevelUnlockCondition": "score >= 1000"
@@ -668,8 +638,6 @@
 
 &#x20;     "questionCount": 8,
 
-&#x20;     "monsterWaveCount": 5,
-
 &#x20;     "bossLevel": true,
 
 &#x20;     "nextLevelUnlockCondition": "boss\_killed = true"
@@ -682,8 +650,6 @@
 
 &#x20;   "questionCountGrowth": 1.1,
 
-&#x20;   "monsterWaveCountGrowth": 1.2,
-
 &#x20;   "bossLevelFrequency": 5
 
 &#x20; }
@@ -695,9 +661,9 @@
 
 
 
-* `levels`：每个关卡的详细配置，包含关卡等级、学科、解锁条件、答题数量、小怪波次配置；
+* `levels`：每个关卡的详细配置，包含关卡等级、学科、解锁条件、答题数量；
 
-* `levelDifficultyGrowth`：关卡难度的整体增长系数，决定答题数量、小怪波次的增长幅度；
+* `levelDifficultyGrowth`：关卡难度的整体增长系数，决定答题数量的增长幅度；
 
 * 以`level`字段为唯一关联键，将答题、割草、Boss 配置数据串联成完整的难度曲线；调整这里的关卡顺序，就能直接变更学科出现节奏。
 
@@ -1306,25 +1272,15 @@ export class GrassCuttingScene extends Scene {
 
 &#x20; }
 
-&#x20; // 初始化玩家角色，应用割草属性加成
+&#x20; // 初始化玩家角色
 
 &#x20; initPlayer(): void {
-
-&#x20;   const { playerSkillSettings } = this.grassCuttingConfig;
 
 &#x20;   // 创建玩家角色，配置物理属性
 
 &#x20;   this.player = this.physics.add.sprite(100, 100, 'player');
 
 &#x20;   this.player.setCollideWorldBounds(true);
-
-&#x20;   // 应用答题属性加成：技能伤害、攻速、范围提升
-
-&#x20;   this.player.setData('skillDamage', playerSkillSettings.skillDamageBase \* this.grassCuttingBonus.damageMultiplier);
-
-&#x20;   this.player.setData('skillSpeed', playerSkillSettings.skillCooldownBase \* this.grassCuttingBonus.speedMultiplier);
-
-&#x20;   this.player.setData('skillDuration', playerSkillSettings.skillDurationBase \* this.grassCuttingBonus.durationMultiplier);
 
 &#x20; }
 
@@ -1334,21 +1290,29 @@ export class GrassCuttingScene extends Scene {
 
 &#x20;   const { monsterSettings } = this.grassCuttingConfig;
 
-&#x20;   // 根据关卡配置的小怪波次，批量创建小怪并配置属性
+&#x20;   // 按波内刷新间隔持续生成小怪，并配置属性
 
-&#x20;   for (let i = 0; i < this.currentLevelData.monsterWaveCount; i++) {
+&#x20;   this.time.addEvent({
 
-&#x20;     const monster = this.physics.add.sprite(200 + i \* 50, 200, 'monster');
+&#x20;     delay: monsterSettings.monsterSpawnIntervalWithinWave \* 1000,
 
-&#x20;     // 应用小怪属性加成：血量、伤害、移动速度提升
+&#x20;     loop: true,
 
-&#x20;     monster.setData('hp', monsterSettings.monsterHpBase \* Math.pow(monsterSettings.monsterHpGrowthPerLevel, this.currentLevel - 1));
+&#x20;     callback: () => {
 
-&#x20;     monster.setData('damage', monsterSettings.monsterDamageBase \* Math.pow(monsterSettings.monsterDamageGrowthPerLevel, this.currentLevel - 1));
+&#x20;       const monster = this.physics.add.sprite(200, 200, 'monster');
 
-&#x20;     monster.setData('speed', monsterSettings.monsterMoveSpeedBase \* Math.pow(monsterSettings.monsterMoveSpeedGrowthPerLevel, this.currentLevel - 1));
+&#x20;       // 应用小怪属性加成：血量、伤害、移动速度提升
 
-&#x20;   }
+&#x20;       monster.setData('hp', monsterSettings.monsterHpBase \* Math.pow(monsterSettings.monsterHpGrowthPerLevel, this.currentLevel - 1));
+
+&#x20;       monster.setData('damage', monsterSettings.monsterDamageBase \* Math.pow(monsterSettings.monsterDamageGrowthPerLevel, this.currentLevel - 1));
+
+&#x20;       monster.setData('speed', monsterSettings.monsterMoveSpeedBase \* Math.pow(monsterSettings.monsterMoveSpeedGrowthPerLevel, this.currentLevel - 1));
+
+&#x20;     }
+
+&#x20;   });
 
 &#x20; }
 
