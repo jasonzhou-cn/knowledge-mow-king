@@ -51,11 +51,14 @@ export class TouchJoystick {
     const s = opts.settings;
     const depth = opts.depth ?? 900;
 
-    this.centerX = s.joystickCenterX;
-    this.centerY = s.joystickCenterY;
-    this.baseRadius = s.joystickBaseRadius;
-    this.knobRadius = s.joystickKnobRadius;
-    this.deadZone = s.joystickDeadZone;
+    // viewport 缩放：摇杆位置和半径都按 viewport 实际尺寸计算
+    // 避免在 1024×540 窄屏上摇杆贴边、在 2340×1080 全面屏上摇杆太小
+    const vpScale = Math.min(scene.scale.width / 960, scene.scale.height / 640);
+    this.centerX = s.joystickCenterX * vpScale;
+    this.centerY = s.joystickCenterY * vpScale;
+    this.baseRadius = s.joystickBaseRadius * vpScale;
+    this.knobRadius = s.joystickKnobRadius * vpScale;
+    this.deadZone = s.joystickDeadZone * vpScale;
     this.idleAlpha = s.joystickIdleAlpha;
     this.activeAlpha = s.joystickActiveAlpha;
     this.maxOffset = Math.max(1, this.baseRadius - this.knobRadius);

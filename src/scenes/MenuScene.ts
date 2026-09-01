@@ -39,31 +39,39 @@ export class MenuScene extends Phaser.Scene {
 
     this.drawBackdrop(w, h);
 
+    // viewport 缩放：方案 C 下把 UI 字号/位置按 viewport 与 960×640 的最小比缩放
+    // 让菜单在 1024×540 窄屏或 2340×1080 全面屏上都能合理铺满
+    const s = Math.min(w / 960, h / 640);
+    // 整组 UI 整体居中：以 viewport 中心为锚点，所有 y 位置改为相对中心的偏移
+    const cx = w / 2;
+    const cy = h / 2;
+
     // 标题
     this.add
-      .text(w / 2, 88, '知识割草王', textStyle(64, css(Palette.accent.primary), { fontStyle: 'bold' }))
+      .text(cx, cy - 200 * s, '知识割草王', textStyle(Math.round(64 * s), css(Palette.accent.primary), { fontStyle: 'bold' }))
       .setOrigin(0.5);
     this.add
-      .text(w / 2, 140, '答得越准越快，割得越狠越爽', textStyle(22, css(Palette.text.secondary)))
+      .text(cx, cy - 148 * s, '答得越准越快，割得越狠越爽', textStyle(Math.round(22 * s), css(Palette.text.secondary)))
       .setOrigin(0.5);
 
     // 成长面板
     const panel = this.add.graphics();
+    const panelW = 480 * s, panelH = 132 * s;
     panel.fillStyle(Palette.background.panel, 0.85);
-    panel.fillRoundedRect(w / 2 - 240, 178, 480, 132, 14);
+    panel.fillRoundedRect(cx - panelW / 2, cy - 110 * s, panelW, panelH, 14);
     panel.lineStyle(2, Palette.accent.primaryDark, 0.7);
-    panel.strokeRoundedRect(w / 2 - 240, 178, 480, 132, 14);
+    panel.strokeRoundedRect(cx - panelW / 2, cy - 110 * s, panelW, panelH, 14);
 
     this.statsText = this.add
-      .text(w / 2, 214, '', textStyle(19, css(Palette.text.primary), { align: 'center', lineSpacing: 8 }))
+      .text(cx, cy - 74 * s, '', textStyle(Math.round(19 * s), css(Palette.text.primary), { align: 'center', lineSpacing: 8 }))
       .setOrigin(0.5, 0);
 
     // 经验进度条
     const expBar = this.add.graphics();
-    const barX = w / 2 - 200;
-    const barY = 274;
-    const barW = 400;
-    const barH = 14;
+    const barX = cx - 200 * s;
+    const barY = cy - 14 * s;
+    const barW = 400 * s;
+    const barH = 14 * s;
     expBar.fillStyle(Palette.background.deep, 1);
     expBar.fillRoundedRect(barX, barY, barW, barH, 7);
     expBar.fillStyle(Palette.accent.gold, 1);
@@ -73,30 +81,30 @@ export class MenuScene extends Phaser.Scene {
 
     // 关卡选择
     this.add
-      .text(w / 2 - 150, 336, '◀ 选择关卡 ▶', textStyle(20, css(Palette.text.hint)))
+      .text(cx - 150 * s, cy + 48 * s, '◀ 选择关卡 ▶', textStyle(Math.round(20 * s), css(Palette.text.hint)))
       .setOrigin(0.5, 0);
     this.levelText = this.add
-      .text(w / 2 + 130, 332, '', textStyle(24, css(Palette.accent.secondary)))
+      .text(cx + 130 * s, cy + 44 * s, '', textStyle(Math.round(24 * s), css(Palette.accent.secondary)))
       .setOrigin(0.5, 0);
 
     // 开始按钮
     const button = this.add.graphics();
-    const btnW = 300;
-    const btnH = 66;
-    const btnX = w / 2 - btnW / 2;
-    const btnY = 392;
+    const btnW = 300 * s;
+    const btnH = 66 * s;
+    const btnX = cx - btnW / 2;
+    const btnY = cy + 104 * s;
     button.fillStyle(Palette.accent.primary, 1);
     button.fillRoundedRect(btnX, btnY, btnW, btnH, 16);
     button.lineStyle(3, Palette.accent.primaryDark, 1);
     button.strokeRoundedRect(btnX, btnY, btnW, btnH, 16);
 
     const buttonText = this.add
-      .text(w / 2, btnY + btnH / 2, '开 始 答 题', textStyle(30, css(Palette.text.onAccent), { fontStyle: 'bold' }))
+      .text(cx, btnY + btnH / 2, '开 始 答 题', textStyle(Math.round(30 * s), css(Palette.text.onAccent), { fontStyle: 'bold' }))
       .setOrigin(0.5);
 
     // 按钮热区（比按钮本身更大，照顾 9 岁玩家的点击精度）
     const zone = this.add
-      .zone(w / 2, btnY + btnH / 2, btnW + 40, btnH + 24)
+      .zone(cx, btnY + btnH / 2, btnW + 40 * s, btnH + 24 * s)
       .setOrigin(0.5)
       .setInteractive({ useHandCursor: true });
 
@@ -104,22 +112,22 @@ export class MenuScene extends Phaser.Scene {
     zone.on('pointerout', () => buttonText.setScale(1));
     zone.on('pointerdown', () => {
       popScale(this, buttonText, 1.16, 180);
-      ripple(this, w / 2, btnY + btnH / 2, Palette.accent.gold, 160, 420);
+      ripple(this, cx, btnY + btnH / 2, Palette.accent.gold, 160, 420);
       this.startLevel();
     });
 
     // 操作说明
     this.add
       .text(
-        w / 2,
-        496,
+        cx,
+        cy + 208 * s,
         '答题：点击屏幕或按空格「停住」选项，让正确答案落在判定框里\n割草：WASD / 方向键移动，技能自动释放',
-        textStyle(17, css(Palette.text.hint), { align: 'center', lineSpacing: 6 }),
+        textStyle(Math.round(17 * s), css(Palette.text.hint), { align: 'center', lineSpacing: 6 }),
       )
       .setOrigin(0.5, 0);
 
     this.startHint = this.add
-      .text(w / 2, h - 26, `题库：${describeBank()}`, textStyle(14, css(Palette.text.hint)))
+      .text(cx, h - 26 * s, `题库：${describeBank()}`, textStyle(Math.round(14 * s), css(Palette.text.hint)))
       .setOrigin(0.5);
 
     this.selectedLevel = progression.unlockedLevel;
@@ -176,7 +184,7 @@ export class MenuScene extends Phaser.Scene {
         `累计得分 ${Math.round(progression.totalScore)}    已解锁至第 ${progression.unlockedLevel} 关`,
     );
     this.levelText.setText(`第 ${this.selectedLevel} 关 · ${entry.name}`);
-    this.startHint.setY(this.scale.height - 26);
+    this.startHint.setY(this.scale.height - 26 * Math.min(this.scale.width / 960, this.scale.height / 640));
   }
 
   /** 进入答题场景 */

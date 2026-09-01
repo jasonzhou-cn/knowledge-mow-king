@@ -100,13 +100,19 @@ export class QuestionScene extends Phaser.Scene {
     });
 
     const a = this.questionConfig.answerSettings;
+    // viewport 缩放：方案 C（Phaser RESIZE）下 960×640 拉伸到 viewport 物理尺寸，
+    // UI 字号/位置/大小若不缩放会"挤在左上"。这里按 viewport 与 960×640 的最小比缩放。
+    const vp = this.scale.width;
+    const vpScale = Math.min(this.scale.width / 960, this.scale.height / 640);
     if (a.mode === 'arrow') {
       // 箭头模式：答案固定，高亮框循环跳转（默认，儿童友好）
+      // centerX/centerY 用 viewport 物理中心（绝对居中），
+      // cardWidth/cardHeight 乘以 vpScale 让卡片尺寸随 viewport 等比缩放
       this.selector = new ArrowSelector(this, {
-        centerX: a.trackCenterX,
-        centerY: a.trackCenterY,
-        cardWidth: a.optionCardWidth,
-        cardHeight: a.optionCardHeight,
+        centerX: vp / 2,
+        centerY: this.scale.height / 2 + 20 * vpScale,
+        cardWidth: a.optionCardWidth * vpScale,
+        cardHeight: a.optionCardHeight * vpScale,
         interval: a.arrowInterval,
         layout: a.arrowLayout,
       });
@@ -114,15 +120,15 @@ export class QuestionScene extends Phaser.Scene {
       // 轨道模式：原「Stop the Cloud」式移动轨道 + 停住判定
       this.track = new AnswerTrack(this, {
         movementType: a.movementType,
-        centerX: a.trackCenterX,
-        centerY: a.trackCenterY,
-        radiusX: a.trackRadiusX,
-        radiusY: a.trackRadiusY,
-        linearSpan: a.linearTrackSpan,
-        cardWidth: a.optionCardWidth,
-        cardHeight: a.optionCardHeight,
-        zoneWidth: a.selectionZoneWidth,
-        zoneHeight: a.selectionZoneHeight,
+        centerX: vp / 2,
+        centerY: this.scale.height / 2 + 20 * vpScale,
+        radiusX: a.trackRadiusX * vpScale,
+        radiusY: a.trackRadiusY * vpScale,
+        linearSpan: a.linearTrackSpan * vpScale,
+        cardWidth: a.optionCardWidth * vpScale,
+        cardHeight: a.optionCardHeight * vpScale,
+        zoneWidth: a.selectionZoneWidth * vpScale,
+        zoneHeight: a.selectionZoneHeight * vpScale,
         speed: this.packed.answerSpeed,
         overlapThreshold: a.overlapThreshold,
         stopSettleDuration: a.stopSettleDuration,
@@ -450,35 +456,41 @@ export class QuestionScene extends Phaser.Scene {
   /** 构建题干面板与各类提示文本 */
   private buildQuestionPanel(subjectName: string): void {
     const w = this.scale.width;
+    // 面板宽度按 viewport 缩放，方案 C 19.5:9 / 1024×540 下自然放大占满中央
+    const s = Math.min(w / 960, this.scale.height / 640);
+    const panelW = Math.min(840 * s, w * 0.9);
+    const panelH = 80 * s;
+    const panelX = w / 2 - panelW / 2;
+    const panelY = 32 * s;
 
-    // 题干面板：y 96~176
+    // 题干面板
     this.panel = this.add.graphics();
     this.panel.fillStyle(Palette.background.panel, 0.92);
-    this.panel.fillRoundedRect(w / 2 - 420, 96, 840, 80, 14);
+    this.panel.fillRoundedRect(panelX, panelY, panelW, panelH, 14);
     this.panel.lineStyle(2, Palette.accent.primaryDark, 0.8);
-    this.panel.strokeRoundedRect(w / 2 - 420, 96, 840, 80, 14);
+    this.panel.strokeRoundedRect(panelX, panelY, panelW, panelH, 14);
 
     const subjectTag = this.add
-      .text(w / 2 - 404, 102, subjectName, textStyle(15, css(Palette.accent.secondary)))
+      .text(panelX + 16 * s, panelY + 6 * s, subjectName, textStyle(Math.round(15 * s), css(Palette.accent.secondary)))
       .setOrigin(0, 0);
     subjectTag.setDepth(2);
 
     this.questionText = this.add
-      .text(w / 2, 146, '', textStyle(28, css(Palette.text.primary), {
+      .text(w / 2, panelY + panelH / 2, '', textStyle(Math.round(28 * s), css(Palette.text.primary), {
         align: 'center',
-        wordWrap: { width: 790 },
+        wordWrap: { width: panelW - 30 * s },
       }))
       .setOrigin(0.5, 0.5);
 
-    // 反馈条：y 184~258，位于题干与轨道之间，不与选项卡片重叠
+    // 反馈条：位于题干与轨道之间，不与选项卡片重叠
     this.resultText = this.add
-      .text(w / 2, 194, '', textStyle(24, css(Palette.text.primary), { fontStyle: 'bold' }))
+      .text(w / 2, panelY + panelH + 32 * s, '', textStyle(Math.round(24 * s), css(Palette.text.primary), { fontStyle: 'bold' }))
       .setOrigin(0.5, 0.5);
 
     this.explanationText = this.add
-      .text(w / 2, 222, '', textStyle(15, css(Palette.text.secondary), {
+      .text(w / 2, panelY + panelH + 60 * s, '', textStyle(Math.round(15 * s), css(Palette.text.secondary), {
         align: 'center',
-        wordWrap: { width: 860 },
+        wordWrap: { width: panelW + 20 * s },
         lineSpacing: 3,
       }))
       .setOrigin(0.5, 0);
@@ -486,7 +498,7 @@ export class QuestionScene extends Phaser.Scene {
     this.hintText = this.add
       .text(
         w / 2,
-        628,
+        this.scale.height - 40,
         this.questionConfig.answerSettings.mode === 'arrow'
           ? '点击屏幕任意位置 或 按空格 —— 让高亮箭头停在正确选项上'
           : '点击屏幕任意位置 或 按空格 —— 让正确选项停在金色判定框里',

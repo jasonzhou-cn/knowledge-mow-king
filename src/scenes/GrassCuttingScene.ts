@@ -32,6 +32,7 @@ import { KillFxSystem } from '../systems/KillFxSystem';
 import { MonsterSpawner, type Monster } from '../systems/MonsterSpawner';
 import { ProjectileSystem, type ProjectileHitPayload } from '../systems/ProjectileSystem';
 import { SafeArea, ENABLE_SAFE_AREA } from '../systems/SafeArea';
+import { getCanvasMode } from '../config/CanvasMode';
 import { sfx } from '../systems/SfxController';
 import { WeaponSystem, type AttackAction } from '../systems/WeaponSystem';
 import { Palette, css, textStyle, weaponTint } from '../ui/Palette';
@@ -284,7 +285,9 @@ export class GrassCuttingScene extends Phaser.Scene {
 
     // 方案 D：SafeArea 让 HUD 永远在 viewport 内，避免 FIT 黑边/全面屏 19.5:9 黑边区出现 UI
     // 回滚：把 ENABLE_SAFE_AREA 改为 false 即退化为方案 A 行为（HUD 直接用 this.scale.width/height）
-    const safeArea = ENABLE_SAFE_AREA
+    // 注意：方案 C（RESIZE）下不需要 SafeArea（无 FIT 黑边），强制用 viewport 物理尺寸
+    const canvasMode = getCanvasMode();
+    const safeArea = ENABLE_SAFE_AREA && canvasMode !== 'c'
       ? new SafeArea(this, 960, 640, 24)
       : null;
     const hudWidth = safeArea ? safeArea.width : this.scale.width;

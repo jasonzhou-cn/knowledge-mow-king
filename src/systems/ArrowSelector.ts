@@ -219,7 +219,7 @@ export class ArrowSelector {
   /** 按布局计算第 i 张卡片的固定位置 */
   private computePositions(count: number): { x: number; y: number }[] {
     const { centerX, centerY, cardWidth, cardHeight, layout } = this.opts;
-    const gap = 28;
+    const gap = 18;
 
     if (layout === 'grid') {
       // 2×2 网格，Z 形顺序：0 左上 → 1 右上 → 2 左下 → 3 右下

@@ -17,7 +17,11 @@ export interface CombatHudOptions {
   gameTime: number;
   level: number;
   levelName: string;
-  /** 底部加成文案的左起始 x；触屏有虚拟摇杆时由场景传入避让后的位置，默认 16 */
+  /**
+   * 底部加成文案的左起始 x：
+   *  - 提供：放在指定 x（场景传避让后的位置）
+   *  - 不提供：默认放在屏幕水平居中（武器栏正下方），不与摇杆冲突
+   */
   bottomTextX?: number;
 }
 
@@ -82,13 +86,13 @@ export class CombatHud {
       .setOrigin(1, 0)
       .setDepth(1002);
 
-    // 底部左侧：让武器栏（底部居中）与加成文案互不遮挡。
-    // 几何核对（height=640）：武器栏格子上移后占 542~598，热区/边界顶边 = 542-6 = 536；
-    // 文案底边 = height-116 = 524，与边界顶边留 12px 间隙（要求 ≥8px）。
-    // 触屏时 x 由场景右移到虚拟摇杆右侧，避免被摇杆压住。
+    // 底部加成文案：默认屏幕水平居中（武器栏正下方居中，方案 C 19.5:9 下呼吸感更好）；
+    // 场景可传 bottomTextX 显式覆盖（触屏有摇杆时由场景计算避让后位置）
+    const bonusX = opts.bottomTextX !== undefined ? opts.bottomTextX : w / 2;
+    const bonusOrigin = opts.bottomTextX !== undefined ? 0 : 0.5;
     this.bonusText = scene.add
-      .text(opts.bottomTextX ?? 16, opts.height - 116, '', textStyle(15, css(Palette.text.hint)))
-      .setOrigin(0, 1)
+      .text(bonusX, opts.height - 116, '', textStyle(15, css(Palette.text.hint)))
+      .setOrigin(bonusOrigin, 1)
       .setDepth(1002);
 
     this.redrawHp();

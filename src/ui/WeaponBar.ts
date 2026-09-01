@@ -40,15 +40,6 @@ export interface WeaponBarOptions {
   depth?: number;
 }
 
-const SLOT_W = 104;
-const SLOT_H = 56;
-const SLOT_GAP = 10;
-const BOTTOM_MARGIN = 10;
-/** 图标外框边长：三把武器贴图长宽比不同，取长边缩到这个尺寸，保持比例不拉伸 */
-const ICON_BOX = 32;
-/** 点击热区在格子基础上向下外扩的高度（上方是战斗区不能挡） */
-const HIT_EXTEND_DOWN = 32;
-
 export class WeaponBar {
   private readonly scene: Phaser.Scene;
   private readonly slots: Slot[] = [];
@@ -60,42 +51,51 @@ export class WeaponBar {
     this.scene = scene;
     this.depth = opts.depth ?? 1002;
 
+    // 武器栏尺寸按 viewport 与 960×640 的最小比缩放（方案 C 19.5:9 全面屏上自然放大）
+    const s = Math.min(opts.width / 960, opts.height / 640);
+    const slotW = 104 * s;
+    const slotH = 56 * s;
+    const slotGap = 10 * s;
+    const bottomMargin = 10 * s;
+    const iconBox = 32 * s;
+    const hitExtend = 32 * s;
+
     const count = Math.max(1, opts.weapons.length);
-    const totalW = count * SLOT_W + (count - 1) * SLOT_GAP;
+    const totalW = count * slotW + (count - 1) * slotGap;
     const startX = Math.round((opts.width - totalW) / 2);
-    // 热区要向下外扩 HIT_EXTEND_DOWN，格子必须同步上移同样的距离，
+    // 热区要向下外扩 hitExtend，格子必须同步上移同样的距离，
     // 否则外扩部分落在屏幕外（格子底边 630 + 外扩 32 > 屏幕高 640），实际可点区域被吃掉大半
-    const startY = opts.height - BOTTOM_MARGIN - SLOT_H - HIT_EXTEND_DOWN;
+    const startY = opts.height - bottomMargin - slotH - hitExtend;
 
     for (let i = 0; i < count; i++) {
-      const x = startX + i * (SLOT_W + SLOT_GAP);
+      const x = startX + i * (slotW + slotGap);
       const y = startY;
 
       const bg = scene.add.graphics().setDepth(this.depth);
 
       const icon = scene.add
-        .image(x + SLOT_W / 2, y + 16, `${WEAPON_TEXTURE_PREFIX}${opts.weapons[i].id}`)
+        .image(x + slotW / 2, y + 16 * s, `${WEAPON_TEXTURE_PREFIX}${opts.weapons[i].id}`)
         .setDepth(this.depth + 1);
       // 等比缩放塞进 ICON_BOX：按贴图原始长边取较小比例，避免拉伸变形
       const iconBaseScale = Math.min(
-        ICON_BOX / Math.max(1, icon.width),
-        ICON_BOX / Math.max(1, icon.height),
+        iconBox / Math.max(1, icon.width),
+        iconBox / Math.max(1, icon.height),
       );
       icon.setScale(iconBaseScale);
 
       const name = scene.add
-        .text(x + SLOT_W / 2, y + 34, opts.weapons[i].name, textStyle(14, css(Palette.text.secondary)))
+        .text(x + slotW / 2, y + 34 * s, opts.weapons[i].name, textStyle(Math.round(14 * s), css(Palette.text.secondary)))
         .setOrigin(0.5, 0.5)
         .setDepth(this.depth + 1);
 
       const hotkey = scene.add
-        .text(x + 6, y + 4, `${i + 1}`, textStyle(12, css(Palette.text.hint)))
+        .text(x + 6 * s, y + 4 * s, `${i + 1}`, textStyle(Math.round(12 * s), css(Palette.text.hint)))
         .setOrigin(0, 0)
         .setDepth(this.depth + 1);
 
       // 点击热区：向下外扩 32px 方便手指点，上方不动以免遮挡战斗区
       const zone = scene.add
-        .zone(x, y, SLOT_W, SLOT_H + HIT_EXTEND_DOWN)
+        .zone(x, y, slotW, slotH + hitExtend)
         .setOrigin(0, 0)
         .setInteractive({ useHandCursor: true })
         .setDepth(this.depth + 2);
@@ -110,13 +110,13 @@ export class WeaponBar {
         zone,
         x,
         y,
-        w: SLOT_W,
-        h: SLOT_H,
+        w: slotW,
+        h: slotH,
       });
     }
 
     // bounds 必须跟着热区一起外扩，否则点在扩展区会被当成「点在战斗区」而触发攻击
-    this.bounds = new Phaser.Geom.Rectangle(startX - 6, startY - 6, totalW + 12, SLOT_H + 12 + HIT_EXTEND_DOWN);
+    this.bounds = new Phaser.Geom.Rectangle(startX - 6 * s, startY - 6 * s, totalW + 12 * s, slotH + 12 * s + hitExtend);
     this.setIndex(0, false);
     // 立刻画一次，避免出现「第一帧格子是空的」的闪烁
     this.update(() => 1);
