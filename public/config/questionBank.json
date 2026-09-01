@@ -14,7 +14,8 @@
         "61"
       ],
       "answerIndex": 0,
-      "explanation": "25 + 37 = 62。个位 5+7=12 进 1，十位 2+3+1=6。"
+      "explanation": "25 + 37 = 62。个位 5+7=12 进 1，十位 2+3+1=6。",
+      "solution": "先加个位：5 加 7 等于 12，写 2 进 1；再算十位 2 加 3 再加进位 1 等于 6，所以是 62。"
     },
     {
       "id": "math-002",
@@ -28,7 +29,8 @@
         "48"
       ],
       "answerIndex": 0,
-      "explanation": "七八五十六，8 × 7 = 56。"
+      "explanation": "七八五十六，8 × 7 = 56。",
+      "solution": "背乘法口诀「七八五十六」，8 乘 7 就是 56。看到 54、63、48 都是别的口诀句子的答案，别被带跑。"
     },
     {
       "id": "math-003",
@@ -42,7 +44,8 @@
         "68"
       ],
       "answerIndex": 0,
-      "explanation": "100 − 38 = 62。可以想成 100 − 40 + 2 = 62。"
+      "explanation": "100 − 38 = 62。可以想成 100 − 40 + 2 = 62。",
+      "solution": "用凑整法：38 离 40 差 2，先算 100 − 40 = 60，再把多减的 2 加回来，60 + 2 = 62。"
     },
     {
       "id": "math-004",
@@ -56,7 +59,8 @@
         "16"
       ],
       "answerIndex": 0,
-      "explanation": "12 × 12 = 144，所以 144 ÷ 12 = 12。"
+      "explanation": "12 × 12 = 144，所以 144 ÷ 12 = 12。",
+      "solution": "反过来想乘法：12 乘多少等于 144？12 × 12 = 144，所以 144 ÷ 12 = 12。"
     },
     {
       "id": "math-005",
@@ -70,7 +74,8 @@
         "40"
       ],
       "answerIndex": 0,
-      "explanation": "长方形面积 = 长 × 宽 = 9 × 4 = 36（平方厘米）。"
+      "explanation": "长方形面积 = 长 × 宽 = 9 × 4 = 36（平方厘米）。",
+      "solution": "长方形面积 = 长 × 宽 = 9 × 4 = 36。注意算面积要带「平方」两个字，单位是平方厘米。"
     },
     {
       "id": "math-006",
@@ -84,7 +89,8 @@
         "2"
       ],
       "answerIndex": 0,
-      "explanation": "同分母相加，3/4 + 1/4 = 4/4 = 1。"
+      "explanation": "同分母相加，3/4 + 1/4 = 4/4 = 1。",
+      "solution": "同分母分数相加，分母不变，只把分子加起来：3 + 1 = 4，4/4 就是 1。"
     },
     {
       "id": "math-007",
@@ -98,7 +104,8 @@
         "72"
       ],
       "answerIndex": 0,
-      "explanation": "5 × 12 = 60（支）。"
+      "explanation": "5 × 12 = 60（支）。",
+      "solution": "每盒 12 支、有 5 盒，就是 5 个 12 相加，用乘法 5 × 12 = 60（支）。"
     },
     {
       "id": "math-008",
@@ -112,7 +119,8 @@
         "0.8"
       ],
       "answerIndex": 0,
-      "explanation": "0.5 + 0.25 = 0.75。"
+      "explanation": "0.5 + 0.25 = 0.75。",
+      "solution": "把 0.5 想成 50 分，0.25 想成 25 分，50 分加 25 分等于 75 分，也就是 0.75。"
     },
     {
       "id": "math-009",
@@ -126,7 +134,8 @@
         "6"
       ],
       "answerIndex": 0,
-      "explanation": "余数必须小于除数，除数是 9，所以余数最大是 8。"
+      "explanation": "余数必须小于除数，除数是 9，所以余数最大是 8。",
+      "solution": "余数一定比除数小！除数是 9，比 9 小的最大整数是 8，所以余数最大是 8。"
     },
     {
       "id": "math-010",
@@ -140,7 +149,8 @@
         "100"
       ],
       "answerIndex": 0,
-      "explanation": "先乘后加：15 × 4 = 60，60 + 20 = 80。"
+      "explanation": "先乘后加：15 × 4 = 60，60 + 20 = 80。",
+      "solution": "有乘法又有加法，先算乘法：15 × 4 = 60，再算 60 + 20 = 80。别从左到右瞎算。"
     },
     {
       "id": "math-011",
@@ -154,7 +164,8 @@
         "18"
       ],
       "answerIndex": 0,
-      "explanation": "正方形周长 = 边长 × 4 = 6 × 4 = 24（厘米）。"
+      "explanation": "正方形周长 = 边长 × 4 = 6 × 4 = 24（厘米）。",
+      "solution": "正方形四条边一样长，周长 = 边长 × 4 = 6 × 4 = 24（厘米）。"
     },
     {
       "id": "math-012",
@@ -168,7 +179,8 @@
         "1/2"
       ],
       "answerIndex": 0,
-      "explanation": "1 = 8/8，8/8 − 3/8 = 5/8。"
+      "explanation": "1 = 8/8，8/8 − 3/8 = 5/8。",
+      "solution": "把 1 化成 8/8，8/8 − 3/8 = 5/8。看到整数减分数，先把整数变成和分母一样的分数再减。"
     },
     {
       "id": "math-013",
@@ -182,7 +194,8 @@
         "3/10"
       ],
       "answerIndex": 0,
-      "explanation": "0.6 = 6/10 = 3/5（分子分母同除以 2）。"
+      "explanation": "0.6 = 6/10 = 3/5（分子分母同除以 2）。",
+      "solution": "0.6 就是十分之六 6/10，分子分母同除以 2 约分，得到最简分数 3/5。"
     },
     {
       "id": "math-014",
@@ -196,7 +209,8 @@
         "450"
       ],
       "answerIndex": 0,
-      "explanation": "99 × 5 = (100 − 1) × 5 = 500 − 5 = 495。"
+      "explanation": "99 × 5 = (100 − 1) × 5 = 500 − 5 = 495。",
+      "solution": "99 离 100 只差 1，先算 100 × 5 = 500，再减掉多算的 1 × 5 = 5，500 − 5 = 495。"
     },
     {
       "id": "math-015",
@@ -210,7 +224,8 @@
         "90"
       ],
       "answerIndex": 0,
-      "explanation": "被除数除数同乘 10：72 ÷ 8 = 9。"
+      "explanation": "被除数除数同乘 10：72 ÷ 8 = 9。",
+      "solution": "除数是小数时，把被除数和除数同时扩大 10 倍：72 ÷ 8 = 9，商不变。"
     },
     {
       "id": "math-016",
@@ -224,7 +239,8 @@
         "90°"
       ],
       "answerIndex": 0,
-      "explanation": "三角形内角和 180°，180 − 50 − 60 = 70°。"
+      "explanation": "三角形内角和 180°，180 − 50 − 60 = 70°。",
+      "solution": "三角形三个内角和是 180°，180 − 50 − 60 = 70°，所以第三个角是 70°。"
     },
     {
       "id": "math-017",
@@ -238,7 +254,8 @@
         "20"
       ],
       "answerIndex": 0,
-      "explanation": "先算括号：12 + 8 = 20，20 × 3 = 60。"
+      "explanation": "先算括号：12 + 8 = 20，20 × 3 = 60。",
+      "solution": "有括号先算括号里：12 + 8 = 20，再算 20 × 3 = 60。"
     },
     {
       "id": "math-018",
@@ -252,7 +269,8 @@
         "115"
       ],
       "answerIndex": 0,
-      "explanation": "1 小时 = 60 分钟，60 + 45 = 105（分钟）。"
+      "explanation": "1 小时 = 60 分钟，60 + 45 = 105（分钟）。",
+      "solution": "1 小时 = 60 分钟，60 + 45 = 105 分钟。别把 1 小时当成 100 分钟哦。"
     },
     {
       "id": "math-019",
@@ -266,7 +284,8 @@
         "3"
       ],
       "answerIndex": 0,
-      "explanation": "2/5 × 15 = 30/5 = 6。"
+      "explanation": "2/5 × 15 = 30/5 = 6。",
+      "solution": "分数乘整数：2/5 × 15 = (2 × 15)/5 = 30/5 = 6，也可以先约分 15 和 5 再算。"
     },
     {
       "id": "math-020",
@@ -280,7 +299,8 @@
         "30"
       ],
       "answerIndex": 0,
-      "explanation": "24 × (1 + 1/3) = 24 + 8 = 32。"
+      "explanation": "24 × (1 + 1/3) = 24 + 8 = 32。",
+      "solution": "乙数比甲数多 1/3，就是 24 加上 24 的 1/3（即 8），24 + 8 = 32。"
     },
     {
       "id": "math-021",
@@ -294,7 +314,8 @@
         "2"
       ],
       "answerIndex": 0,
-      "explanation": "2x = 14 − 6 = 8，x = 4。"
+      "explanation": "2x = 14 − 6 = 8，x = 4。",
+      "solution": "把 6 移到右边变减号：2x = 14 − 6 = 8，再两边除以 2：x = 4。"
     },
     {
       "id": "math-022",
@@ -308,7 +329,8 @@
         "−6"
       ],
       "answerIndex": 0,
-      "explanation": "(−3)² = (−3) × (−3) = 9，负负得正。"
+      "explanation": "(−3)² = (−3) × (−3) = 9，负负得正。",
+      "solution": "平方就是两个相同的数相乘：(−3) × (−3)，负负得正，等于 9。注意负号不能漏掉。"
     },
     {
       "id": "math-023",
@@ -322,7 +344,8 @@
         "4a"
       ],
       "answerIndex": 0,
-      "explanation": "合并同类项：(3 + 5 − 2)a = 6a。"
+      "explanation": "合并同类项：(3 + 5 − 2)a = 6a。",
+      "solution": "字母相同的项才能合并，系数直接相加减：3 + 5 − 2 = 6，字母 a 照抄，所以是 6a。"
     },
     {
       "id": "math-024",
@@ -336,7 +359,8 @@
         "√7"
       ],
       "answerIndex": 0,
-      "explanation": "勾股定理：√(3² + 4²) = √25 = 5。"
+      "explanation": "勾股定理：√(3² + 4²) = √25 = 5。",
+      "solution": "用勾股定理：斜边² = 3² + 4² = 9 + 16 = 25，√25 = 5。直角边 3、4，斜边一定是 5。"
     },
     {
       "id": "math-025",
@@ -350,7 +374,8 @@
         "x⁹"
       ],
       "answerIndex": 0,
-      "explanation": "同底数幂相乘，指数相加：x^(2+3) = x⁵。"
+      "explanation": "同底数幂相乘，指数相加：x^(2+3) = x⁵。",
+      "solution": "同底数幂相乘，底数 x 不变，指数相加：2 + 3 = 5，所以是 x⁵。"
     },
     {
       "id": "math-026",
@@ -364,7 +389,8 @@
         "1"
       ],
       "answerIndex": 0,
-      "explanation": "展开得 2x² + 6x − x − 3 = 2x² + 5x − 3，一次项系数为 5。"
+      "explanation": "展开得 2x² + 6x − x − 3 = 2x² + 5x − 3，一次项系数为 5。",
+      "solution": "展开 (2x−1)(x+3) = 2x² + 6x − x − 3 = 2x² + 5x − 3，x 的一次项 6x − x = 5x，系数是 5。"
     },
     {
       "id": "math-027",
@@ -378,7 +404,8 @@
         "2"
       ],
       "answerIndex": 0,
-      "explanation": "x = ±4，正值解为 4。"
+      "explanation": "x = ±4，正值解为 4。",
+      "solution": "16 是 4 的平方，所以 x = ±4；题目要正值解，答案就是 4。"
     },
     {
       "id": "math-028",
@@ -392,7 +419,8 @@
         "50π"
       ],
       "answerIndex": 0,
-      "explanation": "圆面积 = πr² = π × 5² = 25π。"
+      "explanation": "圆面积 = πr² = π × 5² = 25π。",
+      "solution": "圆面积公式 S = πr²，半径 5 代进去：π × 5² = 25π。周长才用 2πr，别记混。"
     },
     {
       "id": "math-029",
@@ -406,7 +434,8 @@
         "14"
       ],
       "answerIndex": 0,
-      "explanation": "√49 = 7，√25 = 5，7 + 5 = 12。"
+      "explanation": "√49 = 7，√25 = 5，7 + 5 = 12。",
+      "solution": "√49 = 7，√25 = 5，7 + 5 = 12。注意不能把根号里的数直接相加。"
     },
     {
       "id": "math-030",
@@ -420,7 +449,8 @@
         "9"
       ],
       "answerIndex": 0,
-      "explanation": "y = 2 × 3 + 1 = 7。"
+      "explanation": "y = 2 × 3 + 1 = 7。",
+      "solution": "把 x = 3 代进 y = 2x + 1：y = 2 × 3 + 1 = 7。"
     },
     {
       "id": "math-031",
@@ -434,7 +464,8 @@
         "(x+3)²"
       ],
       "answerIndex": 0,
-      "explanation": "平方差公式：x² − 3² = (x + 3)(x − 3)。"
+      "explanation": "平方差公式：x² − 3² = (x + 3)(x − 3)。",
+      "solution": "看到「平方 − 平方」就用平方差公式：x² − 9 = x² − 3² = (x + 3)(x − 3)。"
     },
     {
       "id": "math-032",
@@ -448,7 +479,8 @@
         "−1/4"
       ],
       "answerIndex": 0,
-      "explanation": "负指数取倒数：2⁻² = 1 / 2² = 1/4。"
+      "explanation": "负指数取倒数：2⁻² = 1 / 2² = 1/4。",
+      "solution": "负指数表示取倒数：2⁻² = 1/2² = 1/4。指数有负号就把底数倒过来。"
     },
     {
       "id": "math-033",
@@ -462,7 +494,8 @@
         "21"
       ],
       "answerIndex": 0,
-      "explanation": "3x − 5 = 16 → 3x = 21 → x = 7。"
+      "explanation": "3x − 5 = 16 → 3x = 21 → x = 7。",
+      "solution": "把 −5 移到右边变 +5：3x = 16 + 5 = 21，再除以 3：x = 7。"
     },
     {
       "id": "math-034",
@@ -476,7 +509,8 @@
         "5"
       ],
       "answerIndex": 0,
-      "explanation": "(a + b)² = a² + 2ab + b²，共 3 项。"
+      "explanation": "(a + b)² = a² + 2ab + b²，共 3 项。",
+      "solution": "(a + b)² = a² + 2ab + b²，一共有 a²、2ab、b² 三项，别漏了中间的 2ab。"
     },
     {
       "id": "math-035",
@@ -490,7 +524,8 @@
         "8"
       ],
       "answerIndex": 0,
-      "explanation": "(2+4+6+8+10) / 5 = 30 / 5 = 6。"
+      "explanation": "(2+4+6+8+10) / 5 = 30 / 5 = 6。",
+      "solution": "平均数 = 总和 ÷ 个数：(2 + 4 + 6 + 8 + 10) ÷ 5 = 30 ÷ 5 = 6。"
     },
     {
       "id": "math-036",
@@ -504,7 +539,8 @@
         "1"
       ],
       "answerIndex": 0,
-      "explanation": "特殊角三角函数：sin 30° = 1/2。"
+      "explanation": "特殊角三角函数：sin 30° = 1/2。",
+      "solution": "特殊角要背熟：sin 30° = 1/2。可以想成 30° 的角很小，对边只有斜边的一半。"
     },
     {
       "id": "math-037",
@@ -518,7 +554,8 @@
         "14"
       ],
       "answerIndex": 0,
-      "explanation": "两式相加：2x = 14，x = 7。"
+      "explanation": "两式相加：2x = 14，x = 7。",
+      "solution": "两个式子上下相加，y 和 −y 抵消：2x = 14，x = 7。这叫加减消元法。"
     },
     {
       "id": "math-038",
@@ -532,7 +569,8 @@
         "15"
       ],
       "answerIndex": 0,
-      "explanation": "|−5| = 5，|3| = 3，5 + 3 = 8。"
+      "explanation": "|−5| = 5，|3| = 3，5 + 3 = 8。",
+      "solution": "绝对值就是把负号去掉变正数：|−5| = 5，|3| = 3，5 + 3 = 8。"
     },
     {
       "id": "math-039",
@@ -546,7 +584,8 @@
         "40"
       ],
       "answerIndex": 0,
-      "explanation": "梯形面积 = (上底 + 下底) × 高 ÷ 2 = (4 + 8) × 5 ÷ 2 = 30。"
+      "explanation": "梯形面积 = (上底 + 下底) × 高 ÷ 2 = (4 + 8) × 5 ÷ 2 = 30。",
+      "solution": "梯形面积 = (上底 + 下底) × 高 ÷ 2 = (4 + 8) × 5 ÷ 2 = 30。别忘除以 2。"
     },
     {
       "id": "math-040",
@@ -560,7 +599,8 @@
         "3x²"
       ],
       "answerIndex": 0,
-      "explanation": "系数 3 ÷ 1 = 3，x² ÷ x = x，y ÷ y = 1，结果为 3x。"
+      "explanation": "系数 3 ÷ 1 = 3，x² ÷ x = x，y ÷ y = 1，结果为 3x。",
+      "solution": "系数除系数：3 ÷ 1 = 3；字母同底相除指数相减：x² ÷ x = x，y ÷ y = 1，合起来是 3x。"
     },
     {
       "id": "math-041",
@@ -574,7 +614,8 @@
         "8"
       ],
       "answerIndex": 0,
-      "explanation": "2³ = 8，所以 log₂ 8 = 3。"
+      "explanation": "2³ = 8，所以 log₂ 8 = 3。",
+      "solution": "log₂8 就是在问「2 的几次方等于 8」，2³ = 8，所以答案是 3。"
     },
     {
       "id": "math-042",
@@ -588,7 +629,8 @@
         "−4"
       ],
       "answerIndex": 0,
-      "explanation": "配方得 (x − 2)² − 1，当 x = 2 时最小值为 −1。"
+      "explanation": "配方得 (x − 2)² − 1，当 x = 2 时最小值为 −1。",
+      "solution": "配方：x² − 4x + 3 = (x − 2)² − 1。平方最小是 0，所以整个式子最小是 −1。"
     },
     {
       "id": "math-043",
@@ -602,7 +644,8 @@
         "sin2θ"
       ],
       "answerIndex": 0,
-      "explanation": "同角三角函数基本恒等式：sin²θ + cos²θ = 1。"
+      "explanation": "同角三角函数基本恒等式：sin²θ + cos²θ = 1。",
+      "solution": "这是最常用的三角恒等式：不管角度是多少，sin²θ + cos²θ 永远等于 1，直接记结论。"
     },
     {
       "id": "math-044",
@@ -616,7 +659,8 @@
         "30"
       ],
       "answerIndex": 0,
-      "explanation": "公差 d = 3，a₁₀ = 2 + (10 − 1) × 3 = 2 + 27 = 29。"
+      "explanation": "公差 d = 3，a₁₀ = 2 + (10 − 1) × 3 = 2 + 27 = 29。",
+      "solution": "等差数列第 n 项 = 首项 + (n − 1) × 公差 = 2 + 9 × 3 = 2 + 27 = 29。"
     },
     {
       "id": "math-045",
@@ -630,7 +674,8 @@
         "15"
       ],
       "answerIndex": 0,
-      "explanation": "C(5,2) = 5! / (2! × 3!) = (5 × 4) / 2 = 10。"
+      "explanation": "C(5,2) = 5! / (2! × 3!) = (5 × 4) / 2 = 10。",
+      "solution": "组合数 C(5,2) = (5 × 4) ÷ (2 × 1) = 10。分子从 5 开始往下乘 2 个，分母是 2 的阶乘。"
     },
     {
       "id": "math-046",
@@ -644,7 +689,8 @@
         "2"
       ],
       "answerIndex": 0,
-      "explanation": "2x > 8，两边同除以正数 2，方向不变：x > 4。"
+      "explanation": "2x > 8，两边同除以正数 2，方向不变：x > 4。",
+      "solution": "2x > 5 + 3 = 8，两边同除以正数 2，不等号方向不变：x > 4。"
     },
     {
       "id": "math-047",
@@ -658,7 +704,8 @@
         "不存在"
       ],
       "answerIndex": 0,
-      "explanation": "重要极限：lim(x→0) sin x / x = 1。"
+      "explanation": "重要极限：lim(x→0) sin x / x = 1。",
+      "solution": "这是著名的「重要极限」：x 越接近 0，sin x 和 x 越接近相等，比值趋向 1，直接记住结论。"
     },
     {
       "id": "math-048",
@@ -672,7 +719,8 @@
         "4"
       ],
       "answerIndex": 0,
-      "explanation": "2³ = 8。"
+      "explanation": "2³ = 8。",
+      "solution": "指数 3 表示 2 连乘 3 次：2 × 2 × 2 = 8。"
     },
     {
       "id": "math-049",
@@ -686,7 +734,8 @@
         "−i"
       ],
       "answerIndex": 0,
-      "explanation": "虚数单位的定义：i² = −1。"
+      "explanation": "虚数单位的定义：i² = −1。",
+      "solution": "虚数单位 i 的定义就是 i² = −1，这是硬规定，记住它后面的虚数运算都靠它。"
     },
     {
       "id": "math-050",
@@ -700,7 +749,8 @@
         "3/4"
       ],
       "answerIndex": 0,
-      "explanation": "共 2³ = 8 种等可能结果，恰 2 次正面有 C(3,2) = 3 种，概率 3/8。"
+      "explanation": "共 2³ = 8 种等可能结果，恰 2 次正面有 C(3,2) = 3 种，概率 3/8。",
+      "solution": "抛 3 次共有 2³ = 8 种等可能结果；恰有 2 次正面有 3 种（正正反、正反正、反正正），概率 3/8。"
     },
     {
       "id": "math-051",
@@ -714,7 +764,8 @@
         "0"
       ],
       "answerIndex": 0,
-      "explanation": "lg 100 = 2，lg 0.1 = −1，2 + (−1) = 1。"
+      "explanation": "lg 100 = 2，lg 0.1 = −1，2 + (−1) = 1。",
+      "solution": "lg100 = 2（10² = 100），lg0.1 = −1（10⁻¹ = 0.1），2 + (−1) = 1。"
     },
     {
       "id": "math-052",
@@ -728,7 +779,8 @@
         "21"
       ],
       "answerIndex": 0,
-      "explanation": "公比 q = 2，前 4 项为 3, 6, 12, 24，和为 45。"
+      "explanation": "公比 q = 2，前 4 项为 3, 6, 12, 24，和为 45。",
+      "solution": "公比 q = 2，前 4 项是 3、6、12、24，加起来 3 + 6 + 12 + 24 = 45。"
     },
     {
       "id": "math-053",
@@ -742,7 +794,8 @@
         "x⁴/4"
       ],
       "answerIndex": 0,
-      "explanation": "幂函数求导公式：(xⁿ)′ = n·xⁿ⁻¹，所以 (x³)′ = 3x²。"
+      "explanation": "幂函数求导公式：(xⁿ)′ = n·xⁿ⁻¹，所以 (x³)′ = 3x²。",
+      "solution": "幂函数求导：指数 3 搬到前面当系数，指数减 1 变 2，所以 (x³)′ = 3x²。"
     },
     {
       "id": "math-054",
@@ -756,7 +809,8 @@
         "√2/2"
       ],
       "answerIndex": 0,
-      "explanation": "特殊角三角函数：cos 60° = 1/2。"
+      "explanation": "特殊角三角函数：cos 60° = 1/2。",
+      "solution": "特殊角要背熟：cos 60° = 1/2。它和 sin 30° 一样都是 1/2，可以放在一起记。"
     },
     {
       "id": "math-055",
@@ -770,7 +824,8 @@
         "1"
       ],
       "answerIndex": 0,
-      "explanation": "韦达定理：两根之和 = −b/a = 5。（两根为 2 和 3）"
+      "explanation": "韦达定理：两根之和 = −b/a = 5。（两根为 2 和 3）",
+      "solution": "韦达定理：两根之和 = −b/a = 5。也可以直接解出 x = 2 和 3，2 + 3 = 5，一样。"
     },
     {
       "id": "math-056",
@@ -784,7 +839,8 @@
         "0"
       ],
       "answerIndex": 0,
-      "explanation": "原函数为 x²，代入上下限得 1² − 0² = 1。"
+      "explanation": "原函数为 x²，代入上下限得 1² − 0² = 1。",
+      "solution": "先找原函数：2x 的原函数是 x²；再把上限 1 和下限 0 代进去相减：1² − 0² = 1。"
     },
     {
       "id": "math-057",
@@ -798,7 +854,8 @@
         "空集"
       ],
       "answerIndex": 0,
-      "explanation": "交集取两集合公共元素，只有 3，即 {3}。"
+      "explanation": "交集取两集合公共元素，只有 3，即 {3}。",
+      "solution": "交集取两个集合「共同拥有」的元素，A 和 B 共有的只有 3，所以是 {3}。"
     },
     {
       "id": "math-058",
@@ -812,7 +869,8 @@
         "0"
       ],
       "answerIndex": 0,
-      "explanation": "tan 45° = sin 45° / cos 45° = 1。"
+      "explanation": "tan 45° = sin 45° / cos 45° = 1。",
+      "solution": "tan = sin ÷ cos，tan 45° = sin 45° ÷ cos 45°，而两者相等，所以结果是 1。"
     },
     {
       "id": "math-059",
@@ -826,7 +884,8 @@
         "4/3"
       ],
       "answerIndex": 0,
-      "explanation": "令 3x − 1 = 5，得 3x = 6，x = 2，即 f⁻¹(5) = 2。"
+      "explanation": "令 3x − 1 = 5，得 3x = 6，x = 2，即 f⁻¹(5) = 2。",
+      "solution": "f⁻¹(5) 是在问「f(x) 等于 5 时 x 是多少」，解 3x − 1 = 5，3x = 6，x = 2。"
     },
     {
       "id": "math-060",
@@ -840,7 +899,8 @@
         "0"
       ],
       "answerIndex": 0,
-      "explanation": "这是自然常数 e 的定义式，极限为 e ≈ 2.718。"
+      "explanation": "这是自然常数 e 的定义式，极限为 e ≈ 2.718。",
+      "solution": "这是自然常数 e 的定义式：n 越来越大时，(1 + 1/n)ⁿ 会靠近一个固定数 e ≈ 2.718，直接记结论。"
     },
     {
       "id": "math-061",
@@ -854,7 +914,8 @@
         "3/10"
       ],
       "answerIndex": 0,
-      "explanation": "同分母相加，分母不变分子相加：3/5 + 1/5 = 4/5。"
+      "explanation": "同分母相加，分母不变分子相加：3/5 + 1/5 = 4/5。",
+      "solution": "同分母分数相加，分母 5 不动，分子相加 3 + 1 = 4，得到 4/5。"
     },
     {
       "id": "math-062",
@@ -868,7 +929,8 @@
         "3/10"
       ],
       "answerIndex": 0,
-      "explanation": "2 × 9 = 18，3 × 10 = 30，18/30 约分得 3/5。"
+      "explanation": "2 × 9 = 18，3 × 10 = 30，18/30 约分得 3/5。",
+      "solution": "分子乘分子、分母乘分母：2 × 9 = 18，3 × 10 = 30，得到 18/30，约分（同除以 6）就是 3/5。"
     },
     {
       "id": "math-063",
@@ -882,7 +944,8 @@
         "1/2"
       ],
       "answerIndex": 0,
-      "explanation": "除以一个分数等于乘它的倒数：1/2 × 4 = 2。"
+      "explanation": "除以一个分数等于乘它的倒数：1/2 × 4 = 2。",
+      "solution": "除以一个分数等于乘它的倒数：1/2 ÷ 1/4 = 1/2 × 4 = 2。"
     },
     {
       "id": "math-064",
@@ -896,7 +959,8 @@
         "450%"
       ],
       "answerIndex": 0,
-      "explanation": "小数化百分数，小数点右移两位加 %：0.45 = 45%。"
+      "explanation": "小数化百分数，小数点右移两位加 %：0.45 = 45%。",
+      "solution": "小数化百分数：小数点向右移两位，再加百分号，0.45 → 45%。"
     },
     {
       "id": "math-065",
@@ -910,7 +974,8 @@
         "12"
       ],
       "answerIndex": 0,
-      "explanation": "60 × 25% = 60 × 0.25 = 15。"
+      "explanation": "60 × 25% = 60 × 0.25 = 15。",
+      "solution": "25% 就是四分之一，60 的四分之一是 15；也可以算 60 × 0.25 = 15。"
     },
     {
       "id": "math-066",
@@ -924,7 +989,8 @@
         "50%"
       ],
       "answerIndex": 0,
-      "explanation": "20 ÷ 50 = 0.4 = 40%。"
+      "explanation": "20 ÷ 50 = 0.4 = 40%。",
+      "solution": "求一个数是另一个数的百分之几，用除法：20 ÷ 50 = 0.4 = 40%。"
     },
     {
       "id": "math-067",
@@ -938,7 +1004,8 @@
         "40"
       ],
       "answerIndex": 0,
-      "explanation": "八折即原价的 80%：200 × 0.8 = 160（元）。"
+      "explanation": "八折即原价的 80%：200 × 0.8 = 160（元）。",
+      "solution": "打八折就是按原价的 80% 卖：200 × 80% = 200 × 0.8 = 160（元）。折扣越小越便宜。"
     },
     {
       "id": "math-068",
@@ -952,7 +1019,8 @@
         "36"
       ],
       "answerIndex": 0,
-      "explanation": "12 = 2×2×3，18 = 2×3×3，公共部分 2×3 = 6。"
+      "explanation": "12 = 2×2×3，18 = 2×3×3，公共部分 2×3 = 6。",
+      "solution": "分解质因数：12 = 2×2×3，18 = 2×3×3，两边公共的 2×3 = 6，就是最大公因数。"
     },
     {
       "id": "math-069",
@@ -966,7 +1034,8 @@
         "2"
       ],
       "answerIndex": 0,
-      "explanation": "4 和 6 的公倍数中最小的是 12。"
+      "explanation": "4 和 6 的公倍数中最小的是 12。",
+      "solution": "4 的倍数有 4、8、12、16…，6 的倍数有 6、12、18…，第一个公共倍数是 12，就是最小公倍数。"
     },
     {
       "id": "math-070",
@@ -980,7 +1049,8 @@
         "6 倍"
       ],
       "answerIndex": 0,
-      "explanation": "比的前项和后项同时乘相同的数（0 除外），比值不变，所以后项也扩大 2 倍。"
+      "explanation": "比的前项和后项同时乘相同的数（0 除外），比值不变，所以后项也扩大 2 倍。",
+      "solution": "比的基本性质：前项后项要同时乘或除以同一个数（0 除外），比值才不变，所以后项也要乘 2。"
     },
     {
       "id": "math-071",
@@ -994,7 +1064,8 @@
         "20"
       ],
       "answerIndex": 0,
-      "explanation": "每份是 40 ÷ (3+2) = 8 人，男生 3 × 8 = 24 人。"
+      "explanation": "每份是 40 ÷ (3+2) = 8 人，男生 3 × 8 = 24 人。",
+      "solution": "按比例分配：总份数 3 + 2 = 5，每份 40 ÷ 5 = 8 人，男生占 3 份：3 × 8 = 24 人。"
     },
     {
       "id": "math-072",
@@ -1008,7 +1079,8 @@
         "6.28"
       ],
       "answerIndex": 0,
-      "explanation": "圆周长 C = 2πr = 2 × 3.14 × 3 = 18.84（厘米）。"
+      "explanation": "圆周长 C = 2πr = 2 × 3.14 × 3 = 18.84（厘米）。",
+      "solution": "圆周长公式 C = 2πr = 2 × 3.14 × 3 = 18.84（厘米）。记牢 2πr 是周长。"
     },
     {
       "id": "math-073",
@@ -1022,7 +1094,8 @@
         "梯形"
       ],
       "answerIndex": 0,
-      "explanation": "圆柱侧面沿高剪开展平，得到一个长方形，长等于底面周长，宽等于高。"
+      "explanation": "圆柱侧面沿高剪开展平，得到一个长方形，长等于底面周长，宽等于高。",
+      "solution": "把圆柱侧面沿高剪开再摊平，得到的就是一个长方形，长是底面周长，宽是圆柱的高。"
     },
     {
       "id": "math-074",
@@ -1036,7 +1109,8 @@
         "3.1"
       ],
       "answerIndex": 0,
-      "explanation": "乘 0.5 就是取一半：3.6 的一半是 1.8。"
+      "explanation": "乘 0.5 就是取一半：3.6 的一半是 1.8。",
+      "solution": "乘 0.5 就是取一半，3.6 的一半是 1.8。"
     },
     {
       "id": "math-075",
@@ -1050,7 +1124,8 @@
         "36"
       ],
       "answerIndex": 0,
-      "explanation": "3x = 11 + 7 = 18，x = 6。"
+      "explanation": "3x = 11 + 7 = 18，x = 6。",
+      "solution": "先把 −7 移到右边变 +7：3x = 18，再两边除以 3：x = 6。"
     },
     {
       "id": "math-076",
@@ -1064,7 +1139,8 @@
         "13"
       ],
       "answerIndex": 0,
-      "explanation": "两边除以 5 得 x − 2 = 3，x = 5。"
+      "explanation": "两边除以 5 得 x − 2 = 3，x = 5。",
+      "solution": "先把系数 5 除过去：x − 2 = 3，再把 −2 移过去：x = 5。"
     },
     {
       "id": "math-077",
@@ -1078,7 +1154,8 @@
         "5"
       ],
       "answerIndex": 0,
-      "explanation": "设兔 x 只：4x + 2(10 − x) = 28，解得 x = 4。"
+      "explanation": "设兔 x 只：4x + 2(10 − x) = 28，解得 x = 4。",
+      "solution": "设兔有 x 只，鸡就是 10 − x 只，按腿数列方程：4x + 2(10 − x) = 28，解得 x = 4。"
     },
     {
       "id": "math-078",
@@ -1092,7 +1169,8 @@
         "72"
       ],
       "answerIndex": 0,
-      "explanation": "设原数为 x：1.2x = 60，x = 50。"
+      "explanation": "设原数为 x：1.2x = 60，x = 50。",
+      "solution": "原数增加 20% 后是原数的 120%，所以原数 = 60 ÷ 1.2 = 50。"
     },
     {
       "id": "math-079",
@@ -1106,7 +1184,8 @@
         "58"
       ],
       "answerIndex": 0,
-      "explanation": "七五折即 75%：45 ÷ 0.75 = 60（元）。"
+      "explanation": "七五折即 75%：45 ÷ 0.75 = 60（元）。",
+      "solution": "售价 = 原价 × 75%，反过来原价 = 45 ÷ 0.75 = 60（元）。"
     },
     {
       "id": "math-080",
@@ -1120,7 +1199,8 @@
         "10"
       ],
       "answerIndex": 0,
-      "explanation": "平行四边形面积 = 底 × 高 = 6 × 4 = 24（平方厘米）。"
+      "explanation": "平行四边形面积 = 底 × 高 = 6 × 4 = 24（平方厘米）。",
+      "solution": "平行四边形面积 = 底 × 高 = 6 × 4 = 24（平方厘米）。注意高必须垂直于底。"
     },
     {
       "id": "math-081",
@@ -1134,7 +1214,8 @@
         "5π"
       ],
       "answerIndex": 0,
-      "explanation": "半径 = 10 ÷ 2 = 5，面积 = πr² = 25π。"
+      "explanation": "半径 = 10 ÷ 2 = 5，面积 = πr² = 25π。",
+      "solution": "先求半径：10 ÷ 2 = 5，再套面积公式：π × 5² = 25π。"
     },
     {
       "id": "math-082",
@@ -1148,7 +1229,8 @@
         "4"
       ],
       "answerIndex": 0,
-      "explanation": "由 S = 底 × 高 ÷ 2 得高 = 24 × 2 ÷ 8 = 6（厘米）。"
+      "explanation": "由 S = 底 × 高 ÷ 2 得高 = 24 × 2 ÷ 8 = 6（厘米）。",
+      "solution": "三角形面积 = 底 × 高 ÷ 2，所以高 = 面积 × 2 ÷ 底 = 24 × 2 ÷ 8 = 6（厘米）。"
     },
     {
       "id": "math-083",
@@ -1162,7 +1244,8 @@
         "18"
       ],
       "answerIndex": 0,
-      "explanation": "正方体体积 = 棱长³ = 3 × 3 × 3 = 27。"
+      "explanation": "正方体体积 = 棱长³ = 3 × 3 × 3 = 27。",
+      "solution": "正方体体积 = 棱长 × 棱长 × 棱长 = 3 × 3 × 3 = 27。"
     },
     {
       "id": "math-084",
@@ -1176,7 +1259,8 @@
         "16"
       ],
       "answerIndex": 0,
-      "explanation": "正方体有 6 个面，每个面面积 2² = 4，表面积 = 6 × 4 = 24。"
+      "explanation": "正方体有 6 个面，每个面面积 2² = 4，表面积 = 6 × 4 = 24。",
+      "solution": "一个面的面积是 2 × 2 = 4，正方体有 6 个完全相同的面，所以表面积 = 6 × 4 = 24。"
     },
     {
       "id": "math-085",
@@ -1190,7 +1274,8 @@
         "1/5"
       ],
       "answerIndex": 0,
-      "explanation": "共 5 个球，白球 2 个，概率 = 2/5。"
+      "explanation": "共 5 个球，白球 2 个，概率 = 2/5。",
+      "solution": "概率 = 有利情况 ÷ 所有情况：白球 2 个，总共 5 个球，2 ÷ 5 = 2/5。"
     },
     {
       "id": "math-086",
@@ -1204,7 +1289,8 @@
         "2/3"
       ],
       "answerIndex": 0,
-      "explanation": "偶数有 2、4、6 共 3 种，3/6 = 1/2。"
+      "explanation": "偶数有 2、4、6 共 3 种，3/6 = 1/2。",
+      "solution": "骰子 6 个面，偶数有 2、4、6 三个，3 ÷ 6 = 1/2。"
     },
     {
       "id": "math-087",
@@ -1218,7 +1304,8 @@
         "3"
       ],
       "answerIndex": 0,
-      "explanation": "出现次数最多的数是 5（出现 2 次），所以众数是 5。"
+      "explanation": "出现次数最多的数是 5（出现 2 次），所以众数是 5。",
+      "solution": "众数就是出现次数最多的数，5 出现了 2 次，比其他数都多，所以众数是 5。"
     },
     {
       "id": "math-088",
@@ -1232,7 +1319,8 @@
         "12"
       ],
       "answerIndex": 0,
-      "explanation": "数据从小到大排列后中间那个数是 9，所以中位数是 9。"
+      "explanation": "数据从小到大排列后中间那个数是 9，所以中位数是 9。",
+      "solution": "先把 5 个数从小到大排好，中间的（第 3 个）是 9，中位数就是 9。"
     },
     {
       "id": "math-089",
@@ -1246,7 +1334,8 @@
         "−7"
       ],
       "answerIndex": 0,
-      "explanation": "负负得正：(−2) × (−5) = 10，10 + 3 = 13。"
+      "explanation": "负负得正：(−2) × (−5) = 10，10 + 3 = 13。",
+      "solution": "先算乘法：负负得正，(−2) × (−5) = 10，再算 10 + 3 = 13。"
     },
     {
       "id": "math-090",
@@ -1260,7 +1349,8 @@
         "2250"
       ],
       "answerIndex": 0,
-      "explanation": "101 × 25 = (100 + 1) × 25 = 2500 + 25 = 2525。"
+      "explanation": "101 × 25 = (100 + 1) × 25 = 2500 + 25 = 2525。",
+      "solution": "101 拆成 100 + 1：(100 + 1) × 25 = 2500 + 25 = 2525，用乘法分配律口算更快。"
     },
     {
       "id": "math-091",
@@ -1274,7 +1364,8 @@
         "6"
       ],
       "answerIndex": 0,
-      "explanation": "两式相加得 3x = 12，x = 4（y = 3）。"
+      "explanation": "两式相加得 3x = 12，x = 4（y = 3）。",
+      "solution": "两个式子上下相加，y 和 −y 抵消：2x + x = 3x，11 + 1 = 12，3x = 12，x = 4。"
     },
     {
       "id": "math-092",
@@ -1288,7 +1379,8 @@
         "6"
       ],
       "answerIndex": 0,
-      "explanation": "3x ≥ 12，x ≥ 4，最小整数解为 4。"
+      "explanation": "3x ≥ 12，x ≥ 4，最小整数解为 4。",
+      "solution": "3x ≥ 12，x ≥ 4。因为有等号，x = 4 也可以，所以最小整数解是 4。"
     },
     {
       "id": "math-093",
@@ -1302,7 +1394,8 @@
         "1/9"
       ],
       "answerIndex": 0,
-      "explanation": "共 6 × 6 = 36 种等可能结果，和为 7 有 (1,6)(2,5)(3,4)(4,3)(5,2)(6,1) 共 6 种，概率 = 6/36 = 1/6。"
+      "explanation": "共 6 × 6 = 36 种等可能结果，和为 7 有 (1,6)(2,5)(3,4)(4,3)(5,2)(6,1) 共 6 种，概率 = 6/36 = 1/6。",
+      "solution": "两枚骰子共 6 × 6 = 36 种情况，和为 7 有 (1,6)(2,5)(3,4)(4,3)(5,2)(6,1) 六种，6 ÷ 36 = 1/6。"
     },
     {
       "id": "math-094",
@@ -1316,7 +1409,8 @@
         "1/10"
       ],
       "answerIndex": 0,
-      "explanation": "取法共 C(10,2) = 45 种，成双的取法有 5 种，概率 = 5/45 = 1/9。"
+      "explanation": "取法共 C(10,2) = 45 种，成双的取法有 5 种，概率 = 5/45 = 1/9。",
+      "solution": "从 10 只鞋里取 2 只共 C(10,2) = 45 种；要配成一双只能同一双里的两只，共 5 种，5 ÷ 45 = 1/9。"
     },
     {
       "id": "math-095",
@@ -1330,7 +1424,8 @@
         "36π"
       ],
       "answerIndex": 0,
-      "explanation": "扇形面积 = (60/360) × π × 6² = 6π。"
+      "explanation": "扇形面积 = (60/360) × π × 6² = 6π。",
+      "solution": "扇形面积 = 圆心角 ÷ 360° × 整个圆面积 = (60 ÷ 360) × π × 6² = 6π。"
     },
     {
       "id": "math-096",
@@ -1344,7 +1439,8 @@
         "22"
       ],
       "answerIndex": 0,
-      "explanation": "原来总和 5 × 12 = 60，现在总和 4 × 10 = 40，去掉的数 = 60 − 40 = 20。"
+      "explanation": "原来总和 5 × 12 = 60，现在总和 4 × 10 = 40，去掉的数 = 60 − 40 = 20。",
+      "solution": "先算原总和 5 × 12 = 60，再算剩下的总和 4 × 10 = 40，去掉的数 = 60 − 40 = 20。"
     },
     {
       "id": "math-097",
@@ -1358,7 +1454,8 @@
         "15%"
       ],
       "answerIndex": 0,
-      "explanation": "含糖率 = 糖 ÷ 糖水 = 5 ÷ 20 = 25%。注意分母是糖水总质量而不是水。"
+      "explanation": "含糖率 = 糖 ÷ 糖水 = 5 ÷ 20 = 25%。注意分母是糖水总质量而不是水。",
+      "solution": "含糖率 = 糖 ÷ 糖水 = 5 ÷ 20 = 25%。注意分母是糖水（糖加水），不是单纯的水。"
     },
     {
       "id": "math-098",
@@ -1372,7 +1469,8 @@
         "13"
       ],
       "answerIndex": 0,
-      "explanation": "设这个数为 x：2(x + 3) = 16，x + 3 = 8，x = 5。"
+      "explanation": "设这个数为 x：2(x + 3) = 16，x + 3 = 8，x = 5。",
+      "solution": "设这个数为 x：2(x + 3) = 16，x + 3 = 8，x = 5。"
     },
     {
       "id": "math-099",
@@ -1386,7 +1484,8 @@
         "1/6"
       ],
       "answerIndex": 0,
-      "explanation": "取法共 C(4,2) = 6 种，一黑一白有 2 × 2 = 4 种，概率 = 4/6 = 2/3。"
+      "explanation": "取法共 C(4,2) = 6 种，一黑一白有 2 × 2 = 4 种，概率 = 4/6 = 2/3。",
+      "solution": "4 只袜子取 2 只共 C(4,2) = 6 种取法；一黑一白要黑袜子 2 选 1、白袜子 2 选 1，共 2 × 2 = 4 种，4 ÷ 6 = 2/3。"
     },
     {
       "id": "math-100",
@@ -1400,7 +1499,8 @@
         "8"
       ],
       "answerIndex": 0,
-      "explanation": "面积 = 两直角边之积 ÷ 2，另一条边 = 12 × 2 ÷ 6 = 4。"
+      "explanation": "面积 = 两直角边之积 ÷ 2，另一条边 = 12 × 2 ÷ 6 = 4。",
+      "solution": "直角三角形面积 = 两条直角边相乘 ÷ 2，另一条边 = 12 × 2 ÷ 6 = 4。"
     },
     {
       "id": "english-001",
@@ -1414,7 +1514,8 @@
         "葡萄"
       ],
       "answerIndex": 0,
-      "explanation": "apple 意为苹果，是最常见的水果单词之一。"
+      "explanation": "apple 意为苹果，是最常见的水果单词之一。",
+      "solution": "apple 就是苹果，读起来像「安剖」，想到红红的苹果多念两遍 apple～apple 就记住啦。"
     },
     {
       "id": "english-002",
@@ -1428,7 +1529,8 @@
         "桌子"
       ],
       "answerIndex": 0,
-      "explanation": "book 意为书本。"
+      "explanation": "book 意为书本。",
+      "solution": "book 是书，书页「b」开头的单词，看到 book 就想到课本，多读两遍 book～book。"
     },
     {
       "id": "english-003",
@@ -1442,7 +1544,8 @@
         "警察"
       ],
       "answerIndex": 0,
-      "explanation": "teacher 意为老师，动词 teach（教）加 er 构成。"
+      "explanation": "teacher 意为老师，动词 teach（教）加 er 构成。",
+      "solution": "teach 是「教」，后面加 er 表示「教的人」，所以 teacher 是老师。"
     },
     {
       "id": "english-004",
@@ -1456,7 +1559,8 @@
         "茶"
       ],
       "answerIndex": 0,
-      "explanation": "water 意为水。"
+      "explanation": "water 意为水。",
+      "solution": "water 是水，口渴想喝水时念 water～water，和「我特」谐音，多念几遍就记住了。"
     },
     {
       "id": "english-005",
@@ -1470,7 +1574,8 @@
         "26"
       ],
       "answerIndex": 0,
-      "explanation": "元音字母是 a、e、i、o、u，共 5 个，其余为辅音字母。"
+      "explanation": "元音字母是 a、e、i、o、u，共 5 个，其余为辅音字母。",
+      "solution": "元音字母只有 a、e、i、o、u 五个，剩下的 21 个都是辅音字母，把 aeiou 当口诀背。"
     },
     {
       "id": "english-006",
@@ -1484,7 +1589,8 @@
         "e, f, g"
       ],
       "answerIndex": 0,
-      "explanation": "元音字母只有 a、e、i、o、u，b、c、d、f、g 都是辅音字母。"
+      "explanation": "元音字母只有 a、e、i、o、u，b、c、d、f、g 都是辅音字母。",
+      "solution": "逐个检查有没有 a、e、i、o、u：b、c、d、f、g 都是辅音，只有 a, e, i 一组全是元音。"
     },
     {
       "id": "english-007",
@@ -1498,7 +1604,8 @@
         "一天"
       ],
       "answerIndex": 0,
-      "explanation": "Monday 意为星期一，星期几的单词首字母要大写。"
+      "explanation": "Monday 意为星期一，星期几的单词首字母要大写。",
+      "solution": "Monday 是星期一，Mon 和月亮 moon 有关（古人把周一献给月亮），星期几单词首字母都要大写。"
     },
     {
       "id": "english-008",
@@ -1512,7 +1619,8 @@
         "9"
       ],
       "answerIndex": 0,
-      "explanation": "seven 意为七，six 是六，eight 是八，nine 是九。"
+      "explanation": "seven 意为七，six 是六，eight 是八，nine 是九。",
+      "solution": "seven 是七，数数 one two three four five six seven，seven 就在 six 后面，是第七个。"
     },
     {
       "id": "english-009",
@@ -1526,7 +1634,8 @@
         "红色"
       ],
       "answerIndex": 0,
-      "explanation": "yellow 意为黄色，green 是绿色，blue 是蓝色，red 是红色。"
+      "explanation": "yellow 意为黄色，green 是绿色，blue 是蓝色，red 是红色。",
+      "solution": "yellow 是黄色，想到小黄鸡、柠檬的颜色，yellow～yellow 多念两遍。"
     },
     {
       "id": "english-010",
@@ -1540,7 +1649,8 @@
         "教室"
       ],
       "answerIndex": 0,
-      "explanation": "family 意为家庭、家人。"
+      "explanation": "family 意为家庭、家人。",
+      "solution": "family 是家庭，有人用「father and mother I love you」每个词首字母凑成 family（爸爸和妈妈我爱你），一下就记住了。"
     },
     {
       "id": "english-011",
@@ -1554,7 +1664,8 @@
         "零食"
       ],
       "answerIndex": 0,
-      "explanation": "breakfast 意为早餐，lunch 是午餐，dinner/supper 是晚餐。"
+      "explanation": "breakfast 意为早餐，lunch 是午餐，dinner/supper 是晚餐。",
+      "solution": "breakfast 是早餐：break（打破）+ fast（禁食），早上醒来「打破禁食」吃的第一顿就是早餐。"
     },
     {
       "id": "english-012",
@@ -1568,7 +1679,8 @@
         "fat"
       ],
       "answerIndex": 0,
-      "explanation": "big 意为大，反义词 small 意为小。"
+      "explanation": "big 意为大，反义词 small 意为小。",
+      "solution": "big 是「大」，反义词是 small「小」，把大和小放在一起对比着记。"
     },
     {
       "id": "english-013",
@@ -1582,7 +1694,8 @@
         "wet"
       ],
       "answerIndex": 0,
-      "explanation": "hot 意为热的，反义词 cold 意为冷的。"
+      "explanation": "hot 意为热的，反义词 cold 意为冷的。",
+      "solution": "hot 是「热」，反义词 cold 是「冷」，想想夏天 hot、冬天 cold，一对反义词就记住了。"
     },
     {
       "id": "english-014",
@@ -1596,7 +1709,8 @@
         "冬天"
       ],
       "answerIndex": 0,
-      "explanation": "spring 意为春天，summer 夏天，autumn 秋天，winter 冬天。"
+      "explanation": "spring 意为春天，summer 夏天，autumn 秋天，winter 冬天。",
+      "solution": "spring 是春天，和 summer 夏天、autumn 秋天、winter 冬天一起记，四季是一套的。"
     },
     {
       "id": "english-015",
@@ -1610,7 +1724,8 @@
         "在……里面"
       ],
       "answerIndex": 0,
-      "explanation": "under 意为在……下面，on 在上面，in 在里面。"
+      "explanation": "under 意为在……下面，on 在上面，in 在里面。",
+      "solution": "under 是「在……下面」，想象书在桌子下面 under the desk；on 是上面，in 是里面。"
     },
     {
       "id": "english-016",
@@ -1624,7 +1739,8 @@
         "眼睛"
       ],
       "answerIndex": 0,
-      "explanation": "hand 意为手，foot 是脚，head 是头，eye 是眼睛。"
+      "explanation": "hand 意为手，foot 是脚，head 是头，eye 是眼睛。",
+      "solution": "hand 是手，握手 shake hands 用的就是这个 hand，另一只 hand 还有「帮助」的意思。"
     },
     {
       "id": "english-017",
@@ -1638,7 +1754,8 @@
         "七"
       ],
       "answerIndex": 0,
-      "explanation": "twelve 意为十二，twenty 是二十，注意两者不要混淆。"
+      "explanation": "twelve 意为十二，twenty 是二十，注意两者不要混淆。",
+      "solution": "twelve 是十二，twenty 是二十，两个长得像，多念几遍 twelve、twenty 分清，别搞混。"
     },
     {
       "id": "english-018",
@@ -1652,7 +1769,8 @@
         "食堂"
       ],
       "answerIndex": 0,
-      "explanation": "library 意为图书馆，词根 lib 与图书有关。"
+      "explanation": "library 意为图书馆，词根 lib 与图书有关。",
+      "solution": "library 是图书馆，里面摆满了 books（书），发音像「赖伯瑞」，去借书就想到它。"
     },
     {
       "id": "english-019",
@@ -1666,7 +1784,8 @@
         "六月"
       ],
       "answerIndex": 0,
-      "explanation": "March 意为三月，月份单词首字母要大写。"
+      "explanation": "March 意为三月，月份单词首字母要大写。",
+      "solution": "March 是三月，月份词首字母大写，五月是 May，别把 March 和 May 弄混了。"
     },
     {
       "id": "english-020",
@@ -1680,7 +1799,8 @@
         "鱼"
       ],
       "answerIndex": 0,
-      "explanation": "bird 意为鸟，dog 狗，cat 猫，fish 鱼。"
+      "explanation": "bird 意为鸟，dog 狗，cat 猫，fish 鱼。",
+      "solution": "bird 是鸟，发音像「勃德」，小鸟会飞，以 b 开头的 bird，看到天空就想到它。"
     },
     {
       "id": "english-021",
@@ -1694,7 +1814,8 @@
         "返回"
       ],
       "answerIndex": 0,
-      "explanation": "get up 意为起床，是日常起居常用短语。"
+      "explanation": "get up 意为起床，是日常起居常用短语。",
+      "solution": "get 有「得到」的意思，get up 是固定搭配「起床」，早上起来就喊 get up！"
     },
     {
       "id": "english-022",
@@ -1708,7 +1829,8 @@
         "感谢"
       ],
       "answerIndex": 0,
-      "explanation": "look at 意为看着某物，强调看的动作。"
+      "explanation": "look at 意为看着某物，强调看的动作。",
+      "solution": "look 是看，at 表示朝向，look at 就是「看着……」，比如 look at the blackboard 看黑板。"
     },
     {
       "id": "english-023",
@@ -1722,7 +1844,8 @@
         "写"
       ],
       "answerIndex": 0,
-      "explanation": "listen to 意为听，如 listen to music 听音乐。"
+      "explanation": "listen to 意为听，如 listen to music 听音乐。",
+      "solution": "listen to 是「听」，听音乐 listen to music；它强调听的「动作」，和听到结果 hear 不一样。"
     },
     {
       "id": "english-024",
@@ -1736,7 +1859,8 @@
         "起床"
       ],
       "answerIndex": 0,
-      "explanation": "go to school 意为去上学。"
+      "explanation": "go to school 意为去上学。",
+      "solution": "go to 是「去……」，go to school 就是去上学；回家是 come home，方向相反。"
     },
     {
       "id": "english-025",
@@ -1750,7 +1874,8 @@
         "带午饭"
       ],
       "answerIndex": 0,
-      "explanation": "have 在此表示吃，have lunch 意为吃午饭。"
+      "explanation": "have 在此表示吃，have lunch 意为吃午饭。",
+      "solution": "have 除了「有」，还能表示「吃、喝」，have lunch 吃午饭，have breakfast 吃早饭。"
     },
     {
       "id": "english-026",
@@ -1764,7 +1889,8 @@
         "认真"
       ],
       "answerIndex": 0,
-      "explanation": "take care of 意为照顾、照料，如照顾弟弟妹妹。"
+      "explanation": "take care of 意为照顾、照料，如照顾弟弟妹妹。",
+      "solution": "take care of 是「照顾」，care 是「关心」，把关心给某个人就是在照顾他。"
     },
     {
       "id": "english-027",
@@ -1778,7 +1904,8 @@
         "关掉"
       ],
       "answerIndex": 0,
-      "explanation": "put on 意为穿上、戴上，如 put on your coat 穿上外套。"
+      "explanation": "put on 意为穿上、戴上，如 put on your coat 穿上外套。",
+      "solution": "put on 是「穿上、戴上」，比如 put on your coat 穿上外套；脱下来是 take off。"
     },
     {
       "id": "english-028",
@@ -1792,7 +1919,8 @@
         "上交"
       ],
       "answerIndex": 0,
-      "explanation": "turn on 意为打开（灯、电视等电器），反义短语是 turn off 关闭。"
+      "explanation": "turn on 意为打开（灯、电视等电器），反义短语是 turn off 关闭。",
+      "solution": "turn on 是「打开（电器）」，开灯 turn on the light；关掉是 turn off，一对反义短语。"
     },
     {
       "id": "english-029",
@@ -1806,7 +1934,8 @@
         "熟悉"
       ],
       "answerIndex": 0,
-      "explanation": "be good at 意为擅长，后接名词或动名词，如 be good at swimming。"
+      "explanation": "be good at 意为擅长，后接名词或动名词，如 be good at swimming。",
+      "solution": "be good at 是「擅长」，在某方面做得好就是擅长，后面接名词或动词 ing，如 be good at swimming。"
     },
     {
       "id": "english-030",
@@ -1820,7 +1949,8 @@
         "give"
       ],
       "answerIndex": 0,
-      "explanation": "做作业的固定搭配是 do homework，不能用 make。"
+      "explanation": "做作业的固定搭配是 do homework，不能用 make。",
+      "solution": "做作业是固定搭配 do homework，make 是「制作」的意思，别和 do 混，记住「做作业用 do」。"
     },
     {
       "id": "english-031",
@@ -1834,7 +1964,8 @@
         "bring"
       ],
       "answerIndex": 0,
-      "explanation": "乘交通工具用 take：take a bus / take a train。"
+      "explanation": "乘交通工具用 take：take a bus / take a train。",
+      "solution": "乘公交用 take：take a bus、take a taxi，take 有「乘坐、搭乘」的意思。"
     },
     {
       "id": "english-032",
@@ -1848,7 +1979,8 @@
         "press"
       ],
       "answerIndex": 0,
-      "explanation": "演奏乐器用 play：play the piano 弹钢琴。"
+      "explanation": "演奏乐器用 play：play the piano 弹钢琴。",
+      "solution": "弹钢琴用 play，乐器前面都要加 the：play the piano；而球类运动不加 the。"
     },
     {
       "id": "english-033",
@@ -1862,7 +1994,8 @@
         "go"
       ],
       "answerIndex": 0,
-      "explanation": "球类运动前用 play：play football，注意乐器要加 the，球类不加。"
+      "explanation": "球类运动前用 play：play football，注意乐器要加 the，球类不加。",
+      "solution": "踢足球也用 play：play football，但球类前不加 the；对比 play the piano 一起记。"
     },
     {
       "id": "english-034",
@@ -1876,7 +2009,8 @@
         "生日快乐"
       ],
       "answerIndex": 0,
-      "explanation": "a piece of cake 是习语，表示非常容易的事，不要只按字面理解成一块蛋糕。"
+      "explanation": "a piece of cake 是习语，表示非常容易的事，不要只按字面理解成一块蛋糕。",
+      "solution": "a piece of cake 字面是「一块蛋糕」，实际是习语，意思是「小菜一碟、非常容易」。"
     },
     {
       "id": "english-035",
@@ -1890,7 +2024,8 @@
         "在深夜"
       ],
       "answerIndex": 0,
-      "explanation": "in the morning 意为在早上，at noon 在中午，at night 在晚上。"
+      "explanation": "in the morning 意为在早上，at noon 在中午，at night 在晚上。",
+      "solution": "在早上用 in the morning；在中午 at noon、在晚上 at night，三个时间介词搭配一起背。"
     },
     {
       "id": "english-036",
@@ -1904,7 +2039,8 @@
         "等待"
       ],
       "answerIndex": 0,
-      "explanation": "be late for 意为做某事迟到，如 be late for class 上课迟到。"
+      "explanation": "be late for 意为做某事迟到，如 be late for class 上课迟到。",
+      "solution": "be late for 是「迟到」，late 是「晚的」，上课迟到就是 be late for class。"
     },
     {
       "id": "english-037",
@@ -1918,7 +2054,8 @@
         "喜欢"
       ],
       "answerIndex": 0,
-      "explanation": "look for 意为寻找，强调找的过程；look after 才是照顾。"
+      "explanation": "look for 意为寻找，强调找的过程；look after 才是照顾。",
+      "solution": "look for 是「寻找」的动作，比如找钥匙 look for the key；和 find「找到（结果）」区分开。"
     },
     {
       "id": "english-038",
@@ -1932,7 +2069,8 @@
         "给某人打电话"
       ],
       "answerIndex": 0,
-      "explanation": "say sorry to sb 意为向某人道歉；say goodbye to 是告别。"
+      "explanation": "say sorry to sb 意为向某人道歉；say goodbye to 是告别。",
+      "solution": "say…to 是「对某人说」，say sorry to sb 就是向某人道歉，sorry 就是「对不起」。"
     },
     {
       "id": "english-039",
@@ -1946,7 +2084,8 @@
         "其他"
       ],
       "answerIndex": 0,
-      "explanation": "each other 意为互相、彼此，如 help each other 互相帮助。"
+      "explanation": "each other 意为互相、彼此，如 help each other 互相帮助。",
+      "solution": "each 是「每个」，other 是「另一个」，each other 合起来就是「互相」，互相帮助 help each other。"
     },
     {
       "id": "english-040",
@@ -1960,7 +2099,8 @@
         "lot of"
       ],
       "answerIndex": 0,
-      "explanation": "lots of = a lot of，都可修饰可数或不可数名词，表示许多。"
+      "explanation": "lots of = a lot of，都可修饰可数或不可数名词，表示许多。",
+      "solution": "lots of 和 a lot of 意思一样，都是「许多」，可以互相替换，可数不可数名词都能修饰。"
     },
     {
       "id": "english-041",
@@ -1974,7 +2114,8 @@
         "be"
       ],
       "answerIndex": 0,
-      "explanation": "主语 She 是第三人称单数，be 动词用 is。"
+      "explanation": "主语 She 是第三人称单数，be 动词用 is。",
+      "solution": "主语 She 是第三人称单数，be 动词固定用 is；I 用 am，we/you/they 用 are，三兄弟要分清。"
     },
     {
       "id": "english-042",
@@ -1988,7 +2129,8 @@
         "did"
       ],
       "answerIndex": 0,
-      "explanation": "every day 提示一般现在时，主语 I 后用动词原形 do。"
+      "explanation": "every day 提示一般现在时，主语 I 后用动词原形 do。",
+      "solution": "every day 是「每天」，表示经常发生的动作，用一般现在时，主语 I 后面动词用原形 do。"
     },
     {
       "id": "english-043",
@@ -2002,7 +2144,8 @@
         "going"
       ],
       "answerIndex": 0,
-      "explanation": "yesterday 提示一般过去时，go 的过去式是不规则变化 went。"
+      "explanation": "yesterday 提示一般过去时，go 的过去式是不规则变化 went。",
+      "solution": "yesterday 是「昨天」，过去的时间用一般过去时，go 的过去式是不规则的 went，要背。"
     },
     {
       "id": "english-044",
@@ -2016,7 +2159,8 @@
         "be"
       ],
       "answerIndex": 0,
-      "explanation": "Look 提示动作正在进行，现在进行时 be + doing；主语 children 是复数，用 are。"
+      "explanation": "Look 提示动作正在进行，现在进行时 be + doing；主语 children 是复数，用 are。",
+      "solution": "Look! 提示动作正在发生，用现在进行时 be + doing；children 是复数，be 动词用 are。"
     },
     {
       "id": "english-045",
@@ -2030,7 +2174,8 @@
         "have"
       ],
       "answerIndex": 0,
-      "explanation": "There be 句型遵循就近原则，an apple 是单数，用 is。"
+      "explanation": "There be 句型遵循就近原则，an apple 是单数，用 is。",
+      "solution": "There be 句型看它后面最近的名词，an apple 是单数，所以用 is。"
     },
     {
       "id": "english-046",
@@ -2044,7 +2189,8 @@
         "has"
       ],
       "answerIndex": 0,
-      "explanation": "two books 是复数，There be 句型用 are。"
+      "explanation": "two books 是复数，There be 句型用 are。",
+      "solution": "two books 是复数，There be 句型就用 are，books 本身也是复数形式，前后一致。"
     },
     {
       "id": "english-047",
@@ -2058,7 +2204,8 @@
         "be"
       ],
       "answerIndex": 0,
-      "explanation": "主语 I 与 be 动词搭配用 am。"
+      "explanation": "主语 I 与 be 动词搭配用 am。",
+      "solution": "主语 I 永远配 am，这是固定搭配，I am 缩写就是 I'm。"
     },
     {
       "id": "english-048",
@@ -2072,7 +2219,8 @@
         "watching"
       ],
       "answerIndex": 0,
-      "explanation": "last night 提示一般过去时，watch 的过去式为规则变化 watched。"
+      "explanation": "last night 提示一般过去时，watch 的过去式为规则变化 watched。",
+      "solution": "last night 是「昨天晚上」，过去的时间用一般过去时；watch 是规则动词，直接加 ed 变成 watched。"
     },
     {
       "id": "english-049",
@@ -2086,7 +2234,8 @@
         "was"
       ],
       "answerIndex": 0,
-      "explanation": "be going to 表示将来计划，主语 We 是复数，be 动词用 are。"
+      "explanation": "be going to 表示将来计划，主语 We 是复数，be 动词用 are。",
+      "solution": "be going to 表示将来的计划，主语 We 是复数，be 动词用 are。"
     },
     {
       "id": "english-050",
@@ -2100,7 +2249,8 @@
         "When"
       ],
       "answerIndex": 0,
-      "explanation": "回答是水果（事物），提问最喜欢什么用 What。"
+      "explanation": "回答是水果（事物），提问最喜欢什么用 What。",
+      "solution": "回答是 Apples（物），问「最喜欢什么」用 What；Who 问人、Where 问地方、When 问时间。"
     },
     {
       "id": "english-051",
@@ -2114,7 +2264,8 @@
         "Which"
       ],
       "answerIndex": 0,
-      "explanation": "询问职业用 What：What is your mother?（你妈妈是做什么的？）"
+      "explanation": "询问职业用 What：What is your mother?（你妈妈是做什么的？）",
+      "solution": "回答是职业 a nurse，问职业用固定句式 What is your mother?（你妈妈是做什么的）。"
     },
     {
       "id": "english-052",
@@ -2128,7 +2279,8 @@
         "more tall"
       ],
       "answerIndex": 0,
-      "explanation": "than 提示两者比较，用比较级 taller。"
+      "explanation": "than 提示两者比较，用比较级 taller。",
+      "solution": "than 是「比」，出现 than 就用比较级；tall 的比较级是 taller，最高级 tallest 需要 the。"
     },
     {
       "id": "english-053",
@@ -2142,7 +2294,8 @@
         "most tall"
       ],
       "answerIndex": 0,
-      "explanation": "in our class 表示三者以上比较范围，用最高级 the tallest。"
+      "explanation": "in our class 表示三者以上比较范围，用最高级 the tallest。",
+      "solution": "in our class 表示「在我们班里」这个全班范围，三者以上比较用最高级，前面加 the：the tallest。"
     },
     {
       "id": "english-054",
@@ -2156,7 +2309,8 @@
         "childrens"
       ],
       "answerIndex": 0,
-      "explanation": "child 的复数是不规则变化 children，不是加 s。"
+      "explanation": "child 的复数是不规则变化 children，不是加 s。",
+      "solution": "child 的复数是不规则变化 children，不能直接加 s，这类特殊单词要单独记。"
     },
     {
       "id": "english-055",
@@ -2170,7 +2324,8 @@
         "boxies"
       ],
       "answerIndex": 0,
-      "explanation": "以 s、x、ch、sh 结尾的名词复数加 es：box → boxes。"
+      "explanation": "以 s、x、ch、sh 结尾的名词复数加 es：box → boxes。",
+      "solution": "以 s、x、ch、sh 结尾的名词，复数加 es，box 以 x 结尾，所以是 boxes。"
     },
     {
       "id": "english-056",
@@ -2184,7 +2339,8 @@
         "（不填）"
       ],
       "answerIndex": 0,
-      "explanation": "egg 以元音音素开头，不定冠词用 an。"
+      "explanation": "egg 以元音音素开头，不定冠词用 an。",
+      "solution": "egg 以元音音素开头（e 的读音），不定冠词用 an；a 用于辅音音素开头，看发音不看字母。"
     },
     {
       "id": "english-057",
@@ -2198,7 +2354,8 @@
         "They"
       ],
       "answerIndex": 0,
-      "explanation": "Lily 是女孩名，代词用 She。"
+      "explanation": "Lily 是女孩名，代词用 She。",
+      "solution": "Lily 是女孩名字，指代女孩用 She（她），用 He 就错了。"
     },
     {
       "id": "english-058",
@@ -2212,7 +2369,8 @@
         "of"
       ],
       "answerIndex": 0,
-      "explanation": "具体某一天前用介词 on：on Monday。"
+      "explanation": "具体某一天前用介词 on：on Monday。",
+      "solution": "星期几前面用 on：on Monday；on 用于具体的某一天，in 用于月份、年份、季节。"
     },
     {
       "id": "english-059",
@@ -2226,7 +2384,8 @@
         "to"
       ],
       "answerIndex": 0,
-      "explanation": "月份前用介词 in：in May；具体某天才用 on。"
+      "explanation": "月份前用介词 in：in May；具体某天才用 on。",
+      "solution": "月份前面用 in：in May；只有具体到某一天才用 on，比如 on May 1st。"
     },
     {
       "id": "english-060",
@@ -2240,7 +2399,8 @@
         "Does"
       ],
       "answerIndex": 0,
-      "explanation": "May I ... ? 表示礼貌地请求许可。"
+      "explanation": "May I ... ? 表示礼貌地请求许可。",
+      "solution": "May I…? 是礼貌请求许可的固定句型，比 Can I 更客气，借东西常用它。"
     },
     {
       "id": "english-061",
@@ -2254,7 +2414,8 @@
         "run"
       ],
       "answerIndex": 0,
-      "explanation": "hungry 意为饿，想吃东西用 eat；thirsty 渴了才 drink。"
+      "explanation": "hungry 意为饿，想吃东西用 eat；thirsty 渴了才 drink。",
+      "solution": "hungry 是「饿」，饿了想做的事是吃东西 eat；thirsty（渴）才用 drink。"
     },
     {
       "id": "english-062",
@@ -2268,7 +2429,8 @@
         "ball"
       ],
       "answerIndex": 0,
-      "explanation": "外面下雨要带伞 umbrella。"
+      "explanation": "外面下雨要带伞 umbrella。",
+      "solution": "外面下雨，要带的是伞 umbrella；雨伞以 u 开头，和天气一起想就记住了。"
     },
     {
       "id": "english-063",
@@ -2282,7 +2444,8 @@
         "fast"
       ],
       "answerIndex": 0,
-      "explanation": "cheap 意为便宜的，反义词 expensive 意为昂贵的。"
+      "explanation": "cheap 意为便宜的，反义词 expensive 意为昂贵的。",
+      "solution": "cheap 是「便宜」，反义词是 expensive「昂贵」，一对反义词对比着记。"
     },
     {
       "id": "english-064",
@@ -2296,7 +2459,8 @@
         "sit"
       ],
       "answerIndex": 0,
-      "explanation": "图书馆要保持安静，所以不能 shout 大喊大叫。"
+      "explanation": "图书馆要保持安静，所以不能 shout 大喊大叫。",
+      "solution": "图书馆要求安静，Don't shout 就是「别大喊大叫」；smile/read/sit 都是安静行为，不该被禁止。"
     },
     {
       "id": "english-065",
@@ -2310,7 +2474,8 @@
         "shop"
       ],
       "answerIndex": 0,
-      "explanation": "生病了应该去医院看医生。"
+      "explanation": "生病了应该去医院看医生。",
+      "solution": "生病了要看医生，要去的地方是医院 hospital；park 公园、cinema 电影院、shop 商店都不对。"
     },
     {
       "id": "english-066",
@@ -2324,7 +2489,8 @@
         "night"
       ],
       "answerIndex": 0,
-      "explanation": "天气变暖、树木变绿发生在春天 spring。"
+      "explanation": "天气变暖、树木变绿发生在春天 spring。",
+      "solution": "天气变暖、树木发芽变绿是春天 spring，所以填 spring。"
     },
     {
       "id": "english-067",
@@ -2338,7 +2504,8 @@
         "subject"
       ],
       "answerIndex": 0,
-      "explanation": "summer（夏天）属于季节 season。"
+      "explanation": "summer（夏天）属于季节 season。",
+      "solution": "summer 夏天是一种季节 season，Mike 喜欢游泳、夏天正好游泳，所以选 season。"
     },
     {
       "id": "english-068",
@@ -2352,7 +2519,8 @@
         "How are you?"
       ],
       "answerIndex": 0,
-      "explanation": "回答别人的感谢用 You're welcome（不客气）。"
+      "explanation": "回答别人的感谢用 You're welcome（不客气）。",
+      "solution": "别人说 Thank you（谢谢你），回答 You're welcome（不客气）；I'm fine 是回答 How are you 用的。"
     },
     {
       "id": "english-069",
@@ -2366,7 +2534,8 @@
         "Yes, I am."
       ],
       "answerIndex": 0,
-      "explanation": "How are you 询问近况，常用回答是 Fine, thank you。"
+      "explanation": "How are you 询问近况，常用回答是 Fine, thank you。",
+      "solution": "How are you 问「你好吗」，固定回答 Fine, thank you（我很好，谢谢）。"
     },
     {
       "id": "english-070",
@@ -2380,7 +2549,8 @@
         "How old are you"
       ],
       "answerIndex": 0,
-      "explanation": "回答是钟点时间，提问应该用 What's the time（几点了）。"
+      "explanation": "回答是钟点时间，提问应该用 What's the time（几点了）。",
+      "solution": "回答是钟点 half past six（六点半），问「几点了」用 What's the time；问日期才是 What's the date。"
     },
     {
       "id": "english-071",
@@ -2394,7 +2564,8 @@
         "south"
       ],
       "answerIndex": 0,
-      "explanation": "太阳东升西落：东 east，西 west。"
+      "explanation": "太阳东升西落：东 east，西 west。",
+      "solution": "太阳东升西落，east 东、west 西，north 北、south 南，记口诀「上北下南，左西右东」。"
     },
     {
       "id": "english-072",
@@ -2408,7 +2579,8 @@
         "He cans swim very fast."
       ],
       "answerIndex": 0,
-      "explanation": "情态动词 can 后必须接动词原形 swim。"
+      "explanation": "情态动词 can 后必须接动词原形 swim。",
+      "solution": "情态动词 can 后面必须接动词原形，swim 就是原形，不能加 s 也不能加 to。"
     },
     {
       "id": "english-073",
@@ -2422,7 +2594,8 @@
         "She not like coffee."
       ],
       "answerIndex": 0,
-      "explanation": "第三人称单数的否定句用 doesn't + 动词原形。"
+      "explanation": "第三人称单数的否定句用 doesn't + 动词原形。",
+      "solution": "She 是第三人称单数，否定句用 doesn't + 动词原形：She doesn't like coffee。"
     },
     {
       "id": "english-074",
@@ -2436,7 +2609,8 @@
         "dig"
       ],
       "answerIndex": 0,
-      "explanation": "鸟会在天上飞：fly。"
+      "explanation": "鸟会在天上飞：fly。",
+      "solution": "鸟在天上飞是 fly；swim 游泳是鱼、run 跑是陆地动物、dig 挖土是地鼠，都不对。"
     },
     {
       "id": "english-075",
@@ -2450,7 +2624,8 @@
         "sand"
       ],
       "answerIndex": 0,
-      "explanation": "鱼生活在水里：water。"
+      "explanation": "鱼生活在水里：water。",
+      "solution": "鱼生活在水里 water，fish 和 water 都是高频词，鱼离不开水，联想记忆。"
     },
     {
       "id": "english-076",
@@ -2464,7 +2639,8 @@
         "wet"
       ],
       "answerIndex": 0,
-      "explanation": "冬天寒冷，人们穿保暖的（warm）衣服。"
+      "explanation": "冬天寒冷，人们穿保暖的（warm）衣服。",
+      "solution": "冬天很冷，要穿保暖 warm 的衣服；cool 凉爽、thin 单薄、wet 湿的，都不适合冬天。"
     },
     {
       "id": "english-077",
@@ -2478,7 +2654,8 @@
         "I like tea."
       ],
       "answerIndex": 0,
-      "explanation": "Would you like ... 的礼貌回答是 Yes, please（好的，麻烦了）。"
+      "explanation": "Would you like ... 的礼貌回答是 Yes, please（好的，麻烦了）。",
+      "solution": "Would you like…? 是礼貌询问，接受就说 Yes, please（好的，麻烦了）；拒绝说 No, thanks。"
     },
     {
       "id": "english-078",
@@ -2492,7 +2669,8 @@
         "cook"
       ],
       "answerIndex": 0,
-      "explanation": "在学校教书的人是老师 teacher；farmer 农民，driver 司机，cook 厨师。"
+      "explanation": "在学校教书的人是老师 teacher；farmer 农民，driver 司机，cook 厨师。",
+      "solution": "在学校教书的人是老师 teacher；farmer 农民、driver 司机、cook 厨师，看职业联想。"
     },
     {
       "id": "english-079",
@@ -2506,7 +2684,8 @@
         "wool"
       ],
       "answerIndex": 0,
-      "explanation": "蜜蜂酿造蜂蜜 honey；milk 来自奶牛，wool 来自绵羊。"
+      "explanation": "蜜蜂酿造蜂蜜 honey；milk 来自奶牛，wool 来自绵羊。",
+      "solution": "蜜蜂给我们的是蜂蜜 honey；milk 来自奶牛、eggs 来自母鸡、wool 来自绵羊，别串了。"
     },
     {
       "id": "english-080",
@@ -2520,7 +2699,8 @@
         "England"
       ],
       "answerIndex": 0,
-      "explanation": "长城在中国 China。"
+      "explanation": "长城在中国 China。",
+      "solution": "长城 the Great Wall 在中国 China，它是中国的标志性建筑。"
     },
     {
       "id": "english-081",
@@ -2534,7 +2714,8 @@
         "from"
       ],
       "answerIndex": 0,
-      "explanation": "since + 时间点（起点），for + 时间段；2015 是时间点，用 since。"
+      "explanation": "since + 时间点（起点），for + 时间段；2015 是时间点，用 since。",
+      "solution": "现在完成时中，since 接时间点（2015 年），for 接时间段（two years），2015 是时间点用 since。"
     },
     {
       "id": "english-082",
@@ -2548,7 +2729,8 @@
         "lose"
       ],
       "answerIndex": 0,
-      "explanation": "has + 过去分词构成现在完成时，lose 的过去分词是 lost。"
+      "explanation": "has + 过去分词构成现在完成时，lose 的过去分词是 lost。",
+      "solution": "has + 过去分词构成现在完成时，lose 的过去分词是 lost，表示「已经丢了」这个结果。"
     },
     {
       "id": "english-083",
@@ -2562,7 +2744,8 @@
         "what"
       ],
       "answerIndex": 0,
-      "explanation": "先行词是 book（物），定语从句用 which/that 引导；who 用于人。"
+      "explanation": "先行词是 book（物），定语从句用 which/that 引导；who 用于人。",
+      "solution": "先行词 the book 是物，定语从句用 which 或 that 引导；who 用于人，whose 表示「谁的」。"
     },
     {
       "id": "english-084",
@@ -2576,7 +2759,8 @@
         "rain"
       ],
       "answerIndex": 0,
-      "explanation": "主将从现：if 引导的条件从句用一般现在时表将来，主语 it 用 rains。"
+      "explanation": "主将从现：if 引导的条件从句用一般现在时表将来，主语 it 用 rains。",
+      "solution": "「主将从现」：主句 will stay 表将来，if 从句用一般现在时，主语 it 所以用 rains。"
     },
     {
       "id": "english-085",
@@ -2590,7 +2774,8 @@
         "How a"
       ],
       "answerIndex": 0,
-      "explanation": "感叹句结构：How + 形容词 + 主谓；useful 是形容词，用 How。"
+      "explanation": "感叹句结构：How + 形容词 + 主谓；useful 是形容词，用 How。",
+      "solution": "感叹句结构：How + 形容词 + 主语 + 谓语！useful 是形容词，直接跟在 How 后面。"
     },
     {
       "id": "english-086",
@@ -2604,7 +2789,8 @@
         "（不填）"
       ],
       "answerIndex": 0,
-      "explanation": "honest 的 h 不发音，以元音音素 /ɒ/ 开头，用 an。"
+      "explanation": "honest 的 h 不发音，以元音音素 /ɒ/ 开头，用 an。",
+      "solution": "honest 的 h 不发音，第一个音是元音 /ɒ/，所以用 an；a/an 看发音，不是看字母。"
     },
     {
       "id": "english-087",
@@ -2618,7 +2804,8 @@
         "be"
       ],
       "answerIndex": 0,
-      "explanation": "neither（两者都不）作主语时谓语用单数 is。"
+      "explanation": "neither（两者都不）作主语时谓语用单数 is。",
+      "solution": "neither 表示「两者都不」，作主语时谓语用单数 is，这是个固定用法。"
     },
     {
       "id": "english-088",
@@ -2632,7 +2819,8 @@
         "cleaned"
       ],
       "answerIndex": 0,
-      "explanation": "教室是被人打扫的，用一般现在时被动语态 is cleaned。"
+      "explanation": "教室是被人打扫的，用一般现在时被动语态 is cleaned。",
+      "solution": "教室「被打扫」，是承受动作的一方，用被动语态 be + 过去分词：is cleaned。"
     },
     {
       "id": "english-089",
@@ -2646,7 +2834,8 @@
         "took"
       ],
       "answerIndex": 0,
-      "explanation": "had better（You'd better）后接动词原形，表示建议。"
+      "explanation": "had better（You'd better）后接动词原形，表示建议。",
+      "solution": "had better（最好）后面接动词原形，take 就是原形：You'd better take more exercise。"
     },
     {
       "id": "english-090",
@@ -2660,7 +2849,8 @@
         "to do what"
       ],
       "answerIndex": 0,
-      "explanation": "疑问词 + 不定式：what to do 意为做什么，作 know 的宾语。"
+      "explanation": "疑问词 + 不定式：what to do 意为做什么，作 know 的宾语。",
+      "solution": "疑问词 + 不定式作宾语：what to do 是「做什么」；how to do 后面还缺宾语，这里不成立。"
     },
     {
       "id": "english-091",
@@ -2674,7 +2864,8 @@
         "放弃"
       ],
       "answerIndex": 0,
-      "explanation": "put off 意为推迟、延期，如 put off the meeting 推迟会议。"
+      "explanation": "put off 意为推迟、延期，如 put off the meeting 推迟会议。",
+      "solution": "put 是「放」，put off 把时间往后放，就是「推迟」；put on 穿上，take off 脱下/起飞。"
     },
     {
       "id": "english-092",
@@ -2688,7 +2879,8 @@
         "寻找"
       ],
       "answerIndex": 0,
-      "explanation": "look forward to 意为期待、盼望，如 I look forward to seeing you。"
+      "explanation": "look forward to 意为期待、盼望，如 I look forward to seeing you。",
+      "solution": "look forward to 是「期待、盼望」，后面接名词或动词 ing，如 look forward to seeing you。"
     },
     {
       "id": "english-093",
@@ -2702,7 +2894,8 @@
         "赶走"
       ],
       "answerIndex": 0,
-      "explanation": "run out of 意为用完、耗尽，如 run out of money 花光了钱。"
+      "explanation": "run out of 意为用完、耗尽，如 run out of money 花光了钱。",
+      "solution": "run out of 是「用完、耗尽」，钱花光了就是 run out of money；run out 单独用表示「被用完」。"
     },
     {
       "id": "english-094",
@@ -2716,7 +2909,8 @@
         "分发"
       ],
       "answerIndex": 0,
-      "explanation": "give up 意为放弃；give out 才是分发。"
+      "explanation": "give up 意为放弃；give out 才是分发。",
+      "solution": "give up 是「放弃」，Never give up 永不放弃；give out 是分发，give in 是屈服，一起区分。"
     },
     {
       "id": "english-095",
@@ -2730,7 +2924,8 @@
         "He paid two hours to finish the work."
       ],
       "answerIndex": 0,
-      "explanation": "spend time doing sth 是固定搭配，表示花时间做某事。"
+      "explanation": "spend time doing sth 是固定搭配，表示花时间做某事。",
+      "solution": "spend 时间 doing sth 是固定搭配；take 是 it takes sb…to do，cost 主语是物，pay 是付钱，都对不上。"
     },
     {
       "id": "english-096",
@@ -2744,7 +2939,8 @@
         "few"
       ],
       "answerIndex": 0,
-      "explanation": "milk 是不可数名词，用 a little 修饰；a few/few/many 修饰可数名词。"
+      "explanation": "milk 是不可数名词，用 a little 修饰；a few/few/many 修饰可数名词。",
+      "solution": "milk 是不可数名词，只能用 a little（一点）修饰；a few、few、many 都只能修饰可数名词。"
     },
     {
       "id": "english-097",
@@ -2758,7 +2954,8 @@
         "carefully"
       ],
       "answerIndex": 0,
-      "explanation": "as ... as 之间用形容词原级；修饰系动词 is 后作表语用 careful 而非副词。"
+      "explanation": "as ... as 之间用形容词原级；修饰系动词 is 后作表语用 careful 而非副词。",
+      "solution": "as…as（和……一样）中间要用形容词原级，不能加比较级；is 后面作表语用形容词 careful。"
     },
     {
       "id": "english-098",
@@ -2772,7 +2969,8 @@
         "when"
       ],
       "answerIndex": 0,
-      "explanation": "一般疑问句变宾语从句时用 if/whether 引导，从句用陈述语序。"
+      "explanation": "一般疑问句变宾语从句时用 if/whether 引导，从句用陈述语序。",
+      "solution": "一般疑问句变成宾语从句，要用 if 或 whether 引导，并且语序要变成陈述语序。"
     },
     {
       "id": "english-099",
@@ -2786,7 +2984,8 @@
         "worse"
       ],
       "answerIndex": 0,
-      "explanation": "the + 比较级..., the + 比较级... 表示越……越……：越努力结果越好。"
+      "explanation": "the + 比较级..., the + 比较级... 表示越……越……：越努力结果越好。",
+      "solution": "the + 比较级，the + 比较级，表示「越……越……」，越努力就越能得到更好的结果，用 better。"
     },
     {
       "id": "english-100",
@@ -2800,7 +2999,8 @@
         "命令"
       ],
       "answerIndex": 0,
-      "explanation": "in order to 意为为了、以便，后接动词原形表目的。"
+      "explanation": "in order to 意为为了、以便，后接动词原形表目的。",
+      "solution": "in order to 是「为了」，后面接动词原形表目的；in order 才是「有序地、按顺序」。"
     },
     {
       "id": "science-001",
@@ -2814,7 +3014,8 @@
         "北方"
       ],
       "answerIndex": 0,
-      "explanation": "地球自西向东自转，所以太阳看起来从东方升起、西方落下。"
+      "explanation": "地球自西向东自转，所以太阳看起来从东方升起、西方落下。",
+      "solution": "地球自西向东自转，我们看到的太阳是从东方升起来的，「日出东方」记住就好。"
     },
     {
       "id": "science-002",
@@ -2828,7 +3029,8 @@
         "6"
       ],
       "answerIndex": 0,
-      "explanation": "一年 12 个月，约 365 天。"
+      "explanation": "一年 12 个月，约 365 天。",
+      "solution": "一年有 12 个月、约 365 天，这是常识，每月的时间大概一个月亮圆缺的周期。"
     },
     {
       "id": "science-003",
@@ -2842,7 +3044,8 @@
         "用饮用水冲洗马路"
       ],
       "answerIndex": 0,
-      "explanation": "及时关紧水龙头能避免不必要的浪费；其余做法都在白白消耗大量清水。"
+      "explanation": "及时关紧水龙头能避免不必要的浪费；其余做法都在白白消耗大量清水。",
+      "solution": "及时关紧水龙头能避免浪费；另外几个做法都在大量浪费干净的水，一点都不节约。"
     },
     {
       "id": "science-004",
@@ -2856,7 +3059,8 @@
         "完全黑暗的环境"
       ],
       "answerIndex": 0,
-      "explanation": "植物需要阳光进行光合作用，需要水分维持生命活动，土壤只是常见的支撑和养分来源。"
+      "explanation": "植物需要阳光进行光合作用，需要水分维持生命活动，土壤只是常见的支撑和养分来源。",
+      "solution": "植物必须靠阳光进行光合作用、靠根吸收水分才能活；土壤不是绝对必需（水里也能种），所以选阳光和水分。"
     },
     {
       "id": "science-005",
@@ -2870,7 +3074,8 @@
         "8"
       ],
       "answerIndex": 0,
-      "explanation": "彩虹按红橙黄绿蓝靛紫排列，通常说七种颜色，是阳光经水滴折射色散形成的。"
+      "explanation": "彩虹按红橙黄绿蓝靛紫排列，通常说七种颜色，是阳光经水滴折射色散形成的。",
+      "solution": "彩虹是阳光被小水滴折射色散开的，红橙黄绿蓝靛紫正好七种，数一数就知道。"
     },
     {
       "id": "science-006",
@@ -2884,7 +3089,8 @@
         "回声现象"
       ],
       "answerIndex": 0,
-      "explanation": "毛衣摩擦使电荷转移积累，放电时发出噼啪声和火花，这是摩擦起电（静电）现象。"
+      "explanation": "毛衣摩擦使电荷转移积累，放电时发出噼啪声和火花，这是摩擦起电（静电）现象。",
+      "solution": "脱毛衣时衣服相互摩擦起电，电荷积累后放电，发出噼啪声和火花，这是静电，不是燃烧。"
     },
     {
       "id": "science-007",
@@ -2898,7 +3104,8 @@
         "维生素"
       ],
       "answerIndex": 0,
-      "explanation": "米饭、面食的主要成分是淀粉，属于碳水化合物，是人体最主要的能量来源。"
+      "explanation": "米饭、面食的主要成分是淀粉，属于碳水化合物，是人体最主要的能量来源。",
+      "solution": "米饭、面食主要含淀粉，属于碳水化合物，是身体最主要的能量来源；鸡蛋牛肉才是蛋白质。"
     },
     {
       "id": "science-008",
@@ -2912,7 +3119,8 @@
         "从不运动"
       ],
       "answerIndex": 0,
-      "explanation": "规律作息、均衡饮食、适量运动都是健康习惯；熬夜、挑食、久坐不动都损害健康。"
+      "explanation": "规律作息、均衡饮食、适量运动都是健康习惯；熬夜、挑食、久坐不动都损害健康。",
+      "solution": "规律作息、均衡饮食、适量运动才是健康习惯，早睡早起是其中一条。"
     },
     {
       "id": "science-009",
@@ -2926,7 +3134,8 @@
         "增加食物营养"
       ],
       "answerIndex": 0,
-      "explanation": "低温能抑制细菌繁殖、减缓食物氧化变质，但不能杀死全部细菌。"
+      "explanation": "低温能抑制细菌繁殖、减缓食物氧化变质，但不能杀死全部细菌。",
+      "solution": "冰箱冷藏用低温减慢细菌繁殖、减缓食物变质，但杀不死所有细菌，所以选「低温减缓变质」。"
     },
     {
       "id": "science-010",
@@ -2940,7 +3149,8 @@
         "其他垃圾"
       ],
       "answerIndex": 0,
-      "explanation": "过期药品含有害化学成分，乱扔会污染环境，属于有害垃圾，应投入专门回收箱。"
+      "explanation": "过期药品含有害化学成分，乱扔会污染环境，属于有害垃圾，应投入专门回收箱。",
+      "solution": "过期药品含化学物质，乱扔会污染水土，属于有害垃圾，要放进专门的红色垃圾桶。"
     },
     {
       "id": "science-011",
@@ -2954,7 +3164,8 @@
         "地下水"
       ],
       "answerIndex": 0,
-      "explanation": "地球表面约 71% 被海洋覆盖，绝大多数水是海水，淡水只占很小一部分。"
+      "explanation": "地球表面约 71% 被海洋覆盖，绝大多数水是海水，淡水只占很小一部分。",
+      "solution": "地球表面约 71% 是海洋，绝大多数水是海水（咸水），淡水只占约 2.5%。"
     },
     {
       "id": "science-012",
@@ -2968,7 +3179,8 @@
         "光的色散"
       ],
       "answerIndex": 0,
-      "explanation": "光在同种均匀介质中沿直线传播，遇到不透明物体被挡住，身后形成影子。"
+      "explanation": "光在同种均匀介质中沿直线传播，遇到不透明物体被挡住，身后形成影子。",
+      "solution": "光沿直线传播，被不透明物体挡住，物体背后就出现影子，所以影子来自光的直线传播。"
     },
     {
       "id": "science-013",
@@ -2982,7 +3194,8 @@
         "白纸"
       ],
       "answerIndex": 0,
-      "explanation": "光源是自身能发光的物体；月亮和镜子只是反射别人的光，不发光。"
+      "explanation": "光源是自身能发光的物体；月亮和镜子只是反射别人的光，不发光。",
+      "solution": "光源是自己会发光的物体，太阳自己发光；月亮、镜子、白纸都只是反射别人的光。"
     },
     {
       "id": "science-014",
@@ -2996,7 +3209,8 @@
         "密度小"
       ],
       "answerIndex": 0,
-      "explanation": "哈出的气体温度高于手，热量从高温气体传向手，所以觉得暖和。"
+      "explanation": "哈出的气体温度高于手，热量从高温气体传向手，所以觉得暖和。",
+      "solution": "哈出的气体温度比手高，热量从高温物体传到低温物体，手吸收了热量就变暖和。"
     },
     {
       "id": "science-015",
@@ -3010,7 +3224,8 @@
         "更轻"
       ],
       "answerIndex": 0,
-      "explanation": "浅色物体反射阳光的能力强、吸收的热量少，所以夏天穿浅色更凉快。"
+      "explanation": "浅色物体反射阳光的能力强、吸收的热量少，所以夏天穿浅色更凉快。",
+      "solution": "浅色物体反射阳光多、吸收的热量少，所以夏天穿浅色衣服更凉快，黑色最吸热。"
     },
     {
       "id": "science-016",
@@ -3024,7 +3239,8 @@
         "除虫"
       ],
       "answerIndex": 0,
-      "explanation": "蜜蜂在采蜜时把花粉从一朵花带到另一朵花，帮助植物传粉结出果实和种子。"
+      "explanation": "蜜蜂在采蜜时把花粉从一朵花带到另一朵花，帮助植物传粉结出果实和种子。",
+      "solution": "蜜蜂采蜜时身上粘满花粉，飞到另一朵花上就把花粉带过去，帮植物完成传粉。"
     },
     {
       "id": "science-017",
@@ -3038,7 +3254,8 @@
         "下雪天"
       ],
       "answerIndex": 0,
-      "explanation": "晴天阳光充足、温度高，水分蒸发快，最容易把衣服晒干。"
+      "explanation": "晴天阳光充足、温度高，水分蒸发快，最容易把衣服晒干。",
+      "solution": "晴天阳光足、温度高、空气干，水蒸发最快，衣服干得最快；阴雨天越晾越湿。"
     },
     {
       "id": "science-018",
@@ -3052,7 +3269,8 @@
         "可以掉头"
       ],
       "answerIndex": 0,
-      "explanation": "红灯停、绿灯行、黄灯亮时不抢行，这是基本交通规则。"
+      "explanation": "红灯停、绿灯行、黄灯亮时不抢行，这是基本交通规则。",
+      "solution": "红灯表示停止、绿灯表示通行，这是最基本的交通规则，过马路要看信号灯。"
     },
     {
       "id": "science-019",
@@ -3066,7 +3284,8 @@
         "橡皮"
       ],
       "answerIndex": 0,
-      "explanation": "磁铁能吸引铁、钴、镍等磁性材料，木块、塑料、橡皮都不是磁性材料。"
+      "explanation": "磁铁能吸引铁、钴、镍等磁性材料，木块、塑料、橡皮都不是磁性材料。",
+      "solution": "磁铁只能吸引铁、钴、镍等磁性材料，木块、塑料尺、橡皮都不是磁性材料。"
     },
     {
       "id": "science-020",
@@ -3080,7 +3299,8 @@
         "长时间玩手游"
       ],
       "answerIndex": 0,
-      "explanation": "眼睛与书本保持约一尺距离、坐姿端正、控制用眼时间，才能有效预防近视。"
+      "explanation": "眼睛与书本保持约一尺距离、坐姿端正、控制用眼时间，才能有效预防近视。",
+      "solution": "预防近视要坐姿端正、眼睛离书本约一尺、少玩手机多眺望；躺着看、强光下看都伤眼。"
     },
     {
       "id": "science-021",
@@ -3094,7 +3314,8 @@
         "1.5×10⁸ 米/秒"
       ],
       "answerIndex": 0,
-      "explanation": "光速是宇宙中最快的速度，真空中约 30 万千米每秒（3×10⁸ 米/秒）。"
+      "explanation": "光速是宇宙中最快的速度，真空中约 30 万千米每秒（3×10⁸ 米/秒）。",
+      "solution": "光在真空中每秒约 30 万千米，也就是 3×10⁸ 米/秒，它是宇宙中最快的速度。"
     },
     {
       "id": "science-022",
@@ -3108,7 +3329,8 @@
         "34 米/秒"
       ],
       "answerIndex": 0,
-      "explanation": "15℃ 时声音在空气中约每秒 340 米，远慢于光速，所以先见闪电后闻雷声。"
+      "explanation": "15℃ 时声音在空气中约每秒 340 米，远慢于光速，所以先见闪电后闻雷声。",
+      "solution": "15℃ 时声音在空气中每秒约 340 米，比光速慢得多，所以打雷先见闪电后闻雷声。"
     },
     {
       "id": "science-023",
@@ -3122,7 +3344,8 @@
         "用放大镜看字"
       ],
       "answerIndex": 0,
-      "explanation": "照镜子利用光的反射成像；小孔成像和影子是直线传播，放大镜是折射。"
+      "explanation": "照镜子利用光的反射成像；小孔成像和影子是直线传播，放大镜是折射。",
+      "solution": "照镜子是光在镜面上发生反射后进入眼睛成像；小孔成像和影子是直线传播，放大镜是折射。"
     },
     {
       "id": "science-024",
@@ -3136,7 +3359,8 @@
         "反射作用"
       ],
       "answerIndex": 0,
-      "explanation": "凸透镜会聚光线，凹透镜发散光线。"
+      "explanation": "凸透镜会聚光线，凹透镜发散光线。",
+      "solution": "凸透镜中间厚、边缘薄，能把平行光会聚到焦点，所以对光线起会聚作用；凹透镜才发散。"
     },
     {
       "id": "science-025",
@@ -3150,7 +3374,8 @@
         "反射传播"
       ],
       "answerIndex": 0,
-      "explanation": "影子的边缘呈直线延伸，说明光沿直线传播，被物体挡住后形成阴影。"
+      "explanation": "影子的边缘呈直线延伸，说明光沿直线传播，被物体挡住后形成阴影。",
+      "solution": "影子的边界是直的，说明光是沿直线传播的，被物体挡住后就形成影子。"
     },
     {
       "id": "science-026",
@@ -3164,7 +3389,8 @@
         "温度"
       ],
       "answerIndex": 0,
-      "explanation": "力的作用效果：改变物体的形状（如拉长弹簧）或改变物体的运动状态。"
+      "explanation": "力的作用效果：改变物体的形状（如拉长弹簧）或改变物体的运动状态。",
+      "solution": "力有两个作用效果：改变物体的形状（拉长弹簧）和改变运动状态（推动球），这里弹簧变形是形状改变。"
     },
     {
       "id": "science-027",
@@ -3178,7 +3404,8 @@
         "磁力"
       ],
       "answerIndex": 0,
-      "explanation": "地球对物体的吸引力叫重力，方向竖直向下，使苹果落向地面。"
+      "explanation": "地球对物体的吸引力叫重力，方向竖直向下，使苹果落向地面。",
+      "solution": "地球对物体的吸引力叫重力，方向竖直向下，所以苹果熟了会往地面落。"
     },
     {
       "id": "science-028",
@@ -3192,7 +3419,8 @@
         "更重"
       ],
       "answerIndex": 0,
-      "explanation": "两者温度相同，但金属导热快，把手上的热量迅速带走，所以感觉更凉。"
+      "explanation": "两者温度相同，但金属导热快，把手上的热量迅速带走，所以感觉更凉。",
+      "solution": "金属和木头的温度其实一样，但金属导热快，把手上的热量迅速带走，所以感觉更凉。"
     },
     {
       "id": "science-029",
@@ -3206,7 +3434,8 @@
         "先手后杯"
       ],
       "answerIndex": 0,
-      "explanation": "热传递的方向是从高温物体传向低温物体：热量由热水杯传给手。"
+      "explanation": "热传递的方向是从高温物体传向低温物体：热量由热水杯传给手。",
+      "solution": "热传递的方向是从高温物体到低温物体，水杯比手热，所以热量从水杯传给手。"
     },
     {
       "id": "science-030",
@@ -3220,7 +3449,8 @@
         "旋转"
       ],
       "answerIndex": 0,
-      "explanation": "声音由物体振动产生，振动停止，发声也停止。"
+      "explanation": "声音由物体振动产生，振动停止，发声也停止。",
+      "solution": "声音是由物体振动产生的，敲鼓时鼓面抖动发声，手按住鼓面振动一停，声音就停了。"
     },
     {
       "id": "science-031",
@@ -3234,7 +3464,8 @@
         "核能源"
       ],
       "answerIndex": 0,
-      "explanation": "太阳能、风能可以源源不断地得到，属于可再生能源；煤、石油、天然气是化石能源。"
+      "explanation": "太阳能、风能可以源源不断地得到，属于可再生能源；煤、石油、天然气是化石能源。",
+      "solution": "太阳能、风能能不断再生，是可再生能源；煤、石油、天然气是化石能源，用一点少一点。"
     },
     {
       "id": "science-032",
@@ -3248,7 +3479,8 @@
         "提高温度"
       ],
       "answerIndex": 0,
-      "explanation": "磁力使列车脱离轨道悬浮，摩擦大大减小，因此能高速行驶。"
+      "explanation": "磁力使列车脱离轨道悬浮，摩擦大大减小，因此能高速行驶。",
+      "solution": "磁悬浮列车靠磁极间同极相斥的力量浮起来，和轨道不接触，摩擦力大大减小，跑得更快。"
     },
     {
       "id": "science-033",
@@ -3262,7 +3494,8 @@
         "减小压力"
       ],
       "answerIndex": 0,
-      "explanation": "在接触面粗糙程度一定时，压力越大摩擦力越大，刹车就是用力捏闸增大压力。"
+      "explanation": "在接触面粗糙程度一定时，压力越大摩擦力越大，刹车就是用力捏闸增大压力。",
+      "solution": "刹车时用力捏闸，增大了刹车皮对车圈的压力，压力越大摩擦力越大，车就停下来。"
     },
     {
       "id": "science-034",
@@ -3276,7 +3509,8 @@
         "密度比水大"
       ],
       "answerIndex": 0,
-      "explanation": "漂浮时二力平衡：向上的浮力等于向下的重力，船就能平稳浮在水面。"
+      "explanation": "漂浮时二力平衡：向上的浮力等于向下的重力，船就能平稳浮在水面。",
+      "solution": "轮船漂浮在水面，处于平衡状态，向上的浮力正好等于向下的重力；浮力小于重力就会下沉。"
     },
     {
       "id": "science-035",
@@ -3290,7 +3524,8 @@
         "37℃～45℃"
       ],
       "answerIndex": 0,
-      "explanation": "人体体温变化范围小，体温计按人体温设计，量程为 35℃～42℃。"
+      "explanation": "人体体温变化范围小，体温计按人体温设计，量程为 35℃～42℃。",
+      "solution": "体温计是专门量人体温的，而人体温在 35℃～42℃ 之间变化，所以量程设计成这么窄、更精确。"
     },
     {
       "id": "science-036",
@@ -3304,7 +3539,8 @@
         "不吸不放热"
       ],
       "answerIndex": 0,
-      "explanation": "冰熔化时要吸收大量热，从而给身体降温，这是熔化吸热的应用。"
+      "explanation": "冰熔化时要吸收大量热，从而给身体降温，这是熔化吸热的应用。",
+      "solution": "冰熔化时要吸收大量热量，从发烧的人身上把热量吸走，体温就降下来了，这叫熔化吸热。"
     },
     {
       "id": "science-037",
@@ -3318,7 +3554,8 @@
         "色散现象"
       ],
       "answerIndex": 0,
-      "explanation": "光从水进入空气时发生偏折（折射），所以水下的筷子看起来向上弯折。"
+      "explanation": "光从水进入空气时发生偏折（折射），所以水下的筷子看起来向上弯折。",
+      "solution": "光从水里斜着进入空气时，传播方向会发生偏折（折射），所以水里的筷子看起来弯了。"
     },
     {
       "id": "science-038",
@@ -3332,7 +3569,8 @@
         "衍射"
       ],
       "answerIndex": 0,
-      "explanation": "水面相当于平面镜，白云经水面反射成虚像，所以看到水中出现白云。"
+      "explanation": "水面相当于平面镜，白云经水面反射成虚像，所以看到水中出现白云。",
+      "solution": "水面就像一面镜子，把白云的光反射进眼睛，看到的是白云的虚像，这是光的反射。"
     },
     {
       "id": "science-039",
@@ -3346,7 +3584,8 @@
         "汽化现象"
       ],
       "answerIndex": 0,
-      "explanation": "温暖的水蒸气遇到冰冷的玻璃放热液化成小水珠，出现在玻璃内侧。"
+      "explanation": "温暖的水蒸气遇到冰冷的玻璃放热液化成小水珠，出现在玻璃内侧。",
+      "solution": "室内温暖的水蒸气碰到冰冷的玻璃，放热凝结成小水珠，这是液化现象，出现在玻璃内侧。"
     },
     {
       "id": "science-040",
@@ -3360,7 +3599,8 @@
         "不易腐蚀"
       ],
       "answerIndex": 0,
-      "explanation": "铜的电阻率小、导电性优良，是常用的导线材料。"
+      "explanation": "铜的电阻率小、导电性优良，是常用的导线材料。",
+      "solution": "铜的电阻小、导电性能好，做导线损耗小又耐用，所以电线内芯常用铜。"
     },
     {
       "id": "science-041",
@@ -3374,7 +3614,8 @@
         "心脏"
       ],
       "answerIndex": 0,
-      "explanation": "皮肤覆盖全身，是人体面积最大、最重的器官，还能保护身体、调节体温。"
+      "explanation": "皮肤覆盖全身，是人体面积最大、最重的器官，还能保护身体、调节体温。",
+      "solution": "皮肤覆盖全身，面积约 1.5～2 平方米，是人体面积最大、最重的器官，还兼有保护、调温作用。"
     },
     {
       "id": "science-042",
@@ -3388,7 +3629,8 @@
         "线粒体"
       ],
       "answerIndex": 0,
-      "explanation": "叶绿体含叶绿素，能吸收光能制造有机物，是光合作用的场所。"
+      "explanation": "叶绿体含叶绿素，能吸收光能制造有机物，是光合作用的场所。",
+      "solution": "叶绿体里含叶绿素，能吸收阳光制造有机物，是光合作用的「工厂车间」。"
     },
     {
       "id": "science-043",
@@ -3402,7 +3644,8 @@
         "更多二氧化碳"
       ],
       "answerIndex": 0,
-      "explanation": "光合作用把二氧化碳和水转变成有机物并释放氧气，是大气氧气的重要来源。"
+      "explanation": "光合作用把二氧化碳和水转变成有机物并释放氧气，是大气氧气的重要来源。",
+      "solution": "光合作用把二氧化碳和水合成为有机物，同时释放出氧气，地球上的氧气主要来自绿色植物。"
     },
     {
       "id": "science-044",
@@ -3416,7 +3659,8 @@
         "口腔"
       ],
       "answerIndex": 0,
-      "explanation": "小肠长 5～6 米，内壁有大量绒毛，是消化和吸收的主要场所。"
+      "explanation": "小肠长 5～6 米，内壁有大量绒毛，是消化和吸收的主要场所。",
+      "solution": "小肠最长、内壁又有大量绒毛增大了吸收面积，是消化食物、吸收营养的主要器官；胃只负责初步消化。"
     },
     {
       "id": "science-045",
@@ -3430,7 +3674,8 @@
         "淋巴细胞"
       ],
       "answerIndex": 0,
-      "explanation": "红细胞含血红蛋白，能与氧气结合，把氧气运送到全身各处。"
+      "explanation": "红细胞含血红蛋白，能与氧气结合，把氧气运送到全身各处。",
+      "solution": "红细胞里的血红蛋白能和氧气结合，把氧气运送到全身，所以是「运氧快递员」。"
     },
     {
       "id": "science-046",
@@ -3444,7 +3689,8 @@
         "心脏"
       ],
       "answerIndex": 0,
-      "explanation": "肺是气体交换的场所，是呼吸系统的主要器官；心脏属于循环系统。"
+      "explanation": "肺是气体交换的场所，是呼吸系统的主要器官；心脏属于循环系统。",
+      "solution": "肺是气体交换的场所，是呼吸系统的主要器官；心脏属于循环系统，别弄混。"
     },
     {
       "id": "science-047",
@@ -3458,7 +3704,8 @@
         "两者都不进行"
       ],
       "answerIndex": 0,
-      "explanation": "活细胞时刻都在呼吸；白天有光，光合作用同时进行且强于呼吸作用。"
+      "explanation": "活细胞时刻都在呼吸；白天有光，光合作用同时进行且强于呼吸作用。",
+      "solution": "植物活着就在不停呼吸；白天有光又同时进行光合作用，所以白天光合和呼吸都进行。"
     },
     {
       "id": "science-048",
@@ -3472,7 +3719,8 @@
         "玩游戏"
       ],
       "answerIndex": 0,
-      "explanation": "蜻蜓点水是把卵产入水中，这是它的繁殖行为。"
+      "explanation": "蜻蜓点水是把卵产入水中，这是它的繁殖行为。",
+      "solution": "蜻蜓点水是把卵产进水里，幼虫（水虿）在水里长大，这是蜻蜓的繁殖行为。"
     },
     {
       "id": "science-049",
@@ -3486,7 +3734,8 @@
         "企鹅"
       ],
       "answerIndex": 0,
-      "explanation": "鲸虽生活在水里，但胎生哺乳，是哺乳动物；鲨鱼是鱼类，鳄鱼是爬行动物，企鹅是鸟类。"
+      "explanation": "鲸虽生活在水里，但胎生哺乳，是哺乳动物；鲨鱼是鱼类，鳄鱼是爬行动物，企鹅是鸟类。",
+      "solution": "鲸虽然生活在水里，但用肺呼吸、胎生、哺乳，是哺乳动物；鲨鱼是鱼类、鳄鱼是爬行类、企鹅是鸟类。"
     },
     {
       "id": "science-050",
@@ -3500,7 +3749,8 @@
         "花"
       ],
       "answerIndex": 0,
-      "explanation": "种子吸水膨胀后胚根最先伸长突破种皮发育成根，固定幼苗并吸收水分。"
+      "explanation": "种子吸水膨胀后胚根最先伸长突破种皮发育成根，固定幼苗并吸收水分。",
+      "solution": "种子萌发时胚根最先突破种皮向下长成根，固定幼苗并吸收水分，然后胚芽再长出茎和叶。"
     },
     {
       "id": "science-051",
@@ -3514,7 +3764,8 @@
         "保护内脏"
       ],
       "answerIndex": 0,
-      "explanation": "骨骼肌收缩牵拉骨绕关节转动，从而产生运动；骨起杠杆作用，关节是支点。"
+      "explanation": "骨骼肌收缩牵拉骨绕关节转动，从而产生运动；骨起杠杆作用，关节是支点。",
+      "solution": "骨骼肌受神经传来的刺激收缩，牵拉骨绕关节转动，身体就动起来了；骨是杠杆，关节是支点。"
     },
     {
       "id": "science-052",
@@ -3528,7 +3779,8 @@
         "平衡力"
       ],
       "answerIndex": 0,
-      "explanation": "疫苗让身体提前认识病原体并产生抗体和记忆细胞，从而获得免疫力。"
+      "explanation": "疫苗让身体提前认识病原体并产生抗体和记忆细胞，从而获得免疫力。",
+      "solution": "疫苗让身体先「认识」病原体并产生抗体和记忆细胞，等真病毒入侵时能快速消灭，这就是免疫力。"
     },
     {
       "id": "science-053",
@@ -3542,7 +3794,8 @@
         "系统单位"
       ],
       "answerIndex": 0,
-      "explanation": "除病毒外，生物体都由细胞构成，细胞是结构和功能的基本单位。"
+      "explanation": "除病毒外，生物体都由细胞构成，细胞是结构和功能的基本单位。",
+      "solution": "除病毒外，一切生物体都由细胞构成，细胞是生物体结构和功能的基本单位。"
     },
     {
       "id": "science-054",
@@ -3556,7 +3809,8 @@
         "糖类"
       ],
       "answerIndex": 0,
-      "explanation": "水约占人体质量的 60%～70%，是含量最多的物质，各项生命活动都离不开水。"
+      "explanation": "水约占人体质量的 60%～70%，是含量最多的物质，各项生命活动都离不开水。",
+      "solution": "水约占人体质量的 60%～70%，是人体内含量最多的物质，所以人几天不喝水会非常危险。"
     },
     {
       "id": "science-055",
@@ -3570,7 +3824,8 @@
         "运动过量"
       ],
       "answerIndex": 0,
-      "explanation": "传染病由细菌、病毒、寄生虫等病原体引起，能在人与人之间传播。"
+      "explanation": "传染病由细菌、病毒、寄生虫等病原体引起，能在人与人之间传播。",
+      "solution": "传染病由细菌、病毒、寄生虫等病原体引起并能在人间传播；着凉只是诱因，不是病原。"
     },
     {
       "id": "science-056",
@@ -3584,7 +3839,8 @@
         "气体交换"
       ],
       "answerIndex": 0,
-      "explanation": "大脑是神经系统的最高级部分，负责思维、记忆并指挥全身的活动。"
+      "explanation": "大脑是神经系统的最高级部分，负责思维、记忆并指挥全身的活动。",
+      "solution": "大脑是神经系统的最高级中枢，负责思考、记忆，并指挥全身各个器官活动。"
     },
     {
       "id": "science-057",
@@ -3598,7 +3854,8 @@
         "金鱼"
       ],
       "answerIndex": 0,
-      "explanation": "乌龟体表有甲、爬行产卵，是爬行动物；青蛙是两栖动物，麻雀是鸟类，金鱼是鱼类。"
+      "explanation": "乌龟体表有甲、爬行产卵，是爬行动物；青蛙是两栖动物，麻雀是鸟类，金鱼是鱼类。",
+      "solution": "乌龟体表有甲、用肺呼吸、卵生，是爬行动物；青蛙是两栖动物、麻雀是鸟类、金鱼是鱼类。"
     },
     {
       "id": "science-058",
@@ -3612,7 +3869,8 @@
         "进行呼吸"
       ],
       "answerIndex": 0,
-      "explanation": "根从土壤中吸收水分和无机盐，并把植物固定在土壤里；叶才制造养分。"
+      "explanation": "根从土壤中吸收水分和无机盐，并把植物固定在土壤里；叶才制造养分。",
+      "solution": "根从土壤中吸收水分和无机盐，并把植物固定在土壤里；制造养分靠叶子。"
     },
     {
       "id": "science-059",
@@ -3626,7 +3884,8 @@
         "鳍"
       ],
       "answerIndex": 0,
-      "explanation": "蝌蚪生活在水中用鳃呼吸；成蛙主要用肺呼吸，皮肤辅助呼吸。"
+      "explanation": "蝌蚪生活在水中用鳃呼吸；成蛙主要用肺呼吸，皮肤辅助呼吸。",
+      "solution": "蝌蚪生活在水里用鳃呼吸；变成青蛙后用肺呼吸，皮肤辅助呼吸，这是变态发育。"
     },
     {
       "id": "science-060",
@@ -3640,7 +3899,8 @@
         "脚气病"
       ],
       "answerIndex": 0,
-      "explanation": "缺维生素 C 会得坏血病（牙龈出血）；缺维生素 A 得夜盲症，缺维生素 D 得佝偻病。"
+      "explanation": "缺维生素 C 会得坏血病（牙龈出血）；缺维生素 A 得夜盲症，缺维生素 D 得佝偻病。",
+      "solution": "维生素 C 缺乏会得坏血病（牙龈出血）；夜盲症缺维生素 A，佝偻病缺维生素 D，分开记。"
     },
     {
       "id": "science-061",
@@ -3654,7 +3914,8 @@
         "木星"
       ],
       "answerIndex": 0,
-      "explanation": "太阳质量占太阳系的绝大部分，八大行星都绕它运转，太阳是中心天体。"
+      "explanation": "太阳质量占太阳系的绝大部分，八大行星都绕它运转，太阳是中心天体。",
+      "solution": "太阳的质量占了太阳系的绝大部分，它的引力拉着八大行星绕自己转，所以是太阳系的中心。"
     },
     {
       "id": "science-062",
@@ -3668,7 +3929,8 @@
         "一小时"
       ],
       "answerIndex": 0,
-      "explanation": "地球公转一周约 365 天，即一年；自转一周才是一天。"
+      "explanation": "地球公转一周约 365 天，即一年；自转一周才是一天。",
+      "solution": "地球绕太阳公转一圈约 365 天，正好是一年；自转一圈 24 小时才是一天。"
     },
     {
       "id": "science-063",
@@ -3682,7 +3944,8 @@
         "潮汐"
       ],
       "answerIndex": 0,
-      "explanation": "地球自西向东自转，向阳面为昼、背阳面为夜，产生昼夜交替；四季由公转产生。"
+      "explanation": "地球自西向东自转，向阳面为昼、背阳面为夜，产生昼夜交替；四季由公转产生。",
+      "solution": "地球自转时，被太阳照到的一面是白天，背对太阳的一面是黑夜，转一圈昼夜交替一次。"
     },
     {
       "id": "science-064",
@@ -3696,7 +3959,8 @@
         "一小时"
       ],
       "answerIndex": 0,
-      "explanation": "月球绕地球公转一周约 27～30 天，也就是农历的一个月。"
+      "explanation": "月球绕地球公转一周约 27～30 天，也就是农历的一个月。",
+      "solution": "月球绕地球一圈约 27～30 天，大约是一个月，所以农历月份跟着月相变化走。"
     },
     {
       "id": "science-065",
@@ -3710,7 +3974,8 @@
         "彗星"
       ],
       "answerIndex": 0,
-      "explanation": "太阳自己能发光发热，是恒星；地球是行星，月球是卫星。"
+      "explanation": "太阳自己能发光发热，是恒星；地球是行星，月球是卫星。",
+      "solution": "恒星是自己发光发热的天体，太阳就是一颗恒星；行星（如地球）自己不发光。"
     },
     {
       "id": "science-066",
@@ -3724,7 +3989,8 @@
         "北极星"
       ],
       "answerIndex": 0,
-      "explanation": "月球围绕地球转动，是地球唯一的天然卫星。"
+      "explanation": "月球围绕地球转动，是地球唯一的天然卫星。",
+      "solution": "卫星是绕行星转的天体，月球绕地球转，所以月球是地球的天然卫星。"
     },
     {
       "id": "science-067",
@@ -3738,7 +4004,8 @@
         "自转速度忽快忽慢"
       ],
       "answerIndex": 0,
-      "explanation": "地轴倾斜使太阳直射点在南北回归线间移动，各地获热不同形成四季；日地距离影响很小。"
+      "explanation": "地轴倾斜使太阳直射点在南北回归线间移动，各地获热不同形成四季；日地距离影响很小。",
+      "solution": "地球公转时地轴是倾斜的（约 23.5°）且方向不变，太阳直射点就在南北回归线间移动，形成四季。"
     },
     {
       "id": "science-068",
@@ -3752,7 +4019,8 @@
         "90%"
       ],
       "answerIndex": 0,
-      "explanation": "地球表面约 71% 是海洋，陆地只占约 29%，所以地球又被称为蓝色星球。"
+      "explanation": "地球表面约 71% 是海洋，陆地只占约 29%，所以地球又被称为蓝色星球。",
+      "solution": "地球表面约 71% 是海洋、29% 是陆地，所以从太空看地球是个蓝色的星球。"
     },
     {
       "id": "science-069",
@@ -3766,7 +4034,8 @@
         "站在窗边观看"
       ],
       "answerIndex": 0,
-      "explanation": "室内应就近躲避在坚固桌下、承重墙角，保护头部；电梯可能停电被困，跳窗非常危险。"
+      "explanation": "室内应就近躲避在坚固桌下、承重墙角，保护头部；电梯可能停电被困，跳窗非常危险。",
+      "solution": "地震时室内要就近躲到坚固桌子下或承重墙墙角、护住头部；电梯可能停电被困、跳窗可能摔伤，都很危险。"
     },
     {
       "id": "science-070",
@@ -3780,7 +4049,8 @@
         "地表的河流"
       ],
       "answerIndex": 0,
-      "explanation": "岩浆主要来源于上地幔上部的软流层，沿地壳薄弱处喷出地表。"
+      "explanation": "岩浆主要来源于上地幔上部的软流层，沿地壳薄弱处喷出地表。",
+      "solution": "岩浆主要来自上地幔上部的软流层，那里温度极高，岩石熔化后沿地壳薄弱处喷出地表形成火山。"
     },
     {
       "id": "science-071",
@@ -3794,7 +4064,8 @@
         "残月"
       ],
       "answerIndex": 0,
-      "explanation": "农历十五、十六月亮被照亮的一面朝向地球，是满月（望）；初一是新月。"
+      "explanation": "农历十五、十六月亮被照亮的一面朝向地球，是满月（望）；初一是新月。",
+      "solution": "农历十五、十六，地球在太阳和月球之间，月球被照亮的整个圆面朝向地球，就是满月；初一是新月。"
     },
     {
       "id": "science-072",
@@ -3808,7 +4079,8 @@
         "太阳黑子"
       ],
       "answerIndex": 0,
-      "explanation": "月球运行到太阳和地球之间，挡住太阳光，地球上的人看到日食。"
+      "explanation": "月球运行到太阳和地球之间，挡住太阳光，地球上的人看到日食。",
+      "solution": "日食是月球运行到太阳和地球之间、正好挡住了太阳光，所以挡光的天体是月球。"
     },
     {
       "id": "science-073",
@@ -3822,7 +4094,8 @@
         "电离层"
       ],
       "answerIndex": 0,
-      "explanation": "对流层贴近地面，风、云、雨、雪等天气现象都发生在这一层。"
+      "explanation": "对流层贴近地面，风、云、雨、雪等天气现象都发生在这一层。",
+      "solution": "对流层紧贴地面，风、云、雨、雪等天气都发生在这一层，它是大气层最下面的一层。"
     },
     {
       "id": "science-074",
@@ -3836,7 +4109,8 @@
         "昼夜交替"
       ],
       "answerIndex": 0,
-      "explanation": "天气是短时间内的大气状况（如阴、晴、雨）；四季如春、冬冷夏热描述的是长期气候。"
+      "explanation": "天气是短时间内的大气状况（如阴、晴、雨）；四季如春、冬冷夏热描述的是长期气候。",
+      "solution": "阴转小雨是短时间内的大气状况，是「天气」；四季如春、冬冷夏热描述的是长期稳定的「气候」。"
     },
     {
       "id": "science-075",
@@ -3850,7 +4124,8 @@
         "生物体内的水"
       ],
       "answerIndex": 0,
-      "explanation": "淡水约 2/3 以上以冰川形式分布在两极和高山，人类直接利用的主要是河流湖泊水。"
+      "explanation": "淡水约 2/3 以上以冰川形式分布在两极和高山，人类直接利用的主要是河流湖泊水。",
+      "solution": "淡水大约三分之二以冰川形式存在，主要在两极和高山，所以冰川是储量最大的淡水。"
     },
     {
       "id": "science-076",
@@ -3864,7 +4139,8 @@
         "水星"
       ],
       "answerIndex": 0,
-      "explanation": "木星是八大行星中的巨无霸，体积约是地球的 1300 倍。"
+      "explanation": "木星是八大行星中的巨无霸，体积约是地球的 1300 倍。",
+      "solution": "木星是太阳系八大行星中体积和质量最大的，是名副其实的「行星之王」。"
     },
     {
       "id": "science-077",
@@ -3878,7 +4154,8 @@
         "星座位置的变化"
       ],
       "answerIndex": 0,
-      "explanation": "节气按太阳在黄道上的位置划分，对应地球公转过程中季节、气候和农事的规律。"
+      "explanation": "节气按太阳在黄道上的位置划分，对应地球公转过程中季节、气候和农事的规律。",
+      "solution": "二十四节气按太阳在黄道上的位置划分，对应地球公转过程中季节、气候和农时的变化，指导农民种地。"
     },
     {
       "id": "science-078",
@@ -3892,7 +4169,8 @@
         "高压状态"
       ],
       "answerIndex": 0,
-      "explanation": "航天器绕地球飞行时，重力全部用来提供向心加速度，舱内物体呈现失重状态。"
+      "explanation": "航天器绕地球飞行时，重力全部用来提供向心加速度，舱内物体呈现失重状态。",
+      "solution": "航天器绕地球飞行时，里面的人和物都在「坠落式」绕行，感觉不到重力，就是失重，所以会飘起来。"
     },
     {
       "id": "science-079",
@@ -3906,7 +4184,8 @@
         "一种极光现象"
       ],
       "answerIndex": 0,
-      "explanation": "小颗粒流星体高速进入大气层，与空气摩擦产生高温而发光，形成流星。"
+      "explanation": "小颗粒流星体高速进入大气层，与空气摩擦产生高温而发光，形成流星。",
+      "solution": "流星是太空中微小的颗粒高速闯入大气层，和空气摩擦产生高温而发光，不是星星真的掉下来。"
     },
     {
       "id": "science-080",
@@ -3920,7 +4199,8 @@
         "地磁场"
       ],
       "answerIndex": 0,
-      "explanation": "地球是球体，站得越高视线越过地表遮挡越远，能看到更远的地方。"
+      "explanation": "地球是球体，站得越高视线越过地表遮挡越远，能看到更远的地方。",
+      "solution": "地球是球体，站得越高视线越能越过地面的弯曲遮挡看到更远，「欲穷千里目，更上一层楼」就是这个道理。"
     },
     {
       "id": "science-081",
@@ -3934,7 +4214,8 @@
         "稀有气体"
       ],
       "answerIndex": 0,
-      "explanation": "氧气支持燃烧（助燃性）；氮气、二氧化碳都不支持燃烧，二氧化碳还能灭火。"
+      "explanation": "氧气支持燃烧（助燃性）；氮气、二氧化碳都不支持燃烧，二氧化碳还能灭火。",
+      "solution": "氧气有助燃性，能支持燃烧；氮气、二氧化碳都不助燃，二氧化碳还能用来灭火。"
     },
     {
       "id": "science-082",
@@ -3948,7 +4229,8 @@
         "没有变化"
       ],
       "answerIndex": 0,
-      "explanation": "二氧化碳与氢氧化钙反应生成白色的碳酸钙沉淀，使石灰水变浑浊，这是检验 CO₂ 的方法。"
+      "explanation": "二氧化碳与氢氧化钙反应生成白色的碳酸钙沉淀，使石灰水变浑浊，这是检验 CO₂ 的方法。",
+      "solution": "二氧化碳和石灰水中的氢氧化钙反应，生成白色的碳酸钙沉淀，所以石灰水变浑浊，这是检验 CO₂ 的方法。"
     },
     {
       "id": "science-083",
@@ -3962,7 +4244,8 @@
         "氢和碳"
       ],
       "answerIndex": 0,
-      "explanation": "电解水生成氢气和氧气，证明水（H₂O）由氢、氧两种元素组成。"
+      "explanation": "电解水生成氢气和氧气，证明水（H₂O）由氢、氧两种元素组成。",
+      "solution": "电解水会生成氢气和氧气，证明水由氢、氧两种元素组成，化学式就是 H₂O。"
     },
     {
       "id": "science-084",
@@ -3976,7 +4259,8 @@
         "酒精挥发"
       ],
       "answerIndex": 0,
-      "explanation": "铁生锈生成了新物质铁锈，属于化学变化；其余三种变化没有新物质生成。"
+      "explanation": "铁生锈生成了新物质铁锈，属于化学变化；其余三种变化没有新物质生成。",
+      "solution": "判断化学变化看有没有新物质生成：铁锈是新物质，所以铁生锈是化学变化；其余三种都没有新物质。"
     },
     {
       "id": "science-085",
@@ -3990,7 +4274,8 @@
         "氮气"
       ],
       "answerIndex": 0,
-      "explanation": "铁在潮湿的空气中同时接触氧气和水才会生锈，保持干燥能防锈。"
+      "explanation": "铁在潮湿的空气中同时接触氧气和水才会生锈，保持干燥能防锈。",
+      "solution": "铁生锈需要同时接触氧气和水（也就是潮湿环境），只干不湿或真空里铁都不容易生锈。"
     },
     {
       "id": "science-086",
@@ -4004,7 +4289,8 @@
         "提高环境温度"
       ],
       "answerIndex": 0,
-      "explanation": "燃烧需要可燃物、氧气和温度达到着火点；破坏任一条件即可灭火。着火点是物质的固有属性，不能被降低。"
+      "explanation": "燃烧需要可燃物、氧气和温度达到着火点；破坏任一条件即可灭火。着火点是物质的固有属性，不能被降低。",
+      "solution": "燃烧要满足三个条件：可燃物、氧气、温度到着火点。灭火破坏任一条件即可；着火点是物质固有属性，降不了。"
     },
     {
       "id": "science-087",
@@ -4018,7 +4304,8 @@
         "二氧化碳"
       ],
       "answerIndex": 0,
-      "explanation": "电解水「正氧负氢」：正极产生氧气，负极产生氢气，体积比约 1 : 2。"
+      "explanation": "电解水「正氧负氢」：正极产生氧气，负极产生氢气，体积比约 1 : 2。",
+      "solution": "记住口诀「正氧负氢、氢二氧一」：电解水时正极产生氧气，负极产生氢气，体积比约 1:2。"
     },
     {
       "id": "science-088",
@@ -4032,7 +4319,8 @@
         "矿泉水"
       ],
       "answerIndex": 0,
-      "explanation": "蒸馏水只含水一种物质，是纯净物；空气、海水、矿泉水都含多种物质，是混合物。"
+      "explanation": "蒸馏水只含水一种物质，是纯净物；空气、海水、矿泉水都含多种物质，是混合物。",
+      "solution": "纯净物只含一种物质，蒸馏水就是水；空气、海水、矿泉水里都含多种物质，是混合物。"
     },
     {
       "id": "science-089",
@@ -4046,7 +4334,8 @@
         "两性"
       ],
       "answerIndex": 0,
-      "explanation": "pH < 7 为酸性，pH = 7 为中性，pH > 7 为碱性，pH 越小酸性越强。"
+      "explanation": "pH < 7 为酸性，pH = 7 为中性，pH > 7 为碱性，pH 越小酸性越强。",
+      "solution": "pH 值小于 7 是酸性，等于 7 是中性，大于 7 是碱性，数字越小酸性越强，用 pH 试纸一测就知道。"
     },
     {
       "id": "science-090",
@@ -4060,7 +4349,8 @@
         "碳酸钙"
       ],
       "answerIndex": 0,
-      "explanation": "食盐的主要成分是氯化钠（NaCl）；碳酸钠是纯碱，碳酸钙是大理石的主要成分。"
+      "explanation": "食盐的主要成分是氯化钠（NaCl）；碳酸钠是纯碱，碳酸钙是大理石的主要成分。",
+      "solution": "食盐的主要成分是氯化钠 NaCl；碳酸钠是纯碱，碳酸钙是大理石，氯化钾是钾肥，别混淆。"
     },
     {
       "id": "science-091",
@@ -4074,7 +4364,8 @@
         "只发红不燃烧"
       ],
       "answerIndex": 0,
-      "explanation": "铁丝在氧气中剧烈燃烧、火星四射，生成黑色四氧化三铁；蓝紫色火焰是硫燃烧的现象。"
+      "explanation": "铁丝在氧气中剧烈燃烧、火星四射，生成黑色四氧化三铁；蓝紫色火焰是硫燃烧的现象。",
+      "solution": "铁丝在纯氧中剧烈燃烧、火星四射，生成黑色四氧化三铁；蓝紫色火焰是硫燃烧，淡蓝色火焰是氢气燃烧的现象。"
     },
     {
       "id": "science-092",
@@ -4088,7 +4379,8 @@
         "器官"
       ],
       "answerIndex": 0,
-      "explanation": "生物群落与环境（非生物部分）相互作用构成生态系统；种群只是同种生物的集合。"
+      "explanation": "生物群落与环境（非生物部分）相互作用构成生态系统；种群只是同种生物的集合。",
+      "solution": "一片森林里的各种生物加上阳光、水、土壤等非生物环境，共同构成一个生态系统；种群只是同种生物。"
     },
     {
       "id": "science-093",
@@ -4102,7 +4394,8 @@
         "把废水直接排进河流"
       ],
       "answerIndex": 0,
-      "explanation": "垃圾分类能资源再利用、减少污染；焚烧秸秆、浪费木材、直排废水都会破坏环境。"
+      "explanation": "垃圾分类能资源再利用、减少污染；焚烧秸秆、浪费木材、直排废水都会破坏环境。",
+      "solution": "垃圾分类回收能把资源再利用、减少污染；焚烧秸秆、浪费木材、直排废水都会破坏环境。"
     },
     {
       "id": "science-094",
@@ -4116,7 +4409,8 @@
         "设备最便宜"
       ],
       "answerIndex": 0,
-      "explanation": "太阳能清洁无污染、取之不尽，但受昼夜和天气限制，设备成本也较高。"
+      "explanation": "太阳能清洁无污染、取之不尽，但受昼夜和天气限制，设备成本也较高。",
+      "solution": "太阳能最大的优点是清洁无污染、取之不尽用之不竭；但受昼夜和天气影响，设备成本也不低。"
     },
     {
       "id": "science-095",
@@ -4130,7 +4424,8 @@
         "非生物部分"
       ],
       "answerIndex": 0,
-      "explanation": "兔直接以植物（生产者）为食，是初级消费者；草是生产者，鹰是次级消费者。"
+      "explanation": "兔直接以植物（生产者）为食，是初级消费者；草是生产者，鹰是次级消费者。",
+      "solution": "食物链中草是生产者（自己制造养分），兔吃草是消费者，鹰吃兔也是消费者；分解者是细菌真菌。"
     },
     {
       "id": "science-096",
@@ -4144,7 +4439,8 @@
         "径流"
       ],
       "answerIndex": 0,
-      "explanation": "太阳照射使海水受热汽化（蒸发）成水蒸气，上升遇冷凝结成云，再形成降水。"
+      "explanation": "太阳照射使海水受热汽化（蒸发）成水蒸气，上升遇冷凝结成云，再形成降水。",
+      "solution": "海水受太阳照射变成水蒸气升到空中，这个由液态变气态的过程叫蒸发（汽化）；遇冷变回水才是凝结。"
     },
     {
       "id": "science-097",
@@ -4158,7 +4454,8 @@
         "铝"
       ],
       "answerIndex": 0,
-      "explanation": "Fe 是铁的元素符号；Cu 是铜，Zn 是锌，Al 是铝。"
+      "explanation": "Fe 是铁的元素符号；Cu 是铜，Zn 是锌，Al 是铝。",
+      "solution": "Fe 是铁的元素符号，来自铁的拉丁名 ferrum；Cu 是铜、Zn 是锌、Al 是铝，化学符号要背熟。"
     },
     {
       "id": "science-098",
@@ -4172,7 +4469,8 @@
         "三处一样高"
       ],
       "answerIndex": 0,
-      "explanation": "外焰与空气接触最充分、燃烧最完全，温度最高，加热时应用外焰。"
+      "explanation": "外焰与空气接触最充分、燃烧最完全，温度最高，加热时应用外焰。",
+      "solution": "外焰接触空气最充分、燃烧最完全、温度最高，所以加热时要用酒精灯的外焰。"
     },
     {
       "id": "science-099",
@@ -4186,7 +4484,8 @@
         "电能"
       ],
       "answerIndex": 0,
-      "explanation": "煤、石油、天然气是远古生物遗骸演变来的化石燃料，不可再生。"
+      "explanation": "煤、石油、天然气是远古生物遗骸演变来的化石燃料，不可再生。",
+      "solution": "煤、石油、天然气是远古生物演变来的化石燃料，不可再生；太阳能、风能、电能都不是。"
     },
     {
       "id": "science-100",
@@ -4200,7 +4499,8 @@
         "砍伐森林"
       ],
       "answerIndex": 0,
-      "explanation": "树木草根能固土保水，植树造林是防治水土流失的有效措施；开荒、过牧、滥伐都会加剧流失。"
+      "explanation": "树木草根能固土保水，植树造林是防治水土流失的有效措施；开荒、过牧、滥伐都会加剧流失。",
+      "solution": "树根和草能牢牢抓住土壤、减缓水流冲刷，植树造林是防止水土流失最有效的办法。"
     }
   ]
 }
