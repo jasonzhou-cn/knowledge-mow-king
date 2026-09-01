@@ -1,13 +1,18 @@
 {
   "version": "1.0.0",
-  "description": "数学题库：difficulty 1=小学算术，2=初中代数几何，3=高中基础。answerIndex 为 options 数组中正确项的索引，运行时会随机打乱选项位置以保证答题公平。",
+  "description": "三学科题库（math/english/science）：difficulty 1=小学高年级基础，2=初中基础，3=初中较高/综合。answerIndex 为 options 数组中正确项的索引，运行时会随机打乱选项位置以保证答题公平。",
   "questions": [
     {
       "id": "math-001",
       "subject": "math",
       "difficulty": 1,
       "question": "计算：25 + 37 = ?",
-      "options": ["62", "52", "58", "61"],
+      "options": [
+        "62",
+        "52",
+        "58",
+        "61"
+      ],
       "answerIndex": 0,
       "explanation": "25 + 37 = 62。个位 5+7=12 进 1，十位 2+3+1=6。"
     },
@@ -16,7 +21,12 @@
       "subject": "math",
       "difficulty": 1,
       "question": "计算：8 × 7 = ?",
-      "options": ["56", "54", "63", "48"],
+      "options": [
+        "56",
+        "54",
+        "63",
+        "48"
+      ],
       "answerIndex": 0,
       "explanation": "七八五十六，8 × 7 = 56。"
     },
@@ -25,7 +35,12 @@
       "subject": "math",
       "difficulty": 1,
       "question": "计算：100 − 38 = ?",
-      "options": ["62", "72", "58", "68"],
+      "options": [
+        "62",
+        "72",
+        "58",
+        "68"
+      ],
       "answerIndex": 0,
       "explanation": "100 − 38 = 62。可以想成 100 − 40 + 2 = 62。"
     },
@@ -34,7 +49,12 @@
       "subject": "math",
       "difficulty": 1,
       "question": "计算：144 ÷ 12 = ?",
-      "options": ["12", "11", "14", "16"],
+      "options": [
+        "12",
+        "11",
+        "14",
+        "16"
+      ],
       "answerIndex": 0,
       "explanation": "12 × 12 = 144，所以 144 ÷ 12 = 12。"
     },
@@ -43,7 +63,12 @@
       "subject": "math",
       "difficulty": 1,
       "question": "一个长方形长 9 厘米，宽 4 厘米，面积是多少平方厘米？",
-      "options": ["36", "26", "13", "40"],
+      "options": [
+        "36",
+        "26",
+        "13",
+        "40"
+      ],
       "answerIndex": 0,
       "explanation": "长方形面积 = 长 × 宽 = 9 × 4 = 36（平方厘米）。"
     },
@@ -52,7 +77,12 @@
       "subject": "math",
       "difficulty": 1,
       "question": "计算：3/4 + 1/4 = ?",
-      "options": ["1", "1/2", "3/4", "2"],
+      "options": [
+        "1",
+        "1/2",
+        "3/4",
+        "2"
+      ],
       "answerIndex": 0,
       "explanation": "同分母相加，3/4 + 1/4 = 4/4 = 1。"
     },
@@ -61,7 +91,12 @@
       "subject": "math",
       "difficulty": 1,
       "question": "小明有 5 盒铅笔，每盒 12 支，一共有多少支？",
-      "options": ["60", "50", "65", "72"],
+      "options": [
+        "60",
+        "50",
+        "65",
+        "72"
+      ],
       "answerIndex": 0,
       "explanation": "5 × 12 = 60（支）。"
     },
@@ -70,7 +105,12 @@
       "subject": "math",
       "difficulty": 1,
       "question": "计算：0.5 + 0.25 = ?",
-      "options": ["0.75", "0.3", "0.7", "0.8"],
+      "options": [
+        "0.75",
+        "0.3",
+        "0.7",
+        "0.8"
+      ],
       "answerIndex": 0,
       "explanation": "0.5 + 0.25 = 0.75。"
     },
@@ -79,7 +119,12 @@
       "subject": "math",
       "difficulty": 1,
       "question": "一个数除以 9，余数最大是几？",
-      "options": ["8", "9", "7", "6"],
+      "options": [
+        "8",
+        "9",
+        "7",
+        "6"
+      ],
       "answerIndex": 0,
       "explanation": "余数必须小于除数，除数是 9，所以余数最大是 8。"
     },
@@ -88,7 +133,12 @@
       "subject": "math",
       "difficulty": 1,
       "question": "计算：15 × 4 + 20 = ?",
-      "options": ["80", "70", "90", "100"],
+      "options": [
+        "80",
+        "70",
+        "90",
+        "100"
+      ],
       "answerIndex": 0,
       "explanation": "先乘后加：15 × 4 = 60，60 + 20 = 80。"
     },
@@ -97,7 +147,12 @@
       "subject": "math",
       "difficulty": 1,
       "question": "正方形边长 6 厘米，周长是多少厘米？",
-      "options": ["24", "36", "12", "18"],
+      "options": [
+        "24",
+        "36",
+        "12",
+        "18"
+      ],
       "answerIndex": 0,
       "explanation": "正方形周长 = 边长 × 4 = 6 × 4 = 24（厘米）。"
     },
@@ -106,7 +161,12 @@
       "subject": "math",
       "difficulty": 1,
       "question": "计算：1 − 3/8 = ?",
-      "options": ["5/8", "3/8", "1/8", "1/2"],
+      "options": [
+        "5/8",
+        "3/8",
+        "1/8",
+        "1/2"
+      ],
       "answerIndex": 0,
       "explanation": "1 = 8/8，8/8 − 3/8 = 5/8。"
     },
@@ -115,7 +175,12 @@
       "subject": "math",
       "difficulty": 1,
       "question": "把 0.6 化成最简分数是？",
-      "options": ["3/5", "6/10", "2/3", "3/10"],
+      "options": [
+        "3/5",
+        "6/10",
+        "2/3",
+        "3/10"
+      ],
       "answerIndex": 0,
       "explanation": "0.6 = 6/10 = 3/5（分子分母同除以 2）。"
     },
@@ -124,7 +189,12 @@
       "subject": "math",
       "difficulty": 1,
       "question": "计算：99 × 5 = ?",
-      "options": ["495", "505", "485", "450"],
+      "options": [
+        "495",
+        "505",
+        "485",
+        "450"
+      ],
       "answerIndex": 0,
       "explanation": "99 × 5 = (100 − 1) × 5 = 500 − 5 = 495。"
     },
@@ -133,7 +203,12 @@
       "subject": "math",
       "difficulty": 1,
       "question": "计算：7.2 ÷ 0.8 = ?",
-      "options": ["9", "0.9", "8", "90"],
+      "options": [
+        "9",
+        "0.9",
+        "8",
+        "90"
+      ],
       "answerIndex": 0,
       "explanation": "被除数除数同乘 10：72 ÷ 8 = 9。"
     },
@@ -142,7 +217,12 @@
       "subject": "math",
       "difficulty": 1,
       "question": "三角形两个角分别是 50° 和 60°，第三个角是？",
-      "options": ["70°", "60°", "80°", "90°"],
+      "options": [
+        "70°",
+        "60°",
+        "80°",
+        "90°"
+      ],
       "answerIndex": 0,
       "explanation": "三角形内角和 180°，180 − 50 − 60 = 70°。"
     },
@@ -151,7 +231,12 @@
       "subject": "math",
       "difficulty": 1,
       "question": "计算：(12 + 8) × 3 = ?",
-      "options": ["60", "48", "36", "20"],
+      "options": [
+        "60",
+        "48",
+        "36",
+        "20"
+      ],
       "answerIndex": 0,
       "explanation": "先算括号：12 + 8 = 20，20 × 3 = 60。"
     },
@@ -160,7 +245,12 @@
       "subject": "math",
       "difficulty": 1,
       "question": "1 小时 45 分钟等于多少分钟？",
-      "options": ["105", "145", "75", "115"],
+      "options": [
+        "105",
+        "145",
+        "75",
+        "115"
+      ],
       "answerIndex": 0,
       "explanation": "1 小时 = 60 分钟，60 + 45 = 105（分钟）。"
     },
@@ -169,7 +259,12 @@
       "subject": "math",
       "difficulty": 1,
       "question": "计算：2/5 × 15 = ?",
-      "options": ["6", "5", "10", "3"],
+      "options": [
+        "6",
+        "5",
+        "10",
+        "3"
+      ],
       "answerIndex": 0,
       "explanation": "2/5 × 15 = 30/5 = 6。"
     },
@@ -178,7 +273,12 @@
       "subject": "math",
       "difficulty": 1,
       "question": "甲数是 24，乙数比甲数多 1/3，乙数是多少？",
-      "options": ["32", "28", "36", "30"],
+      "options": [
+        "32",
+        "28",
+        "36",
+        "30"
+      ],
       "answerIndex": 0,
       "explanation": "24 × (1 + 1/3) = 24 + 8 = 32。"
     },
@@ -187,7 +287,12 @@
       "subject": "math",
       "difficulty": 2,
       "question": "解方程：2x + 6 = 14，x = ?",
-      "options": ["4", "10", "8", "2"],
+      "options": [
+        "4",
+        "10",
+        "8",
+        "2"
+      ],
       "answerIndex": 0,
       "explanation": "2x = 14 − 6 = 8，x = 4。"
     },
@@ -196,7 +301,12 @@
       "subject": "math",
       "difficulty": 2,
       "question": "计算：(−3)² = ?",
-      "options": ["9", "−9", "6", "−6"],
+      "options": [
+        "9",
+        "−9",
+        "6",
+        "−6"
+      ],
       "answerIndex": 0,
       "explanation": "(−3)² = (−3) × (−3) = 9，负负得正。"
     },
@@ -205,7 +315,12 @@
       "subject": "math",
       "difficulty": 2,
       "question": "化简：3a + 5a − 2a = ?",
-      "options": ["6a", "10a", "8a", "4a"],
+      "options": [
+        "6a",
+        "10a",
+        "8a",
+        "4a"
+      ],
       "answerIndex": 0,
       "explanation": "合并同类项：(3 + 5 − 2)a = 6a。"
     },
@@ -214,7 +329,12 @@
       "subject": "math",
       "difficulty": 2,
       "question": "直角三角形两条直角边为 3 和 4，斜边长是？",
-      "options": ["5", "6", "7", "√7"],
+      "options": [
+        "5",
+        "6",
+        "7",
+        "√7"
+      ],
       "answerIndex": 0,
       "explanation": "勾股定理：√(3² + 4²) = √25 = 5。"
     },
@@ -223,7 +343,12 @@
       "subject": "math",
       "difficulty": 2,
       "question": "计算：x² · x³ = ?",
-      "options": ["x⁵", "x⁶", "x⁸", "x⁹"],
+      "options": [
+        "x⁵",
+        "x⁶",
+        "x⁸",
+        "x⁹"
+      ],
       "answerIndex": 0,
       "explanation": "同底数幂相乘，指数相加：x^(2+3) = x⁵。"
     },
@@ -232,7 +357,12 @@
       "subject": "math",
       "difficulty": 2,
       "question": "(2x − 1)(x + 3) 展开后，x 的一次项系数是？",
-      "options": ["5", "6", "−1", "1"],
+      "options": [
+        "5",
+        "6",
+        "−1",
+        "1"
+      ],
       "answerIndex": 0,
       "explanation": "展开得 2x² + 6x − x − 3 = 2x² + 5x − 3，一次项系数为 5。"
     },
@@ -241,7 +371,12 @@
       "subject": "math",
       "difficulty": 2,
       "question": "解方程 x² = 16，x 的正值解是？",
-      "options": ["4", "8", "16", "2"],
+      "options": [
+        "4",
+        "8",
+        "16",
+        "2"
+      ],
       "answerIndex": 0,
       "explanation": "x = ±4，正值解为 4。"
     },
@@ -250,7 +385,12 @@
       "subject": "math",
       "difficulty": 2,
       "question": "半径为 5 的圆，面积是多少？",
-      "options": ["25π", "10π", "5π", "50π"],
+      "options": [
+        "25π",
+        "10π",
+        "5π",
+        "50π"
+      ],
       "answerIndex": 0,
       "explanation": "圆面积 = πr² = π × 5² = 25π。"
     },
@@ -259,7 +399,12 @@
       "subject": "math",
       "difficulty": 2,
       "question": "计算：√49 + √25 = ?",
-      "options": ["12", "74", "2", "14"],
+      "options": [
+        "12",
+        "74",
+        "2",
+        "14"
+      ],
       "answerIndex": 0,
       "explanation": "√49 = 7，√25 = 5，7 + 5 = 12。"
     },
@@ -268,7 +413,12 @@
       "subject": "math",
       "difficulty": 2,
       "question": "一次函数 y = 2x + 1，当 x = 3 时 y = ?",
-      "options": ["7", "6", "5", "9"],
+      "options": [
+        "7",
+        "6",
+        "5",
+        "9"
+      ],
       "answerIndex": 0,
       "explanation": "y = 2 × 3 + 1 = 7。"
     },
@@ -277,7 +427,12 @@
       "subject": "math",
       "difficulty": 2,
       "question": "分解因式：x² − 9 = ?",
-      "options": ["(x+3)(x−3)", "(x−3)²", "(x+9)(x−1)", "(x+3)²"],
+      "options": [
+        "(x+3)(x−3)",
+        "(x−3)²",
+        "(x+9)(x−1)",
+        "(x+3)²"
+      ],
       "answerIndex": 0,
       "explanation": "平方差公式：x² − 3² = (x + 3)(x − 3)。"
     },
@@ -286,7 +441,12 @@
       "subject": "math",
       "difficulty": 2,
       "question": "计算：2⁻² = ?",
-      "options": ["1/4", "−4", "4", "−1/4"],
+      "options": [
+        "1/4",
+        "−4",
+        "4",
+        "−1/4"
+      ],
       "answerIndex": 0,
       "explanation": "负指数取倒数：2⁻² = 1 / 2² = 1/4。"
     },
@@ -295,7 +455,12 @@
       "subject": "math",
       "difficulty": 2,
       "question": "某数的 3 倍减去 5 等于 16，这个数是？",
-      "options": ["7", "5", "9", "21"],
+      "options": [
+        "7",
+        "5",
+        "9",
+        "21"
+      ],
       "answerIndex": 0,
       "explanation": "3x − 5 = 16 → 3x = 21 → x = 7。"
     },
@@ -304,7 +469,12 @@
       "subject": "math",
       "difficulty": 2,
       "question": "(a + b)² 展开后共有几项？",
-      "options": ["3", "2", "4", "5"],
+      "options": [
+        "3",
+        "2",
+        "4",
+        "5"
+      ],
       "answerIndex": 0,
       "explanation": "(a + b)² = a² + 2ab + b²，共 3 项。"
     },
@@ -313,7 +483,12 @@
       "subject": "math",
       "difficulty": 2,
       "question": "数据 2, 4, 6, 8, 10 的平均数是？",
-      "options": ["6", "5", "7", "8"],
+      "options": [
+        "6",
+        "5",
+        "7",
+        "8"
+      ],
       "answerIndex": 0,
       "explanation": "(2+4+6+8+10) / 5 = 30 / 5 = 6。"
     },
@@ -322,7 +497,12 @@
       "subject": "math",
       "difficulty": 2,
       "question": "sin 30° 的值是？",
-      "options": ["1/2", "√3/2", "√2/2", "1"],
+      "options": [
+        "1/2",
+        "√3/2",
+        "√2/2",
+        "1"
+      ],
       "answerIndex": 0,
       "explanation": "特殊角三角函数：sin 30° = 1/2。"
     },
@@ -331,7 +511,12 @@
       "subject": "math",
       "difficulty": 2,
       "question": "已知 x + y = 10，x − y = 4，则 x = ?",
-      "options": ["7", "6", "3", "14"],
+      "options": [
+        "7",
+        "6",
+        "3",
+        "14"
+      ],
       "answerIndex": 0,
       "explanation": "两式相加：2x = 14，x = 7。"
     },
@@ -340,7 +525,12 @@
       "subject": "math",
       "difficulty": 2,
       "question": "计算：|−5| + |3| = ?",
-      "options": ["8", "2", "−2", "15"],
+      "options": [
+        "8",
+        "2",
+        "−2",
+        "15"
+      ],
       "answerIndex": 0,
       "explanation": "|−5| = 5，|3| = 3，5 + 3 = 8。"
     },
@@ -349,7 +539,12 @@
       "subject": "math",
       "difficulty": 2,
       "question": "梯形上底 4，下底 8，高 5，面积是？",
-      "options": ["30", "20", "60", "40"],
+      "options": [
+        "30",
+        "20",
+        "60",
+        "40"
+      ],
       "answerIndex": 0,
       "explanation": "梯形面积 = (上底 + 下底) × 高 ÷ 2 = (4 + 8) × 5 ÷ 2 = 30。"
     },
@@ -358,7 +553,12 @@
       "subject": "math",
       "difficulty": 2,
       "question": "计算：(3x²y) ÷ (xy) = ?",
-      "options": ["3x", "3y", "3xy", "3x²"],
+      "options": [
+        "3x",
+        "3y",
+        "3xy",
+        "3x²"
+      ],
       "answerIndex": 0,
       "explanation": "系数 3 ÷ 1 = 3，x² ÷ x = x，y ÷ y = 1，结果为 3x。"
     },
@@ -367,7 +567,12 @@
       "subject": "math",
       "difficulty": 3,
       "question": "计算：log₂ 8 = ?",
-      "options": ["3", "2", "4", "8"],
+      "options": [
+        "3",
+        "2",
+        "4",
+        "8"
+      ],
       "answerIndex": 0,
       "explanation": "2³ = 8，所以 log₂ 8 = 3。"
     },
@@ -376,7 +581,12 @@
       "subject": "math",
       "difficulty": 3,
       "question": "函数 f(x) = x² − 4x + 3 的最小值是？",
-      "options": ["−1", "3", "0", "−4"],
+      "options": [
+        "−1",
+        "3",
+        "0",
+        "−4"
+      ],
       "answerIndex": 0,
       "explanation": "配方得 (x − 2)² − 1，当 x = 2 时最小值为 −1。"
     },
@@ -385,7 +595,12 @@
       "subject": "math",
       "difficulty": 3,
       "question": "sin²θ + cos²θ = ?",
-      "options": ["1", "0", "2", "sin2θ"],
+      "options": [
+        "1",
+        "0",
+        "2",
+        "sin2θ"
+      ],
       "answerIndex": 0,
       "explanation": "同角三角函数基本恒等式：sin²θ + cos²θ = 1。"
     },
@@ -394,7 +609,12 @@
       "subject": "math",
       "difficulty": 3,
       "question": "等差数列 2, 5, 8, 11, ... 的第 10 项是？",
-      "options": ["29", "32", "26", "30"],
+      "options": [
+        "29",
+        "32",
+        "26",
+        "30"
+      ],
       "answerIndex": 0,
       "explanation": "公差 d = 3，a₁₀ = 2 + (10 − 1) × 3 = 2 + 27 = 29。"
     },
@@ -403,7 +623,12 @@
       "subject": "math",
       "difficulty": 3,
       "question": "计算：C(5, 2) = ?",
-      "options": ["10", "20", "5", "15"],
+      "options": [
+        "10",
+        "20",
+        "5",
+        "15"
+      ],
       "answerIndex": 0,
       "explanation": "C(5,2) = 5! / (2! × 3!) = (5 × 4) / 2 = 10。"
     },
@@ -412,7 +637,12 @@
       "subject": "math",
       "difficulty": 3,
       "question": "解不等式 2x − 3 > 5，结果是 x > ?",
-      "options": ["4", "1", "8", "2"],
+      "options": [
+        "4",
+        "1",
+        "8",
+        "2"
+      ],
       "answerIndex": 0,
       "explanation": "2x > 8，两边同除以正数 2，方向不变：x > 4。"
     },
@@ -421,7 +651,12 @@
       "subject": "math",
       "difficulty": 3,
       "question": "极限 lim(x→0) sin x / x = ?",
-      "options": ["1", "0", "∞", "不存在"],
+      "options": [
+        "1",
+        "0",
+        "∞",
+        "不存在"
+      ],
       "answerIndex": 0,
       "explanation": "重要极限：lim(x→0) sin x / x = 1。"
     },
@@ -430,7 +665,12 @@
       "subject": "math",
       "difficulty": 3,
       "question": "函数 y = 2ˣ 在 x = 3 时的值是？",
-      "options": ["8", "6", "9", "4"],
+      "options": [
+        "8",
+        "6",
+        "9",
+        "4"
+      ],
       "answerIndex": 0,
       "explanation": "2³ = 8。"
     },
@@ -439,7 +679,12 @@
       "subject": "math",
       "difficulty": 3,
       "question": "i² = ?（i 为虚数单位）",
-      "options": ["−1", "1", "i", "−i"],
+      "options": [
+        "−1",
+        "1",
+        "i",
+        "−i"
+      ],
       "answerIndex": 0,
       "explanation": "虚数单位的定义：i² = −1。"
     },
@@ -448,7 +693,12 @@
       "subject": "math",
       "difficulty": 3,
       "question": "抛均匀硬币 3 次，恰好 2 次正面的概率是？",
-      "options": ["3/8", "1/2", "1/8", "3/4"],
+      "options": [
+        "3/8",
+        "1/2",
+        "1/8",
+        "3/4"
+      ],
       "answerIndex": 0,
       "explanation": "共 2³ = 8 种等可能结果，恰 2 次正面有 C(3,2) = 3 种，概率 3/8。"
     },
@@ -457,7 +707,12 @@
       "subject": "math",
       "difficulty": 3,
       "question": "计算：lg 100 + lg 0.1 = ?",
-      "options": ["1", "3", "−1", "0"],
+      "options": [
+        "1",
+        "3",
+        "−1",
+        "0"
+      ],
       "answerIndex": 0,
       "explanation": "lg 100 = 2，lg 0.1 = −1，2 + (−1) = 1。"
     },
@@ -466,7 +721,12 @@
       "subject": "math",
       "difficulty": 3,
       "question": "等比数列 3, 6, 12, ... 的前 4 项和是？",
-      "options": ["45", "24", "48", "21"],
+      "options": [
+        "45",
+        "24",
+        "48",
+        "21"
+      ],
       "answerIndex": 0,
       "explanation": "公比 q = 2，前 4 项为 3, 6, 12, 24，和为 45。"
     },
@@ -475,7 +735,12 @@
       "subject": "math",
       "difficulty": 3,
       "question": "求导数：d/dx (x³) = ?",
-      "options": ["3x²", "x²", "3x", "x⁴/4"],
+      "options": [
+        "3x²",
+        "x²",
+        "3x",
+        "x⁴/4"
+      ],
       "answerIndex": 0,
       "explanation": "幂函数求导公式：(xⁿ)′ = n·xⁿ⁻¹，所以 (x³)′ = 3x²。"
     },
@@ -484,7 +749,12 @@
       "subject": "math",
       "difficulty": 3,
       "question": "cos 60° 的值是？",
-      "options": ["1/2", "√3/2", "1", "√2/2"],
+      "options": [
+        "1/2",
+        "√3/2",
+        "1",
+        "√2/2"
+      ],
       "answerIndex": 0,
       "explanation": "特殊角三角函数：cos 60° = 1/2。"
     },
@@ -493,7 +763,12 @@
       "subject": "math",
       "difficulty": 3,
       "question": "方程 x² − 5x + 6 = 0 的两根之和是？",
-      "options": ["5", "6", "−5", "1"],
+      "options": [
+        "5",
+        "6",
+        "−5",
+        "1"
+      ],
       "answerIndex": 0,
       "explanation": "韦达定理：两根之和 = −b/a = 5。（两根为 2 和 3）"
     },
@@ -502,7 +777,12 @@
       "subject": "math",
       "difficulty": 3,
       "question": "计算定积分：∫₀¹ 2x dx = ?",
-      "options": ["1", "2", "1/2", "0"],
+      "options": [
+        "1",
+        "2",
+        "1/2",
+        "0"
+      ],
       "answerIndex": 0,
       "explanation": "原函数为 x²，代入上下限得 1² − 0² = 1。"
     },
@@ -511,7 +791,12 @@
       "subject": "math",
       "difficulty": 3,
       "question": "A = {1, 2, 3}，B = {3, 4, 5}，A ∩ B = ?",
-      "options": ["{3}", "{1,2,3,4,5}", "{1,2}", "空集"],
+      "options": [
+        "{3}",
+        "{1,2,3,4,5}",
+        "{1,2}",
+        "空集"
+      ],
       "answerIndex": 0,
       "explanation": "交集取两集合公共元素，只有 3，即 {3}。"
     },
@@ -520,7 +805,12 @@
       "subject": "math",
       "difficulty": 3,
       "question": "tan 45° 的值是？",
-      "options": ["1", "√3", "√3/3", "0"],
+      "options": [
+        "1",
+        "√3",
+        "√3/3",
+        "0"
+      ],
       "answerIndex": 0,
       "explanation": "tan 45° = sin 45° / cos 45° = 1。"
     },
@@ -529,7 +819,12 @@
       "subject": "math",
       "difficulty": 3,
       "question": "若 f(x) = 3x − 1，则 f⁻¹(5) = ?",
-      "options": ["2", "5", "14", "4/3"],
+      "options": [
+        "2",
+        "5",
+        "14",
+        "4/3"
+      ],
       "answerIndex": 0,
       "explanation": "令 3x − 1 = 5，得 3x = 6，x = 2，即 f⁻¹(5) = 2。"
     },
@@ -538,9 +833,3374 @@
       "subject": "math",
       "difficulty": 3,
       "question": "极限 lim(n→∞) (1 + 1/n)ⁿ = ?",
-      "options": ["e", "1", "∞", "0"],
+      "options": [
+        "e",
+        "1",
+        "∞",
+        "0"
+      ],
       "answerIndex": 0,
       "explanation": "这是自然常数 e 的定义式，极限为 e ≈ 2.718。"
+    },
+    {
+      "id": "math-061",
+      "subject": "math",
+      "difficulty": 1,
+      "question": "计算：3/5 + 1/5 = ?",
+      "options": [
+        "4/5",
+        "2/5",
+        "1/5",
+        "3/10"
+      ],
+      "answerIndex": 0,
+      "explanation": "同分母相加，分母不变分子相加：3/5 + 1/5 = 4/5。"
+    },
+    {
+      "id": "math-062",
+      "subject": "math",
+      "difficulty": 1,
+      "question": "计算：2/3 × 9/10 = ?",
+      "options": [
+        "3/5",
+        "5/6",
+        "2/5",
+        "3/10"
+      ],
+      "answerIndex": 0,
+      "explanation": "2 × 9 = 18，3 × 10 = 30，18/30 约分得 3/5。"
+    },
+    {
+      "id": "math-063",
+      "subject": "math",
+      "difficulty": 1,
+      "question": "计算：1/2 ÷ 1/4 = ?",
+      "options": [
+        "2",
+        "1/8",
+        "4",
+        "1/2"
+      ],
+      "answerIndex": 0,
+      "explanation": "除以一个分数等于乘它的倒数：1/2 × 4 = 2。"
+    },
+    {
+      "id": "math-064",
+      "subject": "math",
+      "difficulty": 1,
+      "question": "把 0.45 化成百分数是？",
+      "options": [
+        "45%",
+        "4.5%",
+        "0.45%",
+        "450%"
+      ],
+      "answerIndex": 0,
+      "explanation": "小数化百分数，小数点右移两位加 %：0.45 = 45%。"
+    },
+    {
+      "id": "math-065",
+      "subject": "math",
+      "difficulty": 1,
+      "question": "60 的 25% 是多少？",
+      "options": [
+        "15",
+        "20",
+        "25",
+        "12"
+      ],
+      "answerIndex": 0,
+      "explanation": "60 × 25% = 60 × 0.25 = 15。"
+    },
+    {
+      "id": "math-066",
+      "subject": "math",
+      "difficulty": 1,
+      "question": "20 是 50 的百分之几？",
+      "options": [
+        "40%",
+        "30%",
+        "25%",
+        "50%"
+      ],
+      "answerIndex": 0,
+      "explanation": "20 ÷ 50 = 0.4 = 40%。"
+    },
+    {
+      "id": "math-067",
+      "subject": "math",
+      "difficulty": 1,
+      "question": "一件衣服原价 200 元，打八折后售价是多少元？",
+      "options": [
+        "160",
+        "180",
+        "150",
+        "40"
+      ],
+      "answerIndex": 0,
+      "explanation": "八折即原价的 80%：200 × 0.8 = 160（元）。"
+    },
+    {
+      "id": "math-068",
+      "subject": "math",
+      "difficulty": 1,
+      "question": "12 和 18 的最大公因数是？",
+      "options": [
+        "6",
+        "2",
+        "3",
+        "36"
+      ],
+      "answerIndex": 0,
+      "explanation": "12 = 2×2×3，18 = 2×3×3，公共部分 2×3 = 6。"
+    },
+    {
+      "id": "math-069",
+      "subject": "math",
+      "difficulty": 1,
+      "question": "4 和 6 的最小公倍数是？",
+      "options": [
+        "12",
+        "24",
+        "10",
+        "2"
+      ],
+      "answerIndex": 0,
+      "explanation": "4 和 6 的公倍数中最小的是 12。"
+    },
+    {
+      "id": "math-070",
+      "subject": "math",
+      "difficulty": 1,
+      "question": "把 3 : 4 的前项扩大到原来的 2 倍，要使比值不变，后项应扩大到原来的几倍？",
+      "options": [
+        "2 倍",
+        "3 倍",
+        "4 倍",
+        "6 倍"
+      ],
+      "answerIndex": 0,
+      "explanation": "比的前项和后项同时乘相同的数（0 除外），比值不变，所以后项也扩大 2 倍。"
+    },
+    {
+      "id": "math-071",
+      "subject": "math",
+      "difficulty": 1,
+      "question": "某班有 40 人，男生与女生人数之比是 3 : 2，男生有多少人？",
+      "options": [
+        "24",
+        "16",
+        "12",
+        "20"
+      ],
+      "answerIndex": 0,
+      "explanation": "每份是 40 ÷ (3+2) = 8 人，男生 3 × 8 = 24 人。"
+    },
+    {
+      "id": "math-072",
+      "subject": "math",
+      "difficulty": 1,
+      "question": "圆的半径是 3 厘米（π 取 3.14），周长是多少厘米？",
+      "options": [
+        "18.84",
+        "9.42",
+        "28.26",
+        "6.28"
+      ],
+      "answerIndex": 0,
+      "explanation": "圆周长 C = 2πr = 2 × 3.14 × 3 = 18.84（厘米）。"
+    },
+    {
+      "id": "math-073",
+      "subject": "math",
+      "difficulty": 1,
+      "question": "圆柱的侧面沿高展开，得到的是？",
+      "options": [
+        "长方形",
+        "圆形",
+        "三角形",
+        "梯形"
+      ],
+      "answerIndex": 0,
+      "explanation": "圆柱侧面沿高剪开展平，得到一个长方形，长等于底面周长，宽等于高。"
+    },
+    {
+      "id": "math-074",
+      "subject": "math",
+      "difficulty": 1,
+      "question": "计算：3.6 × 0.5 = ?",
+      "options": [
+        "1.8",
+        "0.18",
+        "18",
+        "3.1"
+      ],
+      "answerIndex": 0,
+      "explanation": "乘 0.5 就是取一半：3.6 的一半是 1.8。"
+    },
+    {
+      "id": "math-075",
+      "subject": "math",
+      "difficulty": 2,
+      "question": "解方程：3x − 7 = 11，x = ?",
+      "options": [
+        "6",
+        "4",
+        "12",
+        "36"
+      ],
+      "answerIndex": 0,
+      "explanation": "3x = 11 + 7 = 18，x = 6。"
+    },
+    {
+      "id": "math-076",
+      "subject": "math",
+      "difficulty": 2,
+      "question": "解方程：5(x − 2) = 15，x = ?",
+      "options": [
+        "5",
+        "3",
+        "1",
+        "13"
+      ],
+      "answerIndex": 0,
+      "explanation": "两边除以 5 得 x − 2 = 3，x = 5。"
+    },
+    {
+      "id": "math-077",
+      "subject": "math",
+      "difficulty": 2,
+      "question": "鸡兔同笼：共 10 个头、28 条腿，兔子有几只？",
+      "options": [
+        "4",
+        "6",
+        "8",
+        "5"
+      ],
+      "answerIndex": 0,
+      "explanation": "设兔 x 只：4x + 2(10 − x) = 28，解得 x = 4。"
+    },
+    {
+      "id": "math-078",
+      "subject": "math",
+      "difficulty": 2,
+      "question": "一个数增加 20% 后是 60，这个数是多少？",
+      "options": [
+        "50",
+        "48",
+        "40",
+        "72"
+      ],
+      "answerIndex": 0,
+      "explanation": "设原数为 x：1.2x = 60，x = 50。"
+    },
+    {
+      "id": "math-079",
+      "subject": "math",
+      "difficulty": 2,
+      "question": "一本书打七五折后售价 45 元，原价是多少元？",
+      "options": [
+        "60",
+        "52.5",
+        "33.75",
+        "58"
+      ],
+      "answerIndex": 0,
+      "explanation": "七五折即 75%：45 ÷ 0.75 = 60（元）。"
+    },
+    {
+      "id": "math-080",
+      "subject": "math",
+      "difficulty": 2,
+      "question": "平行四边形的底是 6 厘米，高是 4 厘米，面积是多少平方厘米？",
+      "options": [
+        "24",
+        "20",
+        "12",
+        "10"
+      ],
+      "answerIndex": 0,
+      "explanation": "平行四边形面积 = 底 × 高 = 6 × 4 = 24（平方厘米）。"
+    },
+    {
+      "id": "math-081",
+      "subject": "math",
+      "difficulty": 2,
+      "question": "圆的直径是 10，它的面积是？",
+      "options": [
+        "25π",
+        "10π",
+        "100π",
+        "5π"
+      ],
+      "answerIndex": 0,
+      "explanation": "半径 = 10 ÷ 2 = 5，面积 = πr² = 25π。"
+    },
+    {
+      "id": "math-082",
+      "subject": "math",
+      "difficulty": 2,
+      "question": "三角形面积是 24 平方厘米，底是 8 厘米，高是多少厘米？",
+      "options": [
+        "6",
+        "3",
+        "12",
+        "4"
+      ],
+      "answerIndex": 0,
+      "explanation": "由 S = 底 × 高 ÷ 2 得高 = 24 × 2 ÷ 8 = 6（厘米）。"
+    },
+    {
+      "id": "math-083",
+      "subject": "math",
+      "difficulty": 2,
+      "question": "正方体的棱长是 3，体积是多少？",
+      "options": [
+        "27",
+        "9",
+        "54",
+        "18"
+      ],
+      "answerIndex": 0,
+      "explanation": "正方体体积 = 棱长³ = 3 × 3 × 3 = 27。"
+    },
+    {
+      "id": "math-084",
+      "subject": "math",
+      "difficulty": 2,
+      "question": "正方体的棱长是 2，表面积是多少？",
+      "options": [
+        "24",
+        "8",
+        "12",
+        "16"
+      ],
+      "answerIndex": 0,
+      "explanation": "正方体有 6 个面，每个面面积 2² = 4，表面积 = 6 × 4 = 24。"
+    },
+    {
+      "id": "math-085",
+      "subject": "math",
+      "difficulty": 2,
+      "question": "袋中有 3 个红球和 2 个白球，任意摸出一个，摸到白球的概率是？",
+      "options": [
+        "2/5",
+        "3/5",
+        "1/2",
+        "1/5"
+      ],
+      "answerIndex": 0,
+      "explanation": "共 5 个球，白球 2 个，概率 = 2/5。"
+    },
+    {
+      "id": "math-086",
+      "subject": "math",
+      "difficulty": 2,
+      "question": "掷一枚均匀的骰子，掷出偶数的概率是？",
+      "options": [
+        "1/2",
+        "1/3",
+        "1/6",
+        "2/3"
+      ],
+      "answerIndex": 0,
+      "explanation": "偶数有 2、4、6 共 3 种，3/6 = 1/2。"
+    },
+    {
+      "id": "math-087",
+      "subject": "math",
+      "difficulty": 2,
+      "question": "数据 3, 5, 5, 7, 10 的众数是？",
+      "options": [
+        "5",
+        "6",
+        "7",
+        "3"
+      ],
+      "answerIndex": 0,
+      "explanation": "出现次数最多的数是 5（出现 2 次），所以众数是 5。"
+    },
+    {
+      "id": "math-088",
+      "subject": "math",
+      "difficulty": 2,
+      "question": "数据 4, 7, 9, 12, 15 的中位数是？",
+      "options": [
+        "9",
+        "9.4",
+        "7",
+        "12"
+      ],
+      "answerIndex": 0,
+      "explanation": "数据从小到大排列后中间那个数是 9，所以中位数是 9。"
+    },
+    {
+      "id": "math-089",
+      "subject": "math",
+      "difficulty": 2,
+      "question": "计算：(−2) × (−5) + 3 = ?",
+      "options": [
+        "13",
+        "−13",
+        "7",
+        "−7"
+      ],
+      "answerIndex": 0,
+      "explanation": "负负得正：(−2) × (−5) = 10，10 + 3 = 13。"
+    },
+    {
+      "id": "math-090",
+      "subject": "math",
+      "difficulty": 2,
+      "question": "计算：101 × 25 = ?",
+      "options": [
+        "2525",
+        "2500",
+        "2550",
+        "2250"
+      ],
+      "answerIndex": 0,
+      "explanation": "101 × 25 = (100 + 1) × 25 = 2500 + 25 = 2525。"
+    },
+    {
+      "id": "math-091",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "解方程组：2x + y = 11，x − y = 1，则 x = ?",
+      "options": [
+        "4",
+        "3",
+        "5",
+        "6"
+      ],
+      "answerIndex": 0,
+      "explanation": "两式相加得 3x = 12，x = 4（y = 3）。"
+    },
+    {
+      "id": "math-092",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "不等式 3x − 2 ≥ 10 的最小整数解是？",
+      "options": [
+        "4",
+        "3",
+        "5",
+        "6"
+      ],
+      "answerIndex": 0,
+      "explanation": "3x ≥ 12，x ≥ 4，最小整数解为 4。"
+    },
+    {
+      "id": "math-093",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "同时掷两枚骰子，点数之和为 7 的概率是？",
+      "options": [
+        "1/6",
+        "1/12",
+        "7/36",
+        "1/9"
+      ],
+      "answerIndex": 0,
+      "explanation": "共 6 × 6 = 36 种等可能结果，和为 7 有 (1,6)(2,5)(3,4)(4,3)(5,2)(6,1) 共 6 种，概率 = 6/36 = 1/6。"
+    },
+    {
+      "id": "math-094",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "从 5 双不同的鞋子中任取 2 只，恰好配成一双的概率是？",
+      "options": [
+        "1/9",
+        "1/45",
+        "2/9",
+        "1/10"
+      ],
+      "answerIndex": 0,
+      "explanation": "取法共 C(10,2) = 45 种，成双的取法有 5 种，概率 = 5/45 = 1/9。"
+    },
+    {
+      "id": "math-095",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "扇形的半径是 6，圆心角是 60°，扇形面积是？",
+      "options": [
+        "6π",
+        "3π",
+        "12π",
+        "36π"
+      ],
+      "answerIndex": 0,
+      "explanation": "扇形面积 = (60/360) × π × 6² = 6π。"
+    },
+    {
+      "id": "math-096",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "5 个数的平均数是 12，去掉其中一个数后剩下 4 个数的平均数是 10，去掉的数是多少？",
+      "options": [
+        "20",
+        "10",
+        "2",
+        "22"
+      ],
+      "answerIndex": 0,
+      "explanation": "原来总和 5 × 12 = 60，现在总和 4 × 10 = 40，去掉的数 = 60 − 40 = 20。"
+    },
+    {
+      "id": "math-097",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "20 克糖水中含糖 5 克，含糖率是多少？",
+      "options": [
+        "25%",
+        "20%",
+        "30%",
+        "15%"
+      ],
+      "answerIndex": 0,
+      "explanation": "含糖率 = 糖 ÷ 糖水 = 5 ÷ 20 = 25%。注意分母是糖水总质量而不是水。"
+    },
+    {
+      "id": "math-098",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "一个数与 3 的和的 2 倍是 16，这个数是多少？",
+      "options": [
+        "5",
+        "8",
+        "6.5",
+        "13"
+      ],
+      "answerIndex": 0,
+      "explanation": "设这个数为 x：2(x + 3) = 16，x + 3 = 8，x = 5。"
+    },
+    {
+      "id": "math-099",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "抽屉里有 2 只黑袜子和 2 只白袜子，不放回地摸出 2 只，一黑一白的概率是？",
+      "options": [
+        "2/3",
+        "1/2",
+        "1/3",
+        "1/6"
+      ],
+      "answerIndex": 0,
+      "explanation": "取法共 C(4,2) = 6 种，一黑一白有 2 × 2 = 4 种，概率 = 4/6 = 2/3。"
+    },
+    {
+      "id": "math-100",
+      "subject": "math",
+      "difficulty": 3,
+      "question": "直角三角形面积是 12，一条直角边是 6，另一条直角边长是？",
+      "options": [
+        "4",
+        "2",
+        "3",
+        "8"
+      ],
+      "answerIndex": 0,
+      "explanation": "面积 = 两直角边之积 ÷ 2，另一条边 = 12 × 2 ÷ 6 = 4。"
+    },
+    {
+      "id": "english-001",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "\"apple\" 的中文意思是？",
+      "options": [
+        "苹果",
+        "橙子",
+        "香蕉",
+        "葡萄"
+      ],
+      "answerIndex": 0,
+      "explanation": "apple 意为苹果，是最常见的水果单词之一。"
+    },
+    {
+      "id": "english-002",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "\"book\" 的中文意思是？",
+      "options": [
+        "书",
+        "书包",
+        "铅笔",
+        "桌子"
+      ],
+      "answerIndex": 0,
+      "explanation": "book 意为书本。"
+    },
+    {
+      "id": "english-003",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "\"teacher\" 的中文意思是？",
+      "options": [
+        "老师",
+        "学生",
+        "医生",
+        "警察"
+      ],
+      "answerIndex": 0,
+      "explanation": "teacher 意为老师，动词 teach（教）加 er 构成。"
+    },
+    {
+      "id": "english-004",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "\"water\" 的中文意思是？",
+      "options": [
+        "水",
+        "牛奶",
+        "果汁",
+        "茶"
+      ],
+      "answerIndex": 0,
+      "explanation": "water 意为水。"
+    },
+    {
+      "id": "english-005",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "英语 26 个字母中，元音字母共有几个？",
+      "options": [
+        "5",
+        "4",
+        "6",
+        "26"
+      ],
+      "answerIndex": 0,
+      "explanation": "元音字母是 a、e、i、o、u，共 5 个，其余为辅音字母。"
+    },
+    {
+      "id": "english-006",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "下列哪一组全是元音字母？",
+      "options": [
+        "a, e, i",
+        "b, c, d",
+        "a, b, c",
+        "e, f, g"
+      ],
+      "answerIndex": 0,
+      "explanation": "元音字母只有 a、e、i、o、u，b、c、d、f、g 都是辅音字母。"
+    },
+    {
+      "id": "english-007",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "\"Monday\" 的中文意思是？",
+      "options": [
+        "星期一",
+        "星期天",
+        "一个月",
+        "一天"
+      ],
+      "answerIndex": 0,
+      "explanation": "Monday 意为星期一，星期几的单词首字母要大写。"
+    },
+    {
+      "id": "english-008",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "\"seven\" 对应的数字是？",
+      "options": [
+        "7",
+        "6",
+        "8",
+        "9"
+      ],
+      "answerIndex": 0,
+      "explanation": "seven 意为七，six 是六，eight 是八，nine 是九。"
+    },
+    {
+      "id": "english-009",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "\"yellow\" 表示什么颜色？",
+      "options": [
+        "黄色",
+        "绿色",
+        "蓝色",
+        "红色"
+      ],
+      "answerIndex": 0,
+      "explanation": "yellow 意为黄色，green 是绿色，blue 是蓝色，red 是红色。"
+    },
+    {
+      "id": "english-010",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "\"family\" 的中文意思是？",
+      "options": [
+        "家庭",
+        "朋友",
+        "学校",
+        "教室"
+      ],
+      "answerIndex": 0,
+      "explanation": "family 意为家庭、家人。"
+    },
+    {
+      "id": "english-011",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "\"breakfast\" 的中文意思是？",
+      "options": [
+        "早餐",
+        "午餐",
+        "晚餐",
+        "零食"
+      ],
+      "answerIndex": 0,
+      "explanation": "breakfast 意为早餐，lunch 是午餐，dinner/supper 是晚餐。"
+    },
+    {
+      "id": "english-012",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "与 \"big\" 意思相反的单词是？",
+      "options": [
+        "small",
+        "tall",
+        "long",
+        "fat"
+      ],
+      "answerIndex": 0,
+      "explanation": "big 意为大，反义词 small 意为小。"
+    },
+    {
+      "id": "english-013",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "与 \"hot\" 意思相反的单词是？",
+      "options": [
+        "cold",
+        "warm",
+        "cool",
+        "wet"
+      ],
+      "answerIndex": 0,
+      "explanation": "hot 意为热的，反义词 cold 意为冷的。"
+    },
+    {
+      "id": "english-014",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "\"spring\" 的中文意思是？",
+      "options": [
+        "春天",
+        "夏天",
+        "秋天",
+        "冬天"
+      ],
+      "answerIndex": 0,
+      "explanation": "spring 意为春天，summer 夏天，autumn 秋天，winter 冬天。"
+    },
+    {
+      "id": "english-015",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "\"under\" 的中文意思是？",
+      "options": [
+        "在……下面",
+        "在……上面",
+        "在……旁边",
+        "在……里面"
+      ],
+      "answerIndex": 0,
+      "explanation": "under 意为在……下面，on 在上面，in 在里面。"
+    },
+    {
+      "id": "english-016",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "\"hand\" 指的是身体哪个部位？",
+      "options": [
+        "手",
+        "脚",
+        "头",
+        "眼睛"
+      ],
+      "answerIndex": 0,
+      "explanation": "hand 意为手，foot 是脚，head 是头，eye 是眼睛。"
+    },
+    {
+      "id": "english-017",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "\"twelve\" 的中文意思是？",
+      "options": [
+        "十二",
+        "二十",
+        "二",
+        "七"
+      ],
+      "answerIndex": 0,
+      "explanation": "twelve 意为十二，twenty 是二十，注意两者不要混淆。"
+    },
+    {
+      "id": "english-018",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "\"library\" 指的是？",
+      "options": [
+        "图书馆",
+        "实验室",
+        "操场",
+        "食堂"
+      ],
+      "answerIndex": 0,
+      "explanation": "library 意为图书馆，词根 lib 与图书有关。"
+    },
+    {
+      "id": "english-019",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "\"March\" 是一年中的哪个月？",
+      "options": [
+        "三月",
+        "五月",
+        "四月",
+        "六月"
+      ],
+      "answerIndex": 0,
+      "explanation": "March 意为三月，月份单词首字母要大写。"
+    },
+    {
+      "id": "english-020",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "\"bird\" 的中文意思是？",
+      "options": [
+        "鸟",
+        "狗",
+        "猫",
+        "鱼"
+      ],
+      "answerIndex": 0,
+      "explanation": "bird 意为鸟，dog 狗，cat 猫，fish 鱼。"
+    },
+    {
+      "id": "english-021",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "\"get up\" 的中文意思是？",
+      "options": [
+        "起床",
+        "上车",
+        "放弃",
+        "返回"
+      ],
+      "answerIndex": 0,
+      "explanation": "get up 意为起床，是日常起居常用短语。"
+    },
+    {
+      "id": "english-022",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "\"look at\" 的中文意思是？",
+      "options": [
+        "看",
+        "寻找",
+        "照顾",
+        "感谢"
+      ],
+      "answerIndex": 0,
+      "explanation": "look at 意为看着某物，强调看的动作。"
+    },
+    {
+      "id": "english-023",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "\"listen to\" 的中文意思是？",
+      "options": [
+        "听",
+        "说",
+        "读",
+        "写"
+      ],
+      "answerIndex": 0,
+      "explanation": "listen to 意为听，如 listen to music 听音乐。"
+    },
+    {
+      "id": "english-024",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "\"go to school\" 的中文意思是？",
+      "options": [
+        "去上学",
+        "放学回家",
+        "做作业",
+        "起床"
+      ],
+      "answerIndex": 0,
+      "explanation": "go to school 意为去上学。"
+    },
+    {
+      "id": "english-025",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "\"have lunch\" 的中文意思是？",
+      "options": [
+        "吃午饭",
+        "做午饭",
+        "买午饭",
+        "带午饭"
+      ],
+      "answerIndex": 0,
+      "explanation": "have 在此表示吃，have lunch 意为吃午饭。"
+    },
+    {
+      "id": "english-026",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "\"take care of\" 的中文意思是？",
+      "options": [
+        "照顾",
+        "小心",
+        "拿走",
+        "认真"
+      ],
+      "answerIndex": 0,
+      "explanation": "take care of 意为照顾、照料，如照顾弟弟妹妹。"
+    },
+    {
+      "id": "english-027",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "\"put on\" 的中文意思是？",
+      "options": [
+        "穿上",
+        "放下",
+        "起立",
+        "关掉"
+      ],
+      "answerIndex": 0,
+      "explanation": "put on 意为穿上、戴上，如 put on your coat 穿上外套。"
+    },
+    {
+      "id": "english-028",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "\"turn on\" 的中文意思是？",
+      "options": [
+        "打开（电器）",
+        "转身",
+        "关闭",
+        "上交"
+      ],
+      "answerIndex": 0,
+      "explanation": "turn on 意为打开（灯、电视等电器），反义短语是 turn off 关闭。"
+    },
+    {
+      "id": "english-029",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "\"be good at\" 的中文意思是？",
+      "options": [
+        "擅长",
+        "对……友好",
+        "喜爱",
+        "熟悉"
+      ],
+      "answerIndex": 0,
+      "explanation": "be good at 意为擅长，后接名词或动名词，如 be good at swimming。"
+    },
+    {
+      "id": "english-030",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "填入正确动词：___ homework（做作业）",
+      "options": [
+        "do",
+        "make",
+        "take",
+        "give"
+      ],
+      "answerIndex": 0,
+      "explanation": "做作业的固定搭配是 do homework，不能用 make。"
+    },
+    {
+      "id": "english-031",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "填入正确动词：___ a bus（乘公交车）",
+      "options": [
+        "take",
+        "make",
+        "do",
+        "bring"
+      ],
+      "answerIndex": 0,
+      "explanation": "乘交通工具用 take：take a bus / take a train。"
+    },
+    {
+      "id": "english-032",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "填入正确动词：___ the piano（弹钢琴）",
+      "options": [
+        "play",
+        "hit",
+        "knock",
+        "press"
+      ],
+      "answerIndex": 0,
+      "explanation": "演奏乐器用 play：play the piano 弹钢琴。"
+    },
+    {
+      "id": "english-033",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "填入正确动词：___ football（踢足球）",
+      "options": [
+        "play",
+        "do",
+        "make",
+        "go"
+      ],
+      "answerIndex": 0,
+      "explanation": "球类运动前用 play：play football，注意乐器要加 the，球类不加。"
+    },
+    {
+      "id": "english-034",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "\"a piece of cake\" 的意思是？",
+      "options": [
+        "小菜一碟（很容易）",
+        "一块蛋糕",
+        "甜品时间",
+        "生日快乐"
+      ],
+      "answerIndex": 0,
+      "explanation": "a piece of cake 是习语，表示非常容易的事，不要只按字面理解成一块蛋糕。"
+    },
+    {
+      "id": "english-035",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "\"in the morning\" 的中文意思是？",
+      "options": [
+        "在早上",
+        "在中午",
+        "在晚上",
+        "在深夜"
+      ],
+      "answerIndex": 0,
+      "explanation": "in the morning 意为在早上，at noon 在中午，at night 在晚上。"
+    },
+    {
+      "id": "english-036",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "\"be late for\" 的中文意思是？",
+      "options": [
+        "迟到",
+        "早到",
+        "缺席",
+        "等待"
+      ],
+      "answerIndex": 0,
+      "explanation": "be late for 意为做某事迟到，如 be late for class 上课迟到。"
+    },
+    {
+      "id": "english-037",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "\"look for\" 的中文意思是？",
+      "options": [
+        "寻找",
+        "看着",
+        "照顾",
+        "喜欢"
+      ],
+      "answerIndex": 0,
+      "explanation": "look for 意为寻找，强调找的过程；look after 才是照顾。"
+    },
+    {
+      "id": "english-038",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "\"say sorry to\" 的中文意思是？",
+      "options": [
+        "向……道歉",
+        "向……告别",
+        "谢谢某人",
+        "给某人打电话"
+      ],
+      "answerIndex": 0,
+      "explanation": "say sorry to sb 意为向某人道歉；say goodbye to 是告别。"
+    },
+    {
+      "id": "english-039",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "\"each other\" 的中文意思是？",
+      "options": [
+        "互相",
+        "另一个",
+        "每一个",
+        "其他"
+      ],
+      "answerIndex": 0,
+      "explanation": "each other 意为互相、彼此，如 help each other 互相帮助。"
+    },
+    {
+      "id": "english-040",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "\"lots of\" 与下列哪个短语意思相同？",
+      "options": [
+        "a lot of",
+        "a lot",
+        "much of",
+        "lot of"
+      ],
+      "answerIndex": 0,
+      "explanation": "lots of = a lot of，都可修饰可数或不可数名词，表示许多。"
+    },
+    {
+      "id": "english-041",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "She ___ a student.",
+      "options": [
+        "is",
+        "am",
+        "are",
+        "be"
+      ],
+      "answerIndex": 0,
+      "explanation": "主语 She 是第三人称单数，be 动词用 is。"
+    },
+    {
+      "id": "english-042",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "I ___ my homework every day.",
+      "options": [
+        "do",
+        "does",
+        "doing",
+        "did"
+      ],
+      "answerIndex": 0,
+      "explanation": "every day 提示一般现在时，主语 I 后用动词原形 do。"
+    },
+    {
+      "id": "english-043",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "He ___ to school by bus yesterday.",
+      "options": [
+        "went",
+        "goes",
+        "go",
+        "going"
+      ],
+      "answerIndex": 0,
+      "explanation": "yesterday 提示一般过去时，go 的过去式是不规则变化 went。"
+    },
+    {
+      "id": "english-044",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "Look! The children ___ playing football.",
+      "options": [
+        "are",
+        "is",
+        "am",
+        "be"
+      ],
+      "answerIndex": 0,
+      "explanation": "Look 提示动作正在进行，现在进行时 be + doing；主语 children 是复数，用 are。"
+    },
+    {
+      "id": "english-045",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "There ___ an apple on the table.",
+      "options": [
+        "is",
+        "are",
+        "am",
+        "have"
+      ],
+      "answerIndex": 0,
+      "explanation": "There be 句型遵循就近原则，an apple 是单数，用 is。"
+    },
+    {
+      "id": "english-046",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "There ___ two books on the desk.",
+      "options": [
+        "are",
+        "is",
+        "be",
+        "has"
+      ],
+      "answerIndex": 0,
+      "explanation": "two books 是复数，There be 句型用 are。"
+    },
+    {
+      "id": "english-047",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "I ___ taller than my brother.",
+      "options": [
+        "am",
+        "is",
+        "are",
+        "be"
+      ],
+      "answerIndex": 0,
+      "explanation": "主语 I 与 be 动词搭配用 am。"
+    },
+    {
+      "id": "english-048",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "She ___ TV last night.",
+      "options": [
+        "watched",
+        "watches",
+        "watch",
+        "watching"
+      ],
+      "answerIndex": 0,
+      "explanation": "last night 提示一般过去时，watch 的过去式为规则变化 watched。"
+    },
+    {
+      "id": "english-049",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "We ___ going to visit the museum tomorrow.",
+      "options": [
+        "are",
+        "is",
+        "am",
+        "was"
+      ],
+      "answerIndex": 0,
+      "explanation": "be going to 表示将来计划，主语 We 是复数，be 动词用 are。"
+    },
+    {
+      "id": "english-050",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "— ___ do you like best? — Apples.",
+      "options": [
+        "What",
+        "Who",
+        "Where",
+        "When"
+      ],
+      "answerIndex": 0,
+      "explanation": "回答是水果（事物），提问最喜欢什么用 What。"
+    },
+    {
+      "id": "english-051",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "— ___ is your mother? — She is a nurse.",
+      "options": [
+        "What",
+        "Who",
+        "Where",
+        "Which"
+      ],
+      "answerIndex": 0,
+      "explanation": "询问职业用 What：What is your mother?（你妈妈是做什么的？）"
+    },
+    {
+      "id": "english-052",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "Tom is ___ than Jack.",
+      "options": [
+        "taller",
+        "tall",
+        "tallest",
+        "more tall"
+      ],
+      "answerIndex": 0,
+      "explanation": "than 提示两者比较，用比较级 taller。"
+    },
+    {
+      "id": "english-053",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "He is the ___ student in our class.",
+      "options": [
+        "tallest",
+        "taller",
+        "tall",
+        "most tall"
+      ],
+      "answerIndex": 0,
+      "explanation": "in our class 表示三者以上比较范围，用最高级 the tallest。"
+    },
+    {
+      "id": "english-054",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "one child, two ___.",
+      "options": [
+        "children",
+        "childs",
+        "childes",
+        "childrens"
+      ],
+      "answerIndex": 0,
+      "explanation": "child 的复数是不规则变化 children，不是加 s。"
+    },
+    {
+      "id": "english-055",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "three ___（box 的复数）",
+      "options": [
+        "boxes",
+        "boxs",
+        "box",
+        "boxies"
+      ],
+      "answerIndex": 0,
+      "explanation": "以 s、x、ch、sh 结尾的名词复数加 es：box → boxes。"
+    },
+    {
+      "id": "english-056",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "I have ___ egg for breakfast.",
+      "options": [
+        "an",
+        "a",
+        "the",
+        "（不填）"
+      ],
+      "answerIndex": 0,
+      "explanation": "egg 以元音音素开头，不定冠词用 an。"
+    },
+    {
+      "id": "english-057",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "This is Lily. ___ is my friend.",
+      "options": [
+        "She",
+        "He",
+        "It",
+        "They"
+      ],
+      "answerIndex": 0,
+      "explanation": "Lily 是女孩名，代词用 She。"
+    },
+    {
+      "id": "english-058",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "We have classes ___ Monday.",
+      "options": [
+        "on",
+        "in",
+        "at",
+        "of"
+      ],
+      "answerIndex": 0,
+      "explanation": "具体某一天前用介词 on：on Monday。"
+    },
+    {
+      "id": "english-059",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "My birthday is ___ May.",
+      "options": [
+        "in",
+        "on",
+        "at",
+        "to"
+      ],
+      "answerIndex": 0,
+      "explanation": "月份前用介词 in：in May；具体某天才用 on。"
+    },
+    {
+      "id": "english-060",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "___ I borrow your pen?",
+      "options": [
+        "May",
+        "Am",
+        "Do",
+        "Does"
+      ],
+      "answerIndex": 0,
+      "explanation": "May I ... ? 表示礼貌地请求许可。"
+    },
+    {
+      "id": "english-061",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "I'm hungry. I want to ___ something.",
+      "options": [
+        "eat",
+        "drink",
+        "sleep",
+        "run"
+      ],
+      "answerIndex": 0,
+      "explanation": "hungry 意为饿，想吃东西用 eat；thirsty 渴了才 drink。"
+    },
+    {
+      "id": "english-062",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "It's raining outside. Take an ___ with you.",
+      "options": [
+        "umbrella",
+        "apple",
+        "book",
+        "ball"
+      ],
+      "answerIndex": 0,
+      "explanation": "外面下雨要带伞 umbrella。"
+    },
+    {
+      "id": "english-063",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "The opposite of \"cheap\" is ___.",
+      "options": [
+        "expensive",
+        "happy",
+        "small",
+        "fast"
+      ],
+      "answerIndex": 0,
+      "explanation": "cheap 意为便宜的，反义词 expensive 意为昂贵的。"
+    },
+    {
+      "id": "english-064",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "Don't ___ in the library. Keep quiet.",
+      "options": [
+        "shout",
+        "smile",
+        "read",
+        "sit"
+      ],
+      "answerIndex": 0,
+      "explanation": "图书馆要保持安静，所以不能 shout 大喊大叫。"
+    },
+    {
+      "id": "english-065",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "If you are ill, you should go to the ___ and see a doctor.",
+      "options": [
+        "hospital",
+        "park",
+        "cinema",
+        "shop"
+      ],
+      "answerIndex": 0,
+      "explanation": "生病了应该去医院看医生。"
+    },
+    {
+      "id": "english-066",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "Trees turn green in ___ because the weather gets warm.",
+      "options": [
+        "spring",
+        "winter",
+        "autumn",
+        "night"
+      ],
+      "answerIndex": 0,
+      "explanation": "天气变暖、树木变绿发生在春天 spring。"
+    },
+    {
+      "id": "english-067",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "Mike likes swimming, so summer is his favorite ___.",
+      "options": [
+        "season",
+        "food",
+        "color",
+        "subject"
+      ],
+      "answerIndex": 0,
+      "explanation": "summer（夏天）属于季节 season。"
+    },
+    {
+      "id": "english-068",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "— Thank you very much. — ___",
+      "options": [
+        "You're welcome.",
+        "I'm fine.",
+        "OK.",
+        "How are you?"
+      ],
+      "answerIndex": 0,
+      "explanation": "回答别人的感谢用 You're welcome（不客气）。"
+    },
+    {
+      "id": "english-069",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "— How are you? — ___",
+      "options": [
+        "Fine, thank you.",
+        "I'm thirteen.",
+        "Good morning.",
+        "Yes, I am."
+      ],
+      "answerIndex": 0,
+      "explanation": "How are you 询问近况，常用回答是 Fine, thank you。"
+    },
+    {
+      "id": "english-070",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "— ___? — It's half past six.",
+      "options": [
+        "What's the time",
+        "What's the date",
+        "What day is it",
+        "How old are you"
+      ],
+      "answerIndex": 0,
+      "explanation": "回答是钟点时间，提问应该用 What's the time（几点了）。"
+    },
+    {
+      "id": "english-071",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "The sun rises in the ___ and sets in the west.",
+      "options": [
+        "east",
+        "west",
+        "north",
+        "south"
+      ],
+      "answerIndex": 0,
+      "explanation": "太阳东升西落：东 east，西 west。"
+    },
+    {
+      "id": "english-072",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "Choose the correct sentence.",
+      "options": [
+        "He can swim very fast.",
+        "He can swims very fast.",
+        "He can to swim very fast.",
+        "He cans swim very fast."
+      ],
+      "answerIndex": 0,
+      "explanation": "情态动词 can 后必须接动词原形 swim。"
+    },
+    {
+      "id": "english-073",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "Choose the correct sentence.",
+      "options": [
+        "She doesn't like coffee.",
+        "She don't like coffee.",
+        "She isn't like coffee.",
+        "She not like coffee."
+      ],
+      "answerIndex": 0,
+      "explanation": "第三人称单数的否定句用 doesn't + 动词原形。"
+    },
+    {
+      "id": "english-074",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "Birds can ___ in the sky.",
+      "options": [
+        "fly",
+        "swim",
+        "run",
+        "dig"
+      ],
+      "answerIndex": 0,
+      "explanation": "鸟会在天上飞：fly。"
+    },
+    {
+      "id": "english-075",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "Fish live in ___.",
+      "options": [
+        "water",
+        "trees",
+        "the sky",
+        "sand"
+      ],
+      "answerIndex": 0,
+      "explanation": "鱼生活在水里：water。"
+    },
+    {
+      "id": "english-076",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "Winter is cold, so people often wear ___ clothes.",
+      "options": [
+        "warm",
+        "cool",
+        "thin",
+        "wet"
+      ],
+      "answerIndex": 0,
+      "explanation": "冬天寒冷，人们穿保暖的（warm）衣服。"
+    },
+    {
+      "id": "english-077",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "— Would you like some tea? — ___.",
+      "options": [
+        "Yes, please.",
+        "Yes, I would like.",
+        "No, I don't.",
+        "I like tea."
+      ],
+      "answerIndex": 0,
+      "explanation": "Would you like ... 的礼貌回答是 Yes, please（好的，麻烦了）。"
+    },
+    {
+      "id": "english-078",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "A person who teaches in a school is a ___.",
+      "options": [
+        "teacher",
+        "farmer",
+        "driver",
+        "cook"
+      ],
+      "answerIndex": 0,
+      "explanation": "在学校教书的人是老师 teacher；farmer 农民，driver 司机，cook 厨师。"
+    },
+    {
+      "id": "english-079",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "Bees give us ___.",
+      "options": [
+        "honey",
+        "milk",
+        "eggs",
+        "wool"
+      ],
+      "answerIndex": 0,
+      "explanation": "蜜蜂酿造蜂蜜 honey；milk 来自奶牛，wool 来自绵羊。"
+    },
+    {
+      "id": "english-080",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "The Great Wall is in ___.",
+      "options": [
+        "China",
+        "Japan",
+        "America",
+        "England"
+      ],
+      "answerIndex": 0,
+      "explanation": "长城在中国 China。"
+    },
+    {
+      "id": "english-081",
+      "subject": "english",
+      "difficulty": 3,
+      "question": "I have lived here ___ 2015.",
+      "options": [
+        "since",
+        "for",
+        "at",
+        "from"
+      ],
+      "answerIndex": 0,
+      "explanation": "since + 时间点（起点），for + 时间段；2015 是时间点，用 since。"
+    },
+    {
+      "id": "english-082",
+      "subject": "english",
+      "difficulty": 3,
+      "question": "She has ___ her keys, so she can't open the door.",
+      "options": [
+        "lost",
+        "loses",
+        "losing",
+        "lose"
+      ],
+      "answerIndex": 0,
+      "explanation": "has + 过去分词构成现在完成时，lose 的过去分词是 lost。"
+    },
+    {
+      "id": "english-083",
+      "subject": "english",
+      "difficulty": 3,
+      "question": "The book ___ I bought yesterday is interesting.",
+      "options": [
+        "which",
+        "who",
+        "whose",
+        "what"
+      ],
+      "answerIndex": 0,
+      "explanation": "先行词是 book（物），定语从句用 which/that 引导；who 用于人。"
+    },
+    {
+      "id": "english-084",
+      "subject": "english",
+      "difficulty": 3,
+      "question": "If it ___ tomorrow, we will stay at home.",
+      "options": [
+        "rains",
+        "will rain",
+        "rained",
+        "rain"
+      ],
+      "answerIndex": 0,
+      "explanation": "主将从现：if 引导的条件从句用一般现在时表将来，主语 it 用 rains。"
+    },
+    {
+      "id": "english-085",
+      "subject": "english",
+      "difficulty": 3,
+      "question": "___ useful the book is!",
+      "options": [
+        "How",
+        "What",
+        "What a",
+        "How a"
+      ],
+      "answerIndex": 0,
+      "explanation": "感叹句结构：How + 形容词 + 主谓；useful 是形容词，用 How。"
+    },
+    {
+      "id": "english-086",
+      "subject": "english",
+      "difficulty": 3,
+      "question": "He is ___ honest boy.",
+      "options": [
+        "an",
+        "a",
+        "the",
+        "（不填）"
+      ],
+      "answerIndex": 0,
+      "explanation": "honest 的 h 不发音，以元音音素 /ɒ/ 开头，用 an。"
+    },
+    {
+      "id": "english-087",
+      "subject": "english",
+      "difficulty": 3,
+      "question": "Neither of the answers ___ right.",
+      "options": [
+        "is",
+        "are",
+        "were",
+        "be"
+      ],
+      "answerIndex": 0,
+      "explanation": "neither（两者都不）作主语时谓语用单数 is。"
+    },
+    {
+      "id": "english-088",
+      "subject": "english",
+      "difficulty": 3,
+      "question": "The classroom ___ every day.",
+      "options": [
+        "is cleaned",
+        "cleans",
+        "is cleaning",
+        "cleaned"
+      ],
+      "answerIndex": 0,
+      "explanation": "教室是被人打扫的，用一般现在时被动语态 is cleaned。"
+    },
+    {
+      "id": "english-089",
+      "subject": "english",
+      "difficulty": 3,
+      "question": "You'd better ___ more exercise.",
+      "options": [
+        "take",
+        "to take",
+        "taking",
+        "took"
+      ],
+      "answerIndex": 0,
+      "explanation": "had better（You'd better）后接动词原形，表示建议。"
+    },
+    {
+      "id": "english-090",
+      "subject": "english",
+      "difficulty": 3,
+      "question": "I don't know ___ next.",
+      "options": [
+        "what to do",
+        "how to do",
+        "what should do",
+        "to do what"
+      ],
+      "answerIndex": 0,
+      "explanation": "疑问词 + 不定式：what to do 意为做什么，作 know 的宾语。"
+    },
+    {
+      "id": "english-091",
+      "subject": "english",
+      "difficulty": 3,
+      "question": "\"put off\" 的中文意思是？",
+      "options": [
+        "推迟",
+        "穿上",
+        "起飞",
+        "放弃"
+      ],
+      "answerIndex": 0,
+      "explanation": "put off 意为推迟、延期，如 put off the meeting 推迟会议。"
+    },
+    {
+      "id": "english-092",
+      "subject": "english",
+      "difficulty": 3,
+      "question": "\"look forward to\" 的中文意思是？",
+      "options": [
+        "期待",
+        "向前看",
+        "回顾",
+        "寻找"
+      ],
+      "answerIndex": 0,
+      "explanation": "look forward to 意为期待、盼望，如 I look forward to seeing you。"
+    },
+    {
+      "id": "english-093",
+      "subject": "english",
+      "difficulty": 3,
+      "question": "\"run out of\" 的中文意思是？",
+      "options": [
+        "用完",
+        "逃跑",
+        "出去",
+        "赶走"
+      ],
+      "answerIndex": 0,
+      "explanation": "run out of 意为用完、耗尽，如 run out of money 花光了钱。"
+    },
+    {
+      "id": "english-094",
+      "subject": "english",
+      "difficulty": 3,
+      "question": "\"give up\" 的中文意思是？",
+      "options": [
+        "放弃",
+        "举起",
+        "捡起",
+        "分发"
+      ],
+      "answerIndex": 0,
+      "explanation": "give up 意为放弃；give out 才是分发。"
+    },
+    {
+      "id": "english-095",
+      "subject": "english",
+      "difficulty": 3,
+      "question": "Choose the correct sentence.",
+      "options": [
+        "He spent two hours finishing the work.",
+        "He spent two hours to finish the work.",
+        "He cost two hours finishing the work.",
+        "He paid two hours to finish the work."
+      ],
+      "answerIndex": 0,
+      "explanation": "spend time doing sth 是固定搭配，表示花时间做某事。"
+    },
+    {
+      "id": "english-096",
+      "subject": "english",
+      "difficulty": 3,
+      "question": "There is ___ milk in the glass.",
+      "options": [
+        "a little",
+        "a few",
+        "many",
+        "few"
+      ],
+      "answerIndex": 0,
+      "explanation": "milk 是不可数名词，用 a little 修饰；a few/few/many 修饰可数名词。"
+    },
+    {
+      "id": "english-097",
+      "subject": "english",
+      "difficulty": 3,
+      "question": "Lucy is as ___ as her sister.",
+      "options": [
+        "careful",
+        "more careful",
+        "most careful",
+        "carefully"
+      ],
+      "answerIndex": 0,
+      "explanation": "as ... as 之间用形容词原级；修饰系动词 is 后作表语用 careful 而非副词。"
+    },
+    {
+      "id": "english-098",
+      "subject": "english",
+      "difficulty": 3,
+      "question": "He asked me ___ I liked English.",
+      "options": [
+        "if",
+        "what",
+        "that",
+        "when"
+      ],
+      "answerIndex": 0,
+      "explanation": "一般疑问句变宾语从句时用 if/whether 引导，从句用陈述语序。"
+    },
+    {
+      "id": "english-099",
+      "subject": "english",
+      "difficulty": 3,
+      "question": "The harder you work, the ___ result you will get.",
+      "options": [
+        "better",
+        "best",
+        "good",
+        "worse"
+      ],
+      "answerIndex": 0,
+      "explanation": "the + 比较级..., the + 比较级... 表示越……越……：越努力结果越好。"
+    },
+    {
+      "id": "english-100",
+      "subject": "english",
+      "difficulty": 3,
+      "question": "\"in order to\" 的中文意思是？",
+      "options": [
+        "为了",
+        "依次",
+        "有序",
+        "命令"
+      ],
+      "answerIndex": 0,
+      "explanation": "in order to 意为为了、以便，后接动词原形表目的。"
+    },
+    {
+      "id": "science-001",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "一天中，太阳从哪个方向升起？",
+      "options": [
+        "东方",
+        "西方",
+        "南方",
+        "北方"
+      ],
+      "answerIndex": 0,
+      "explanation": "地球自西向东自转，所以太阳看起来从东方升起、西方落下。"
+    },
+    {
+      "id": "science-002",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "一年有多少个月？",
+      "options": [
+        "12",
+        "10",
+        "24",
+        "6"
+      ],
+      "answerIndex": 0,
+      "explanation": "一年 12 个月，约 365 天。"
+    },
+    {
+      "id": "science-003",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "下列哪种做法可以节约用水？",
+      "options": [
+        "及时关紧水龙头",
+        "洗碗时一直开着水龙头",
+        "用长流水解冻食物",
+        "用饮用水冲洗马路"
+      ],
+      "answerIndex": 0,
+      "explanation": "及时关紧水龙头能避免不必要的浪费；其余做法都在白白消耗大量清水。"
+    },
+    {
+      "id": "science-004",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "植物的正常生长离不开？",
+      "options": [
+        "阳光和水分",
+        "只有土壤",
+        "只有化肥",
+        "完全黑暗的环境"
+      ],
+      "answerIndex": 0,
+      "explanation": "植物需要阳光进行光合作用，需要水分维持生命活动，土壤只是常见的支撑和养分来源。"
+    },
+    {
+      "id": "science-005",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "彩虹通常有几种颜色？",
+      "options": [
+        "7",
+        "5",
+        "6",
+        "8"
+      ],
+      "answerIndex": 0,
+      "explanation": "彩虹按红橙黄绿蓝靛紫排列，通常说七种颜色，是阳光经水滴折射色散形成的。"
+    },
+    {
+      "id": "science-006",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "冬天脱毛衣时听到噼啪声、看到小火花，这是？",
+      "options": [
+        "静电现象",
+        "燃烧现象",
+        "毛衣断裂",
+        "回声现象"
+      ],
+      "answerIndex": 0,
+      "explanation": "毛衣摩擦使电荷转移积累，放电时发出噼啪声和火花，这是摩擦起电（静电）现象。"
+    },
+    {
+      "id": "science-007",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "米饭主要为我们提供的营养素是？",
+      "options": [
+        "碳水化合物（糖类）",
+        "蛋白质",
+        "脂肪",
+        "维生素"
+      ],
+      "answerIndex": 0,
+      "explanation": "米饭、面食的主要成分是淀粉，属于碳水化合物，是人体最主要的能量来源。"
+    },
+    {
+      "id": "science-008",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "下列哪种是有益健康的好习惯？",
+      "options": [
+        "早睡早起，规律作息",
+        "经常熬夜玩手机",
+        "挑食偏食",
+        "从不运动"
+      ],
+      "answerIndex": 0,
+      "explanation": "规律作息、均衡饮食、适量运动都是健康习惯；熬夜、挑食、久坐不动都损害健康。"
+    },
+    {
+      "id": "science-009",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "冰箱冷藏食物的主要目的是？",
+      "options": [
+        "低温减缓食物变质",
+        "杀死全部细菌",
+        "让食物变得更甜",
+        "增加食物营养"
+      ],
+      "answerIndex": 0,
+      "explanation": "低温能抑制细菌繁殖、减缓食物氧化变质，但不能杀死全部细菌。"
+    },
+    {
+      "id": "science-010",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "垃圾分类中，过期药品属于？",
+      "options": [
+        "有害垃圾",
+        "厨余垃圾",
+        "可回收物",
+        "其他垃圾"
+      ],
+      "answerIndex": 0,
+      "explanation": "过期药品含有害化学成分，乱扔会污染环境，属于有害垃圾，应投入专门回收箱。"
+    },
+    {
+      "id": "science-011",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "地球上大部分的水是？",
+      "options": [
+        "海水（咸水）",
+        "河水",
+        "湖水",
+        "地下水"
+      ],
+      "answerIndex": 0,
+      "explanation": "地球表面约 71% 被海洋覆盖，绝大多数水是海水，淡水只占很小一部分。"
+    },
+    {
+      "id": "science-012",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "影子是怎么形成的？",
+      "options": [
+        "光沿直线传播被挡住",
+        "光发生折射",
+        "光发生反射",
+        "光的色散"
+      ],
+      "answerIndex": 0,
+      "explanation": "光在同种均匀介质中沿直线传播，遇到不透明物体被挡住，身后形成影子。"
+    },
+    {
+      "id": "science-013",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "下列哪个物体是光源？",
+      "options": [
+        "太阳",
+        "月亮",
+        "镜子",
+        "白纸"
+      ],
+      "answerIndex": 0,
+      "explanation": "光源是自身能发光的物体；月亮和镜子只是反射别人的光，不发光。"
+    },
+    {
+      "id": "science-014",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "冬天向手心哈气会觉得暖和，主要是因为哈出的气体？",
+      "options": [
+        "温度比手高，传热给手",
+        "湿度大",
+        "速度快",
+        "密度小"
+      ],
+      "answerIndex": 0,
+      "explanation": "哈出的气体温度高于手，热量从高温气体传向手，所以觉得暖和。"
+    },
+    {
+      "id": "science-015",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "夏天穿浅色衣服比较凉快，是因为浅色衣服？",
+      "options": [
+        "反射阳光多、吸热少",
+        "更加透气",
+        "更薄",
+        "更轻"
+      ],
+      "answerIndex": 0,
+      "explanation": "浅色物体反射阳光的能力强、吸收的热量少，所以夏天穿浅色更凉快。"
+    },
+    {
+      "id": "science-016",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "蜜蜂在花丛中采蜜，同时还能帮助植物？",
+      "options": [
+        "传粉",
+        "排水",
+        "降温",
+        "除虫"
+      ],
+      "answerIndex": 0,
+      "explanation": "蜜蜂在采蜜时把花粉从一朵花带到另一朵花，帮助植物传粉结出果实和种子。"
+    },
+    {
+      "id": "science-017",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "下列哪种天气最适合晾晒衣服？",
+      "options": [
+        "晴天",
+        "雨天",
+        "大雾天",
+        "下雪天"
+      ],
+      "answerIndex": 0,
+      "explanation": "晴天阳光充足、温度高，水分蒸发快，最容易把衣服晒干。"
+    },
+    {
+      "id": "science-018",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "交通信号灯中，红灯表示？",
+      "options": [
+        "停止通行",
+        "快速通过",
+        "注意慢行",
+        "可以掉头"
+      ],
+      "answerIndex": 0,
+      "explanation": "红灯停、绿灯行、黄灯亮时不抢行，这是基本交通规则。"
+    },
+    {
+      "id": "science-019",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "磁铁能吸引下列哪种物品？",
+      "options": [
+        "铁钉",
+        "木块",
+        "塑料尺",
+        "橡皮"
+      ],
+      "answerIndex": 0,
+      "explanation": "磁铁能吸引铁、钴、镍等磁性材料，木块、塑料、橡皮都不是磁性材料。"
+    },
+    {
+      "id": "science-020",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "预防近视的正确做法是？",
+      "options": [
+        "保持正确的读写姿势",
+        "躺着看书",
+        "在阳光直射下看书",
+        "长时间玩手游"
+      ],
+      "answerIndex": 0,
+      "explanation": "眼睛与书本保持约一尺距离、坐姿端正、控制用眼时间，才能有效预防近视。"
+    },
+    {
+      "id": "science-021",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "光在真空中的传播速度约为？",
+      "options": [
+        "3×10⁸ 米/秒",
+        "3×10⁶ 米/秒",
+        "340 米/秒",
+        "1.5×10⁸ 米/秒"
+      ],
+      "answerIndex": 0,
+      "explanation": "光速是宇宙中最快的速度，真空中约 30 万千米每秒（3×10⁸ 米/秒）。"
+    },
+    {
+      "id": "science-022",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "声音在 15℃ 空气中的传播速度约为？",
+      "options": [
+        "340 米/秒",
+        "3×10⁸ 米/秒",
+        "1500 米/秒",
+        "34 米/秒"
+      ],
+      "answerIndex": 0,
+      "explanation": "15℃ 时声音在空气中约每秒 340 米，远慢于光速，所以先见闪电后闻雷声。"
+    },
+    {
+      "id": "science-023",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "下列哪个例子利用了光的反射？",
+      "options": [
+        "照镜子",
+        "小孔成像",
+        "影子的形成",
+        "用放大镜看字"
+      ],
+      "answerIndex": 0,
+      "explanation": "照镜子利用光的反射成像；小孔成像和影子是直线传播，放大镜是折射。"
+    },
+    {
+      "id": "science-024",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "放大镜是凸透镜，它对光线有？",
+      "options": [
+        "会聚作用",
+        "发散作用",
+        "没有作用",
+        "反射作用"
+      ],
+      "answerIndex": 0,
+      "explanation": "凸透镜会聚光线，凹透镜发散光线。"
+    },
+    {
+      "id": "science-025",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "影子的形成说明光在同种均匀介质中沿？",
+      "options": [
+        "直线传播",
+        "曲线传播",
+        "折射传播",
+        "反射传播"
+      ],
+      "answerIndex": 0,
+      "explanation": "影子的边缘呈直线延伸，说明光沿直线传播，被物体挡住后形成阴影。"
+    },
+    {
+      "id": "science-026",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "用力拉弹簧，弹簧变长了，说明力可以改变物体的？",
+      "options": [
+        "形状",
+        "运动状态",
+        "颜色",
+        "温度"
+      ],
+      "answerIndex": 0,
+      "explanation": "力的作用效果：改变物体的形状（如拉长弹簧）或改变物体的运动状态。"
+    },
+    {
+      "id": "science-027",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "苹果从树上落向地面，是因为受到？",
+      "options": [
+        "重力",
+        "浮力",
+        "摩擦力",
+        "磁力"
+      ],
+      "answerIndex": 0,
+      "explanation": "地球对物体的吸引力叫重力，方向竖直向下，使苹果落向地面。"
+    },
+    {
+      "id": "science-028",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "冬天用手摸户外的金属栏杆比摸木栏杆感觉更凉，是因为金属？",
+      "options": [
+        "导热快，带走手上的热量多",
+        "温度一定更低",
+        "更坚硬",
+        "更重"
+      ],
+      "answerIndex": 0,
+      "explanation": "两者温度相同，但金属导热快，把手上的热量迅速带走，所以感觉更凉。"
+    },
+    {
+      "id": "science-029",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "冬天手捧热水杯会变暖，热量从哪里传到哪里？",
+      "options": [
+        "水杯传到手",
+        "手传到水杯",
+        "不会传递",
+        "先手后杯"
+      ],
+      "answerIndex": 0,
+      "explanation": "热传递的方向是从高温物体传向低温物体：热量由热水杯传给手。"
+    },
+    {
+      "id": "science-030",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "一切正在发声的物体都在？",
+      "options": [
+        "振动",
+        "发光",
+        "发热",
+        "旋转"
+      ],
+      "answerIndex": 0,
+      "explanation": "声音由物体振动产生，振动停止，发声也停止。"
+    },
+    {
+      "id": "science-031",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "太阳能、风能属于？",
+      "options": [
+        "可再生能源",
+        "不可再生能源",
+        "化石能源",
+        "核能源"
+      ],
+      "answerIndex": 0,
+      "explanation": "太阳能、风能可以源源不断地得到，属于可再生能源；煤、石油、天然气是化石能源。"
+    },
+    {
+      "id": "science-032",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "磁悬浮列车利用磁极间的相互作用使列车？",
+      "options": [
+        "悬浮起来以减小摩擦",
+        "增大摩擦",
+        "加快腐蚀",
+        "提高温度"
+      ],
+      "answerIndex": 0,
+      "explanation": "磁力使列车脱离轨道悬浮，摩擦大大减小，因此能高速行驶。"
+    },
+    {
+      "id": "science-033",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "自行车刹车时，是通过什么方式增大摩擦力的？",
+      "options": [
+        "增大刹车皮对车圈的压力",
+        "减小接触面粗糙程度",
+        "变滑动为滚动",
+        "减小压力"
+      ],
+      "answerIndex": 0,
+      "explanation": "在接触面粗糙程度一定时，压力越大摩擦力越大，刹车就是用力捏闸增大压力。"
+    },
+    {
+      "id": "science-034",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "轮船能浮在水面上，是因为它受到的？",
+      "options": [
+        "浮力等于重力",
+        "浮力小于重力",
+        "没有重力",
+        "密度比水大"
+      ],
+      "answerIndex": 0,
+      "explanation": "漂浮时二力平衡：向上的浮力等于向下的重力，船就能平稳浮在水面。"
+    },
+    {
+      "id": "science-035",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "体温计的测量范围一般是？",
+      "options": [
+        "35℃～42℃",
+        "0℃～100℃",
+        "−20℃～50℃",
+        "37℃～45℃"
+      ],
+      "answerIndex": 0,
+      "explanation": "人体体温变化范围小，体温计按人体温设计，量程为 35℃～42℃。"
+    },
+    {
+      "id": "science-036",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "用冰块给发烧的人物理降温，是因为冰融化时？",
+      "options": [
+        "吸收热量",
+        "放出热量",
+        "温度升高",
+        "不吸不放热"
+      ],
+      "answerIndex": 0,
+      "explanation": "冰熔化时要吸收大量热，从而给身体降温，这是熔化吸热的应用。"
+    },
+    {
+      "id": "science-037",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "筷子斜插入水中，看起来在水面处变弯了，这是光的？",
+      "options": [
+        "折射现象",
+        "反射现象",
+        "直线传播",
+        "色散现象"
+      ],
+      "answerIndex": 0,
+      "explanation": "光从水进入空气时发生偏折（折射），所以水下的筷子看起来向上弯折。"
+    },
+    {
+      "id": "science-038",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "站在岸上看到水中的白云，是光经过什么形成的？",
+      "options": [
+        "水面反射形成的虚像",
+        "水面折射形成的实像",
+        "直线传播",
+        "衍射"
+      ],
+      "answerIndex": 0,
+      "explanation": "水面相当于平面镜，白云经水面反射成虚像，所以看到水中出现白云。"
+    },
+    {
+      "id": "science-039",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "冬天窗玻璃内侧出现的小水珠，是室内水蒸气发生的？",
+      "options": [
+        "液化现象",
+        "凝固现象",
+        "升华现象",
+        "汽化现象"
+      ],
+      "answerIndex": 0,
+      "explanation": "温暖的水蒸气遇到冰冷的玻璃放热液化成小水珠，出现在玻璃内侧。"
+    },
+    {
+      "id": "science-040",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "电线内芯通常用铜制作，是因为铜的？",
+      "options": [
+        "导电性好",
+        "价格最便宜",
+        "质量很轻",
+        "不易腐蚀"
+      ],
+      "answerIndex": 0,
+      "explanation": "铜的电阻率小、导电性优良，是常用的导线材料。"
+    },
+    {
+      "id": "science-041",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "人体最大的器官是？",
+      "options": [
+        "皮肤",
+        "肝脏",
+        "大脑",
+        "心脏"
+      ],
+      "answerIndex": 0,
+      "explanation": "皮肤覆盖全身，是人体面积最大、最重的器官，还能保护身体、调节体温。"
+    },
+    {
+      "id": "science-042",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "植物进行光合作用的主要场所是？",
+      "options": [
+        "叶绿体",
+        "细胞壁",
+        "细胞核",
+        "线粒体"
+      ],
+      "answerIndex": 0,
+      "explanation": "叶绿体含叶绿素，能吸收光能制造有机物，是光合作用的场所。"
+    },
+    {
+      "id": "science-043",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "植物进行光合作用时，吸收二氧化碳并释放？",
+      "options": [
+        "氧气",
+        "氮气",
+        "氢气",
+        "更多二氧化碳"
+      ],
+      "answerIndex": 0,
+      "explanation": "光合作用把二氧化碳和水转变成有机物并释放氧气，是大气氧气的重要来源。"
+    },
+    {
+      "id": "science-044",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "人体消化食物和吸收营养物质的主要器官是？",
+      "options": [
+        "小肠",
+        "胃",
+        "大肠",
+        "口腔"
+      ],
+      "answerIndex": 0,
+      "explanation": "小肠长 5～6 米，内壁有大量绒毛，是消化和吸收的主要场所。"
+    },
+    {
+      "id": "science-045",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "血液中负责运输氧气的细胞是？",
+      "options": [
+        "红细胞",
+        "白细胞",
+        "血小板",
+        "淋巴细胞"
+      ],
+      "answerIndex": 0,
+      "explanation": "红细胞含血红蛋白，能与氧气结合，把氧气运送到全身各处。"
+    },
+    {
+      "id": "science-046",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "人体呼吸系统的主要器官是？",
+      "options": [
+        "肺",
+        "气管",
+        "鼻腔",
+        "心脏"
+      ],
+      "answerIndex": 0,
+      "explanation": "肺是气体交换的场所，是呼吸系统的主要器官；心脏属于循环系统。"
+    },
+    {
+      "id": "science-047",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "白天绿色植物通常进行？",
+      "options": [
+        "光合作用和呼吸作用",
+        "只有光合作用",
+        "只有呼吸作用",
+        "两者都不进行"
+      ],
+      "answerIndex": 0,
+      "explanation": "活细胞时刻都在呼吸；白天有光，光合作用同时进行且强于呼吸作用。"
+    },
+    {
+      "id": "science-048",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "蜻蜓不断用尾部点水，实际上是在？",
+      "options": [
+        "产卵",
+        "喝水",
+        "洗澡",
+        "玩游戏"
+      ],
+      "answerIndex": 0,
+      "explanation": "蜻蜓点水是把卵产入水中，这是它的繁殖行为。"
+    },
+    {
+      "id": "science-049",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "下列哪种动物是哺乳动物？",
+      "options": [
+        "鲸",
+        "鲨鱼",
+        "鳄鱼",
+        "企鹅"
+      ],
+      "answerIndex": 0,
+      "explanation": "鲸虽生活在水里，但胎生哺乳，是哺乳动物；鲨鱼是鱼类，鳄鱼是爬行动物，企鹅是鸟类。"
+    },
+    {
+      "id": "science-050",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "种子萌发时，一般最先突破种皮长出的结构是？",
+      "options": [
+        "根",
+        "茎",
+        "叶",
+        "花"
+      ],
+      "answerIndex": 0,
+      "explanation": "种子吸水膨胀后胚根最先伸长突破种皮发育成根，固定幼苗并吸收水分。"
+    },
+    {
+      "id": "science-051",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "人体完成运动时，肌肉起到的作用是？",
+      "options": [
+        "受神经传来刺激后收缩，牵动骨绕关节活动",
+        "支撑身体重心",
+        "储存钙质",
+        "保护内脏"
+      ],
+      "answerIndex": 0,
+      "explanation": "骨骼肌收缩牵拉骨绕关节转动，从而产生运动；骨起杠杆作用，关节是支点。"
+    },
+    {
+      "id": "science-052",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "接种疫苗可以帮助人体获得对某些疾病的？",
+      "options": [
+        "免疫力",
+        "记忆力",
+        "消化力",
+        "平衡力"
+      ],
+      "answerIndex": 0,
+      "explanation": "疫苗让身体提前认识病原体并产生抗体和记忆细胞，从而获得免疫力。"
+    },
+    {
+      "id": "science-053",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "细胞是生物体结构和功能的？",
+      "options": [
+        "基本单位",
+        "最大单位",
+        "器官单位",
+        "系统单位"
+      ],
+      "answerIndex": 0,
+      "explanation": "除病毒外，生物体都由细胞构成，细胞是结构和功能的基本单位。"
+    },
+    {
+      "id": "science-054",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "人体内含量最多的物质是？",
+      "options": [
+        "水",
+        "蛋白质",
+        "脂肪",
+        "糖类"
+      ],
+      "answerIndex": 0,
+      "explanation": "水约占人体质量的 60%～70%，是含量最多的物质，各项生命活动都离不开水。"
+    },
+    {
+      "id": "science-055",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "传染病通常是由什么引起的？",
+      "options": [
+        "病原体（细菌、病毒等）",
+        "着凉",
+        "吃得太饱",
+        "运动过量"
+      ],
+      "answerIndex": 0,
+      "explanation": "传染病由细菌、病毒、寄生虫等病原体引起，能在人与人之间传播。"
+    },
+    {
+      "id": "science-056",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "大脑在人体中主要负责？",
+      "options": [
+        "思维和指挥全身活动",
+        "消化食物",
+        "运输血液",
+        "气体交换"
+      ],
+      "answerIndex": 0,
+      "explanation": "大脑是神经系统的最高级部分，负责思维、记忆并指挥全身的活动。"
+    },
+    {
+      "id": "science-057",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "下列属于爬行动物的是？",
+      "options": [
+        "乌龟",
+        "青蛙",
+        "麻雀",
+        "金鱼"
+      ],
+      "answerIndex": 0,
+      "explanation": "乌龟体表有甲、爬行产卵，是爬行动物；青蛙是两栖动物，麻雀是鸟类，金鱼是鱼类。"
+    },
+    {
+      "id": "science-058",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "植物根的主要作用是？",
+      "options": [
+        "吸收水分和无机盐并固定植物",
+        "制造养分",
+        "开花结果",
+        "进行呼吸"
+      ],
+      "answerIndex": 0,
+      "explanation": "根从土壤中吸收水分和无机盐，并把植物固定在土壤里；叶才制造养分。"
+    },
+    {
+      "id": "science-059",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "青蛙的幼体（蝌蚪）用什么呼吸？",
+      "options": [
+        "鳃",
+        "肺",
+        "皮肤",
+        "鳍"
+      ],
+      "answerIndex": 0,
+      "explanation": "蝌蚪生活在水中用鳃呼吸；成蛙主要用肺呼吸，皮肤辅助呼吸。"
+    },
+    {
+      "id": "science-060",
+      "subject": "science",
+      "difficulty": 3,
+      "question": "长期缺乏维生素 C 可能引起？",
+      "options": [
+        "坏血病",
+        "佝偻病",
+        "夜盲症",
+        "脚气病"
+      ],
+      "answerIndex": 0,
+      "explanation": "缺维生素 C 会得坏血病（牙龈出血）；缺维生素 A 得夜盲症，缺维生素 D 得佝偻病。"
+    },
+    {
+      "id": "science-061",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "太阳系的中心天体是？",
+      "options": [
+        "太阳",
+        "地球",
+        "月球",
+        "木星"
+      ],
+      "answerIndex": 0,
+      "explanation": "太阳质量占太阳系的绝大部分，八大行星都绕它运转，太阳是中心天体。"
+    },
+    {
+      "id": "science-062",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "地球绕太阳公转一周大约需要？",
+      "options": [
+        "一年",
+        "一天",
+        "一个月",
+        "一小时"
+      ],
+      "answerIndex": 0,
+      "explanation": "地球公转一周约 365 天，即一年；自转一周才是一天。"
+    },
+    {
+      "id": "science-063",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "地球自转产生的自然现象是？",
+      "options": [
+        "昼夜交替",
+        "四季变化",
+        "月相变化",
+        "潮汐"
+      ],
+      "answerIndex": 0,
+      "explanation": "地球自西向东自转，向阳面为昼、背阳面为夜，产生昼夜交替；四季由公转产生。"
+    },
+    {
+      "id": "science-064",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "月球绕地球转一圈大约需要？",
+      "options": [
+        "一个月",
+        "一天",
+        "一年",
+        "一小时"
+      ],
+      "answerIndex": 0,
+      "explanation": "月球绕地球公转一周约 27～30 天，也就是农历的一个月。"
+    },
+    {
+      "id": "science-065",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "太阳是一颗？",
+      "options": [
+        "恒星",
+        "行星",
+        "卫星",
+        "彗星"
+      ],
+      "answerIndex": 0,
+      "explanation": "太阳自己能发光发热，是恒星；地球是行星，月球是卫星。"
+    },
+    {
+      "id": "science-066",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "地球的天然卫星是？",
+      "options": [
+        "月球",
+        "太阳",
+        "火星",
+        "北极星"
+      ],
+      "answerIndex": 0,
+      "explanation": "月球围绕地球转动，是地球唯一的天然卫星。"
+    },
+    {
+      "id": "science-067",
+      "subject": "science",
+      "difficulty": 3,
+      "question": "四季变化的主要原因是地球公转时？",
+      "options": [
+        "地轴倾斜且方向保持不变",
+        "离太阳忽远忽近",
+        "太阳发热不稳定",
+        "自转速度忽快忽慢"
+      ],
+      "answerIndex": 0,
+      "explanation": "地轴倾斜使太阳直射点在南北回归线间移动，各地获热不同形成四季；日地距离影响很小。"
+    },
+    {
+      "id": "science-068",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "地球表面海洋面积约占地球总面积的？",
+      "options": [
+        "71%",
+        "50%",
+        "30%",
+        "90%"
+      ],
+      "answerIndex": 0,
+      "explanation": "地球表面约 71% 是海洋，陆地只占约 29%，所以地球又被称为蓝色星球。"
+    },
+    {
+      "id": "science-069",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "地震发生时，如果在室内，比较安全的做法是？",
+      "options": [
+        "躲到坚固的桌子下或墙角",
+        "立刻乘电梯下楼",
+        "跳窗逃生",
+        "站在窗边观看"
+      ],
+      "answerIndex": 0,
+      "explanation": "室内应就近躲避在坚固桌下、承重墙角，保护头部；电梯可能停电被困，跳窗非常危险。"
+    },
+    {
+      "id": "science-070",
+      "subject": "science",
+      "difficulty": 3,
+      "question": "火山喷发出的岩浆主要来自？",
+      "options": [
+        "地球内部的地幔",
+        "地球的大气层",
+        "月球内部",
+        "地表的河流"
+      ],
+      "answerIndex": 0,
+      "explanation": "岩浆主要来源于上地幔上部的软流层，沿地壳薄弱处喷出地表。"
+    },
+    {
+      "id": "science-071",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "农历十五左右出现的月相是？",
+      "options": [
+        "满月",
+        "新月",
+        "上弦月",
+        "残月"
+      ],
+      "answerIndex": 0,
+      "explanation": "农历十五、十六月亮被照亮的一面朝向地球，是满月（望）；初一是新月。"
+    },
+    {
+      "id": "science-072",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "发生日食时，挡住太阳光的天体是？",
+      "options": [
+        "月球",
+        "地球",
+        "金星",
+        "太阳黑子"
+      ],
+      "answerIndex": 0,
+      "explanation": "月球运行到太阳和地球之间，挡住太阳光，地球上的人看到日食。"
+    },
+    {
+      "id": "science-073",
+      "subject": "science",
+      "difficulty": 3,
+      "question": "大气层中离地面最近的一层是？",
+      "options": [
+        "对流层",
+        "平流层",
+        "中间层",
+        "电离层"
+      ],
+      "answerIndex": 0,
+      "explanation": "对流层贴近地面，风、云、雨、雪等天气现象都发生在这一层。"
+    },
+    {
+      "id": "science-074",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "下列属于天气现象的是？",
+      "options": [
+        "阴转小雨",
+        "四季如春",
+        "冬冷夏热",
+        "昼夜交替"
+      ],
+      "answerIndex": 0,
+      "explanation": "天气是短时间内的大气状况（如阴、晴、雨）；四季如春、冬冷夏热描述的是长期气候。"
+    },
+    {
+      "id": "science-075",
+      "subject": "science",
+      "difficulty": 3,
+      "question": "地球上的淡水中，储量最多的是？",
+      "options": [
+        "两极和高山的冰川",
+        "河流水",
+        "湖泊水",
+        "生物体内的水"
+      ],
+      "answerIndex": 0,
+      "explanation": "淡水约 2/3 以上以冰川形式分布在两极和高山，人类直接利用的主要是河流湖泊水。"
+    },
+    {
+      "id": "science-076",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "太阳系中体积最大的行星是？",
+      "options": [
+        "木星",
+        "地球",
+        "火星",
+        "水星"
+      ],
+      "answerIndex": 0,
+      "explanation": "木星是八大行星中的巨无霸，体积约是地球的 1300 倍。"
+    },
+    {
+      "id": "science-077",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "二十四节气反映的是？",
+      "options": [
+        "地球公转带来的季节与气候变化",
+        "月球自转的规律",
+        "潮汐涨落的规律",
+        "星座位置的变化"
+      ],
+      "answerIndex": 0,
+      "explanation": "节气按太阳在黄道上的位置划分，对应地球公转过程中季节、气候和农事的规律。"
+    },
+    {
+      "id": "science-078",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "航天员在太空舱里会飘起来，是因为他们处于？",
+      "options": [
+        "失重状态",
+        "睡眠状态",
+        "加速状态",
+        "高压状态"
+      ],
+      "answerIndex": 0,
+      "explanation": "航天器绕地球飞行时，重力全部用来提供向心加速度，舱内物体呈现失重状态。"
+    },
+    {
+      "id": "science-079",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "流星是？",
+      "options": [
+        "流星体闯入大气层摩擦燃烧发光",
+        "星星从天上掉下来",
+        "人造卫星碎片反射光",
+        "一种极光现象"
+      ],
+      "answerIndex": 0,
+      "explanation": "小颗粒流星体高速进入大气层，与空气摩擦产生高温而发光，形成流星。"
+    },
+    {
+      "id": "science-080",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "「站得高看得远」这一现象与地球的什么特点有关？",
+      "options": [
+        "地球是一个球体",
+        "地球自转很快",
+        "地球公转",
+        "地磁场"
+      ],
+      "answerIndex": 0,
+      "explanation": "地球是球体，站得越高视线越过地表遮挡越远，能看到更远的地方。"
+    },
+    {
+      "id": "science-081",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "空气中能支持燃烧的气体是？",
+      "options": [
+        "氧气",
+        "氮气",
+        "二氧化碳",
+        "稀有气体"
+      ],
+      "answerIndex": 0,
+      "explanation": "氧气支持燃烧（助燃性）；氮气、二氧化碳都不支持燃烧，二氧化碳还能灭火。"
+    },
+    {
+      "id": "science-082",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "二氧化碳通入澄清石灰水，石灰水会？",
+      "options": [
+        "变浑浊",
+        "变蓝色",
+        "变红色",
+        "没有变化"
+      ],
+      "answerIndex": 0,
+      "explanation": "二氧化碳与氢氧化钙反应生成白色的碳酸钙沉淀，使石灰水变浑浊，这是检验 CO₂ 的方法。"
+    },
+    {
+      "id": "science-083",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "水是由哪两种元素组成的？",
+      "options": [
+        "氢和氧",
+        "氢和氮",
+        "氧和碳",
+        "氢和碳"
+      ],
+      "answerIndex": 0,
+      "explanation": "电解水生成氢气和氧气，证明水（H₂O）由氢、氧两种元素组成。"
+    },
+    {
+      "id": "science-084",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "下列变化属于化学变化的是？",
+      "options": [
+        "铁钉生锈",
+        "冰块融化",
+        "玻璃打碎",
+        "酒精挥发"
+      ],
+      "answerIndex": 0,
+      "explanation": "铁生锈生成了新物质铁锈，属于化学变化；其余三种变化没有新物质生成。"
+    },
+    {
+      "id": "science-085",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "铁生锈需要同时接触？",
+      "options": [
+        "氧气和水",
+        "只有氧气",
+        "只有水",
+        "氮气"
+      ],
+      "answerIndex": 0,
+      "explanation": "铁在潮湿的空气中同时接触氧气和水才会生锈，保持干燥能防锈。"
+    },
+    {
+      "id": "science-086",
+      "subject": "science",
+      "difficulty": 3,
+      "question": "灭火的主要原理之一是？",
+      "options": [
+        "隔绝氧气或把温度降到着火点以下",
+        "降低可燃物的着火点",
+        "增加氧气浓度",
+        "提高环境温度"
+      ],
+      "answerIndex": 0,
+      "explanation": "燃烧需要可燃物、氧气和温度达到着火点；破坏任一条件即可灭火。着火点是物质的固有属性，不能被降低。"
+    },
+    {
+      "id": "science-087",
+      "subject": "science",
+      "difficulty": 3,
+      "question": "电解水实验中，与电源正极相连的一端产生？",
+      "options": [
+        "氧气",
+        "氢气",
+        "氮气",
+        "二氧化碳"
+      ],
+      "answerIndex": 0,
+      "explanation": "电解水「正氧负氢」：正极产生氧气，负极产生氢气，体积比约 1 : 2。"
+    },
+    {
+      "id": "science-088",
+      "subject": "science",
+      "difficulty": 3,
+      "question": "下列物质中属于纯净物的是？",
+      "options": [
+        "蒸馏水",
+        "空气",
+        "海水",
+        "矿泉水"
+      ],
+      "answerIndex": 0,
+      "explanation": "蒸馏水只含水一种物质，是纯净物；空气、海水、矿泉水都含多种物质，是混合物。"
+    },
+    {
+      "id": "science-089",
+      "subject": "science",
+      "difficulty": 3,
+      "question": "pH 值小于 7 的溶液呈？",
+      "options": [
+        "酸性",
+        "碱性",
+        "中性",
+        "两性"
+      ],
+      "answerIndex": 0,
+      "explanation": "pH < 7 为酸性，pH = 7 为中性，pH > 7 为碱性，pH 越小酸性越强。"
+    },
+    {
+      "id": "science-090",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "食盐的主要成分是？",
+      "options": [
+        "氯化钠",
+        "碳酸钠",
+        "氯化钾",
+        "碳酸钙"
+      ],
+      "answerIndex": 0,
+      "explanation": "食盐的主要成分是氯化钠（NaCl）；碳酸钠是纯碱，碳酸钙是大理石的主要成分。"
+    },
+    {
+      "id": "science-091",
+      "subject": "science",
+      "difficulty": 3,
+      "question": "铁丝在氧气中燃烧的现象是？",
+      "options": [
+        "剧烈燃烧、火星四射，生成黑色固体",
+        "发出明亮的蓝紫色火焰",
+        "发出淡蓝色火焰",
+        "只发红不燃烧"
+      ],
+      "answerIndex": 0,
+      "explanation": "铁丝在氧气中剧烈燃烧、火星四射，生成黑色四氧化三铁；蓝紫色火焰是硫燃烧的现象。"
+    },
+    {
+      "id": "science-092",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "一片森林里的阳光、水、土壤和各种生物共同构成一个？",
+      "options": [
+        "生态系统",
+        "种群",
+        "细胞",
+        "器官"
+      ],
+      "answerIndex": 0,
+      "explanation": "生物群落与环境（非生物部分）相互作用构成生态系统；种群只是同种生物的集合。"
+    },
+    {
+      "id": "science-093",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "下列做法有利于环境保护的是？",
+      "options": [
+        "垃圾分类回收",
+        "随意焚烧秸秆",
+        "大量使用一次性筷子",
+        "把废水直接排进河流"
+      ],
+      "answerIndex": 0,
+      "explanation": "垃圾分类能资源再利用、减少污染；焚烧秸秆、浪费木材、直排废水都会破坏环境。"
+    },
+    {
+      "id": "science-094",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "太阳能作为能源最突出的优点是？",
+      "options": [
+        "清洁且可再生",
+        "昼夜都能使用",
+        "不受天气影响",
+        "设备最便宜"
+      ],
+      "answerIndex": 0,
+      "explanation": "太阳能清洁无污染、取之不尽，但受昼夜和天气限制，设备成本也较高。"
+    },
+    {
+      "id": "science-095",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "在食物链「草 → 兔 → 鹰」中，兔属于？",
+      "options": [
+        "消费者",
+        "生产者",
+        "分解者",
+        "非生物部分"
+      ],
+      "answerIndex": 0,
+      "explanation": "兔直接以植物（生产者）为食，是初级消费者；草是生产者，鹰是次级消费者。"
+    },
+    {
+      "id": "science-096",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "水循环中，海水变成水蒸气升上天空的过程叫？",
+      "options": [
+        "蒸发（汽化）",
+        "凝结",
+        "降水",
+        "径流"
+      ],
+      "answerIndex": 0,
+      "explanation": "太阳照射使海水受热汽化（蒸发）成水蒸气，上升遇冷凝结成云，再形成降水。"
+    },
+    {
+      "id": "science-097",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "化学元素符号 Fe 表示？",
+      "options": [
+        "铁",
+        "铜",
+        "锌",
+        "铝"
+      ],
+      "answerIndex": 0,
+      "explanation": "Fe 是铁的元素符号；Cu 是铜，Zn 是锌，Al 是铝。"
+    },
+    {
+      "id": "science-098",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "酒精灯的火焰中温度最高的部分是？",
+      "options": [
+        "外焰",
+        "内焰",
+        "焰心",
+        "三处一样高"
+      ],
+      "answerIndex": 0,
+      "explanation": "外焰与空气接触最充分、燃烧最完全，温度最高，加热时应用外焰。"
+    },
+    {
+      "id": "science-099",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "下列能源中属于化石燃料的是？",
+      "options": [
+        "煤",
+        "太阳能",
+        "风能",
+        "电能"
+      ],
+      "answerIndex": 0,
+      "explanation": "煤、石油、天然气是远古生物遗骸演变来的化石燃料，不可再生。"
+    },
+    {
+      "id": "science-100",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "防止水土流失的有效措施是？",
+      "options": [
+        "植树造林",
+        "陡坡开荒",
+        "过度放牧",
+        "砍伐森林"
+      ],
+      "answerIndex": 0,
+      "explanation": "树木草根能固土保水，植树造林是防治水土流失的有效措施；开荒、过牧、滥伐都会加剧流失。"
     }
   ]
 }
