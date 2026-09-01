@@ -30,7 +30,12 @@ cmd="${1:-status}"
 case "$cmd" in
   dev)
     echo "[deploy] vite dev HMR (port 5174) - 备用热重载开发位"
-    npx vite --port 5174 --host 0.0.0.0 --strictPort
+    echo "[deploy] 如果 5174 已有 vite dev 进程在跑，直接复用即可"
+    netstat -ano 2>/dev/null | grep ":5174.*LISTENING" | head -1 | awk '{print "         当前 5174 pid=" $5 "（无需重启）"}' || true
+    echo "[deploy] 如未跑，按下面命令启动："
+    echo "         nohup npx vite --port 5174 --host 0.0.0.0 --strictPort > /dev/null 2>&1 &"
+    echo "[deploy] 手机访问 http://192.168.31.134:5174/ 即可热重载"
+    exit 0
     ;;
   base)
     echo "[deploy] build dist-c/ (方案 C + cursor) + 发布到 5173/5180"
@@ -81,7 +86,7 @@ case "$cmd" in
       tag=""
       case "$port" in
         *5173) tag="(主开发位 / preview / 与 5180 同步)" ;;
-        *5174) tag="(dev HMR / 按需启动)" ;;
+        *5174) tag="(dev HMR / 备用 / 已起则复用)" ;;
         *5180) tag="(基座 / base / 与 5173 同源)" ;;
         *5181) tag="(备用 / backup / 方案 D 默认)" ;;
       esac
