@@ -11,10 +11,15 @@ import { GrassCuttingScene } from './scenes/GrassCuttingScene';
 import { MenuScene } from './scenes/MenuScene';
 import { QuestionScene } from './scenes/QuestionScene';
 import { ResultScene } from './scenes/ResultScene';
+import { CANVAS_MODE_DESC, getCanvasMode, getPhaserScaleConfig } from './config/CanvasMode';
 
 /** 逻辑分辨率（所有配置里的坐标都基于这个尺寸） */
 export const GAME_WIDTH = 960;
 export const GAME_HEIGHT = 640;
+
+// 打印当前 canvas 适配模式（生产构建也保留，便于部署定位问题）
+// eslint-disable-next-line no-console
+console.log('[KB Canvas Mode]', getCanvasMode(), '—', CANVAS_MODE_DESC[getCanvasMode()]);
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -22,10 +27,7 @@ const config: Phaser.Types.Core.GameConfig = {
   width: GAME_WIDTH,
   height: GAME_HEIGHT,
   backgroundColor: '#0b1622',
-  scale: {
-    mode: Phaser.Scale.FIT,
-    autoCenter: Phaser.Scale.CENTER_BOTH,
-  },
+  scale: getPhaserScaleConfig(),
   input: {
     // Phaser 默认只创建 1 个触摸 Pointer，第二根手指会被直接丢弃；
     // 移动端必须支持「一根手指拖摇杆走位 + 另一根手指点攻击」，所以至少要 2 个
@@ -35,9 +37,9 @@ const config: Phaser.Types.Core.GameConfig = {
     antialias: true,
     powerPreference: 'high-performance',
   },
-// 关闭 Phaser 的居中问候语，保持界面干净
-banner: false,
-scene: [BootScene, MenuScene, QuestionScene, GrassCuttingScene, ResultScene],
+  // 关闭 Phaser 的居中问候语，保持界面干净
+  banner: false,
+  scene: [BootScene, MenuScene, QuestionScene, GrassCuttingScene, ResultScene],
 };
 
 const game = new Phaser.Game(config);
