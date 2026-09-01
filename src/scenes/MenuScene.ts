@@ -11,6 +11,7 @@ import { resolveLevelEntry } from '../config/resolve';
 import type { LevelConfig } from '../config/types';
 import { describeBank } from '../data/QuestionBank';
 import { progression } from '../systems/ProgressionSystem';
+import { isTutorialDone, TutorialOverlay } from '../ui/TutorialOverlay';
 import { Palette, css, textStyle } from '../ui/Palette';
 import { popScale, ripple } from '../ui/Feedback';
 
@@ -187,9 +188,16 @@ export class MenuScene extends Phaser.Scene {
     this.startHint.setY(this.scale.height - 26 * Math.min(this.scale.width / 960, this.scale.height / 640));
   }
 
-  /** 进入答题场景 */
+  /** 进入答题场景（首次游玩先展示新手引导 T-017） */
   private startLevel(): void {
     const data: LevelStartData = { level: this.selectedLevel, bonusTime: 0 };
-    this.scene.start('QuestionScene', data);
+    if (isTutorialDone()) {
+      this.scene.start('QuestionScene', data);
+      return;
+    }
+    // 首次进入：3 步引导讲解玩法，完成后真正进入答题
+    new TutorialOverlay(this, () => {
+      this.scene.start('QuestionScene', data);
+    });
   }
 }
