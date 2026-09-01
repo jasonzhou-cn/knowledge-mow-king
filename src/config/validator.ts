@@ -910,6 +910,7 @@ function validateQuestionBank(raw: unknown): Validator {
       );
     }
     v.string(item, 'explanation', `${base}.explanation`);
+    v.string(item, 'solution', `${base}.solution`);
   });
   return v;
 }

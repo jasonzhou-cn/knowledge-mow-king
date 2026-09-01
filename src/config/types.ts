@@ -481,6 +481,8 @@ export interface QuestionEntry {
   options: string[];
   answerIndex: number;
   explanation: string;
+  /** 解题思路（T-016）：儿童友好语言，说明正确答案的关键判断依据，答错时展示 */
+  solution: string;
 }
 
 export interface QuestionBank {

@@ -148,6 +148,7 @@ export class QuestionBankStore {
       difficulty: question.difficulty,
       question: question.question,
       explanation: question.explanation,
+      solution: question.solution,
       options,
       answerIndex,
       correctText,

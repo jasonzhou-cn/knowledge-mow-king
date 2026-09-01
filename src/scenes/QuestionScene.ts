@@ -38,7 +38,7 @@ export interface GrassCuttingData {
 }
 
 /** 场景内部状态机 */
-type SceneState = 'moving' | 'feedback' | 'summary';
+type SceneState = 'moving' | 'feedback' | 'wrongPause' | 'summary';
 
 export class QuestionScene extends Phaser.Scene {
   private startData: LevelStartData = { level: 1 };
@@ -75,6 +75,10 @@ export class QuestionScene extends Phaser.Scene {
   }
 
   create(): void {
+    // 供 CDP 无头验证直接访问答题场景状态（T-016）；仅开发模式暴露，生产 tree-shake 剔除
+    if (import.meta.env.DEV) {
+      (window as unknown as { __QS__?: QuestionScene }).__QS__ = this;
+    }
     const loader = ConfigLoader.getInstance();
     this.questionConfig = loader.getConfig('questionConfig');
     const subjectConfig = loader.getConfig('subjectConfig') as SubjectConfig;
@@ -200,7 +204,7 @@ export class QuestionScene extends Phaser.Scene {
     this.questionText.setText(engine.current.question);
     this.explanationText.setText('');
     this.resultText.setText('');
-    this.hintText.setVisible(true);
+    this.hintText.setText(this.modeHint()).setVisible(true);
     if (this.selector) {
       this.selector.setOptions(engine.current.options);
       this.selector.start();
@@ -255,6 +259,10 @@ export class QuestionScene extends Phaser.Scene {
       return;
     }
 
+    // submit() 内部会推进 index（commit → index++），提交后 engine.current 已指向下一题。
+    // 因此这里必须先快照当前题引用：对象本身不变，指针移动不影响快照。
+    // 这同时修复了历史 bug——此前反馈里的「正确答案/解析」会显示下一题的内容（张冠李戴）。
+    const q = engine.current;
     const { outcome, record } = engine.submit(index);
     const correct = outcome === 'correct';
     if (this.selector) this.selector.setState(index, correct ? 'correct' : 'wrong');
@@ -271,28 +279,35 @@ export class QuestionScene extends Phaser.Scene {
       sfx.play('correct');
       ripple(this, pos.x, pos.y, Palette.status.correct, 150, 460);
       this.resultText.setText('✓ 答对了！').setColor(css(Palette.status.correct));
-    } else {
-      // 答错时同时高亮正确答案，形成「我选了什么 / 正确是什么」的对照
-      sfx.play('wrong');
-      if (this.selector) this.selector.setState(engine.current.answerIndex, 'correct');
-      else if (this.cursorSel) this.cursorSel.setState(engine.current.answerIndex, 'correct');
-      else this.track?.setState(engine.current.answerIndex, 'correct');
-      shake(this, this.resultText, 7, 260);
-      ripple(this, pos.x, pos.y, Palette.status.wrong, 130, 420);
-      this.resultText.setText('✕ 答错了').setColor(css(Palette.status.wrong));
+      // 解析是教育价值的落点，答对时也展示（用快照，避免指向下一题）
+      this.explanationText.setText(
+        `正确答案：${q.correctText}　|　${q.explanation}`,
+      );
+      this.refreshComboHint();
+      this.enterFeedback(
+        true,
+        this.questionConfig.answerSettings.feedbackHoldDuration +
+          this.questionConfig.answerSettings.explanationHoldDuration,
+      );
+      void record;
+      return;
     }
 
-    // 解析是教育价值的落点，无论对错都要展示
+    // ── 答错：暂停答题流程，展示解题思路（T-016），等待小朋友看完后手动继续 ──
+    // 答错时同时高亮正确答案，形成「我选了什么 / 正确是什么」的对照
+    sfx.play('wrong');
+    if (this.selector) this.selector.setState(q.answerIndex, 'correct');
+    else if (this.cursorSel) this.cursorSel.setState(q.answerIndex, 'correct');
+    else this.track?.setState(q.answerIndex, 'correct');
+    shake(this, this.resultText, 7, 260);
+    ripple(this, pos.x, pos.y, Palette.status.wrong, 130, 420);
+    this.resultText.setText('✕ 答错了，看看解题思路吧').setColor(css(Palette.status.wrong));
     this.explanationText.setText(
-      `正确答案：${engine.current.correctText}　|　${engine.current.explanation}`,
+      `正确答案：${q.correctText}\n解题思路：${q.solution}`,
     );
+    this.hintText.setText('点击任意位置 或 按空格 继续答题').setVisible(true);
     this.refreshComboHint();
-
-    this.enterFeedback(
-      true,
-      this.questionConfig.answerSettings.feedbackHoldDuration +
-        this.questionConfig.answerSettings.explanationHoldDuration,
-    );
+    this.enterWrongPause();
     void record;
   }
 
@@ -314,14 +329,16 @@ export class QuestionScene extends Phaser.Scene {
     if (!engine) return;
     if (!this.track && !this.selector && !this.cursorSel) return;
 
+    // 与 handleStop 同理：registerTimeout 内部会推进 index，先快照当前题
+    const q = engine.current;
     engine.registerTimeout();
     sfx.play('wrong');
-    if (this.selector) this.selector.setState(engine.current.answerIndex, 'correct');
-    else if (this.cursorSel) this.cursorSel.setState(engine.current.answerIndex, 'correct');
-    else this.track!.setState(engine.current.answerIndex, 'correct');
+    if (this.selector) this.selector.setState(q.answerIndex, 'correct');
+    else if (this.cursorSel) this.cursorSel.setState(q.answerIndex, 'correct');
+    else this.track!.setState(q.answerIndex, 'correct');
     this.resultText.setText('⏰ 超时了').setColor(css(Palette.status.warning));
     this.explanationText.setText(
-      `正确答案：${engine.current.correctText}　|　${engine.current.explanation}`,
+      `正确答案：${q.correctText}　|　${q.explanation}`,
     );
     this.hintText.setVisible(false);
     this.refreshComboHint();
@@ -339,6 +356,18 @@ export class QuestionScene extends Phaser.Scene {
     this.stateDuration = duration;
     this.pendingAdvance = advance;
     this.hud?.setTimeLeft(0, Math.max(0.1, this.engine ? this.engine.limit : 10));
+  }
+
+  /**
+   * 答错暂停（T-016）：进入 wrongPause 状态，展示该题解题思路。
+   * 倒计时自然冻结——update() 只在 'moving' 状态调用 engine.update，
+   * wrongPause 下无任何推进逻辑，等待玩家点击/空格确认后继续下一题。
+   */
+  private enterWrongPause(): void {
+    this.state = 'wrongPause';
+    this.stateTimer = 0;
+    this.stateDuration = 0;
+    this.pendingAdvance = false;
   }
 
   /** 推进到下一题；全部答完则进入加成结算 */
@@ -531,32 +560,39 @@ export class QuestionScene extends Phaser.Scene {
       }))
       .setOrigin(0.5, 0);
 
-    const mode = this.questionConfig.answerSettings.mode;
-    const hint =
-      mode === 'arrow'
-        ? '点击屏幕任意位置 或 按空格 —— 让高亮箭头停在正确选项上'
-        : mode === 'cursor'
-          ? '点击屏幕任意位置 或 按空格 —— 让游标停在正确选项的判定框里'
-          : '点击屏幕任意位置 或 按空格 —— 让正确选项停在金色判定框里';
     this.hintText = this.add
       .text(
         w / 2,
         this.scale.height - 40,
-        hint,
+        this.modeHint(),
         textStyle(16, css(Palette.text.hint)),
       )
       .setOrigin(0.5, 1);
+  }
+
+  /** 当前答题模式的底部提示文案（每题开始时复位，答错暂停时临时覆盖） */
+  private modeHint(): string {
+    const mode = this.questionConfig.answerSettings.mode;
+    return mode === 'arrow'
+      ? '点击屏幕任意位置 或 按空格 —— 让高亮箭头停在正确选项上'
+      : mode === 'cursor'
+        ? '点击屏幕任意位置 或 按空格 —— 让游标停在正确选项的判定框里'
+        : '点击屏幕任意位置 或 按空格 —— 让正确选项停在金色判定框里';
   }
 
   /** 注册点击与键盘输入 */
   private registerInput(): void {
     this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
       if (this.state === 'moving') this.handleStop(pointer.worldX, pointer.worldY);
+      // 答错暂停：看完解题思路后，点击任意位置继续下一题
+      else if (this.state === 'wrongPause') this.advanceQuestion();
     });
     this.input.keyboard?.on('keydown-SPACE', () => {
       if (this.state === 'moving') {
         // 键盘操作没有指针位置，用判定区中心作为反馈原点
         this.handleStop(this.scale.width / 2, this.scale.height / 2);
+      } else if (this.state === 'wrongPause') {
+        this.advanceQuestion();
       }
     });
   }
