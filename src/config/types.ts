@@ -105,8 +105,11 @@ export type MovementType = 'circular' | 'linear';
  *  - 'arrow'：答案固定不动，高亮框在选项间循环跳转，玩家在目标选项高亮时确认
  *             （降低儿童认知负荷：只需追踪一个移动箭头，不用盯 4 个移动答案）
  *  - 'track'：原「Stop the Cloud」式移动轨道，玩家点击停住做重叠判定
+ *  - 'cursor'：答案固定不动，一个高亮游标在选项间持续平滑往返移动，
+ *              玩家主动停住时按游标当前位置判定（停在哪张判定框内 → 选哪个）
+ *              （结合「游标移动 + 用户停住」两个交互元素，9-18 岁儿童熟悉）
  */
-export type AnswerMode = 'arrow' | 'track';
+export type AnswerMode = 'arrow' | 'track' | 'cursor';
 
 export interface AnswerSettings {
   /** 交互模式：arrow=固定答案+箭头循环选择（默认）；track=移动轨道+停住判定 */
@@ -135,6 +138,12 @@ export interface AnswerSettings {
   arrowInterval: number;
   /** 箭头模式：选项布局——row=一行 4 个（箭头左右扫掠）；grid=2×2 网格 */
   arrowLayout: 'row' | 'grid';
+  /** 游标模式：游标在 4 个答案间往返一轮的时长（秒）——越小越难 */
+  cursorCycleDuration: number;
+  /** 游标模式：判定框宽度（每张卡片中央的小框，px）；越大越容易命中 */
+  cursorHitZoneWidth: number;
+  /** 游标模式：判定框高度（每张卡片中央的小框，px） */
+  cursorHitZoneHeight: number;
 }
 
 export interface SubjectDifficultyEntry {

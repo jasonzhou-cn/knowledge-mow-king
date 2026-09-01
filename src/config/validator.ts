@@ -501,7 +501,7 @@ function validateQuestionConfig(raw: unknown): Validator {
   }
 
   const as = v.object(root, 'answerSettings', 'questionConfig.answerSettings');
-  v.string(as, 'mode', 'questionConfig.answerSettings.mode', ['arrow', 'track']);
+  v.string(as, 'mode', 'questionConfig.answerSettings.mode', ['arrow', 'track', 'cursor']);
   v.string(as, 'movementType', 'questionConfig.answerSettings.movementType', ['circular', 'linear']);
   v.string(as, 'movementEasing', 'questionConfig.answerSettings.movementEasing', ['linear']);
   v.number(as, 'stopThreshold', 'questionConfig.answerSettings.stopThreshold', { min: 0, max: 1 });
@@ -522,6 +522,9 @@ function validateQuestionConfig(raw: unknown): Validator {
   v.number(as, 'explanationHoldDuration', 'questionConfig.answerSettings.explanationHoldDuration', { min: 0, max: 8 });
   v.number(as, 'arrowInterval', 'questionConfig.answerSettings.arrowInterval', { min: 0.4, max: 4 });
   v.string(as, 'arrowLayout', 'questionConfig.answerSettings.arrowLayout', ['row', 'grid']);
+  v.number(as, 'cursorCycleDuration', 'questionConfig.answerSettings.cursorCycleDuration', { min: 0.8, max: 6 });
+  v.number(as, 'cursorHitZoneWidth', 'questionConfig.answerSettings.cursorHitZoneWidth', { min: 40, max: 300 });
+  v.number(as, 'cursorHitZoneHeight', 'questionConfig.answerSettings.cursorHitZoneHeight', { min: 30, max: 200 });
 
   // 判定区必须至少和选项卡片一样大，否则永远无法达到 100% 重叠
   if (

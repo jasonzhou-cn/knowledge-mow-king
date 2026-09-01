@@ -18,7 +18,7 @@
     "consecutiveCorrectThreshold": 3
   },
   "answerSettings": {
-    "mode": "arrow",
+    "mode": "cursor",
     "movementType": "circular",
     "movementEasing": "linear",
     "stopThreshold": 0.5,
@@ -38,7 +38,10 @@
     "feedbackHoldDuration": 0.7,
     "explanationHoldDuration": 1.9,
     "arrowInterval": 1.2,
-    "arrowLayout": "row"
+    "arrowLayout": "row",
+    "cursorCycleDuration": 1.8,
+    "cursorHitZoneWidth": 110,
+    "cursorHitZoneHeight": 50
   },
   "subjectDifficulty": {
     "math": {

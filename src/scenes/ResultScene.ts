@@ -47,7 +47,10 @@ export class ResultScene extends Phaser.Scene {
     const rewardConfig = loader.getConfig('rewardConfig');
     const levelConfig = loader.getConfig('levelConfig') as LevelConfig;
     const questionConfig = loader.getConfig('questionConfig');
-    const isArrowMode = questionConfig.answerSettings.mode === 'arrow';
+    const answerMode = questionConfig.answerSettings.mode;
+    // arrow / cursor 模式没有「没停准」概念（arrow = 选中即确认；cursor = 停在间隙算 miss），
+    // track 模式才有「没停准」措辞
+    const useMissWording = answerMode === 'track';
 
     const w = this.scale.width;
     const h = this.scale.height;
@@ -100,7 +103,7 @@ export class ResultScene extends Phaser.Scene {
       `正确率 ${Math.round(payload.quiz.accuracy * 100)}%`,
       `平均每题 ${formatOneDecimal(payload.quiz.averageAnswerTime)} 秒`,
       `最大连对 ${payload.quiz.maxCombo}`,
-      this.answerStatsLine(payload.quiz, isArrowMode),
+      this.answerStatsLine(payload.quiz, useMissWording),
     ]);
 
     // 中栏：割草战果
