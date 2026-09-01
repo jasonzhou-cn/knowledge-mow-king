@@ -31,6 +31,7 @@ import { ComboSystem } from '../systems/ComboSystem';
 import { KillFxSystem } from '../systems/KillFxSystem';
 import { MonsterSpawner, type Monster } from '../systems/MonsterSpawner';
 import { ProjectileSystem, type ProjectileHitPayload } from '../systems/ProjectileSystem';
+import { SafeArea, ENABLE_SAFE_AREA } from '../systems/SafeArea';
 import { sfx } from '../systems/SfxController';
 import { WeaponSystem, type AttackAction } from '../systems/WeaponSystem';
 import { Palette, css, textStyle, weaponTint } from '../ui/Palette';
@@ -281,9 +282,17 @@ export class GrassCuttingScene extends Phaser.Scene {
       this.bottomTextX = this.joystick.rightEdge + JOYSTICK_TEXT_GUTTER;
     }
 
+    // 方案 D：SafeArea 让 HUD 永远在 viewport 内，避免 FIT 黑边/全面屏 19.5:9 黑边区出现 UI
+    // 回滚：把 ENABLE_SAFE_AREA 改为 false 即退化为方案 A 行为（HUD 直接用 this.scale.width/height）
+    const safeArea = ENABLE_SAFE_AREA
+      ? new SafeArea(this, 960, 640, 24)
+      : null;
+    const hudWidth = safeArea ? safeArea.width : this.scale.width;
+    const hudHeight = safeArea ? safeArea.height : this.scale.height;
+
     this.hud = new CombatHud(this, {
-      width: this.scale.width,
-      height: this.scale.height,
+      width: hudWidth,
+      height: hudHeight,
       maxHp: this.maxHp,
       gameTime: this.timeLeft,
       level: incoming.level,
@@ -293,8 +302,8 @@ export class GrassCuttingScene extends Phaser.Scene {
     this.hud.setBonus(bonus.damageMultiplier, bonus.rangeMultiplier, bonus.durationMultiplier);
 
     this.weaponBar = new WeaponBar(this, {
-      width: this.scale.width,
-      height: this.scale.height,
+      width: hudWidth,
+      height: hudHeight,
       weapons: this.weaponSystem.all,
       onSelect: (index) => this.switchWeapon(index),
     });
