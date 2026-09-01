@@ -7,11 +7,11 @@
 
 import Phaser from 'phaser';
 import { ConfigLoader } from '../config/ConfigLoader';
-import { resolveLevelEntry } from '../config/resolve';
 import type { LevelConfig } from '../config/types';
 import { describeBank } from '../data/QuestionBank';
 import { progression } from '../systems/ProgressionSystem';
 import { isTutorialDone, TutorialOverlay } from '../ui/TutorialOverlay';
+import { LevelSelectPanel } from '../ui/LevelSelectPanel';
 import { Palette, css, textStyle } from '../ui/Palette';
 import { popScale, ripple } from '../ui/Feedback';
 
@@ -26,7 +26,7 @@ export interface LevelStartData {
 export class MenuScene extends Phaser.Scene {
   /** 当前选中的关卡号 */
   private selectedLevel = 1;
-  private levelText!: Phaser.GameObjects.Text;
+  private levelPanel!: LevelSelectPanel;
   private statsText!: Phaser.GameObjects.Text;
   private startHint!: Phaser.GameObjects.Text;
 
@@ -80,13 +80,19 @@ export class MenuScene extends Phaser.Scene {
     expBar.lineStyle(1, Palette.text.hint, 0.5);
     expBar.strokeRoundedRect(barX, barY, barW, barH, 7);
 
-    // 关卡选择
-    this.add
-      .text(cx - 150 * s, cy + 48 * s, '◀ 选择关卡 ▶', textStyle(Math.round(20 * s), css(Palette.text.hint)))
-      .setOrigin(0.5, 0);
-    this.levelText = this.add
-      .text(cx + 130 * s, cy + 44 * s, '', textStyle(Math.round(24 * s), css(Palette.accent.secondary)))
-      .setOrigin(0.5, 0);
+    // 先设 selectedLevel（确保关卡地图拿到正确的 unlockedLevel 默认页）
+    this.selectedLevel = progression.unlockedLevel;
+
+    // 关卡选择：可视化关卡地图（T-019，替代原「◀ 选择关卡 ▶」文字行）
+    this.levelPanel = new LevelSelectPanel(this, {
+      levels: (ConfigLoader.getInstance().getConfig('levelConfig') as LevelConfig).levels,
+      unlockedLevel: progression.unlockedLevel,
+      selectedLevel: this.selectedLevel,
+      onChange: (level) => {
+        this.selectedLevel = level;
+        this.refreshStats();
+      },
+    });
 
     // 开始按钮
     const button = this.add.graphics();
@@ -164,19 +170,13 @@ export class MenuScene extends Phaser.Scene {
     for (let y = 0; y <= h - 150; y += 60) g.lineBetween(0, y, w, y);
   }
 
-  /** 切换选中的关卡 */
+  /** 切换选中的关卡（转发给关卡地图面板，处理页内跳转） */
   private shiftLevel(delta: number): void {
-    const next = Phaser.Math.Clamp(this.selectedLevel + delta, 1, progression.unlockedLevel);
-    if (next === this.selectedLevel) return;
-    this.selectedLevel = next;
-    this.refreshStats();
+    this.levelPanel?.shiftSelected(delta);
   }
 
-  /** 刷新成长信息与关卡名 */
+  /** 刷新成长信息并同步关卡地图选中态 */
   private refreshStats(): void {
-    const levelConfig = ConfigLoader.getInstance().getConfig('levelConfig');
-    const entry = resolveLevelEntry(levelConfig as LevelConfig, this.selectedLevel);
-
     const need = progression.expToNextLevel;
     const needText = Number.isFinite(need) ? `${Math.round(need)}` : '已满级';
 
@@ -184,7 +184,7 @@ export class MenuScene extends Phaser.Scene {
       `等级 ${progression.level}    经验 ${Math.round(progression.exp)} / ${needText}\n` +
         `累计得分 ${Math.round(progression.totalScore)}    已解锁至第 ${progression.unlockedLevel} 关`,
     );
-    this.levelText.setText(`第 ${this.selectedLevel} 关 · ${entry.name}`);
+    this.levelPanel?.refresh(progression.unlockedLevel, this.selectedLevel);
     this.startHint.setY(this.scale.height - 26 * Math.min(this.scale.width / 960, this.scale.height / 640));
   }
 
