@@ -34,19 +34,41 @@ case "$cmd" in
     ;;
   base)
     echo "[deploy] build dist-c/ (方案 C + cursor) + 发布到 5180"
-    echo "[deploy] 注意：5180 上的 vite preview 进程不会被重启"
-    echo "[deploy]       下次请求会从磁盘重读新版包"
+    echo ""
+    echo "  ⚠️  重要：此操作会替换当前 5180 上的 base 版本！"
+    echo "  ⚠️  5180 当前服务的是冻结的 base 快照（tag: base-v1）"
+    echo ""
+    if [ -f .git/HEAD ] && git rev-parse --verify base-v1 >/dev/null 2>&1; then
+      current_base=$(git rev-list -n 1 base-v1)
+      current_head=$(git rev-parse HEAD)
+      echo "  base-v1  = $current_base"
+      echo "  HEAD     = $current_head"
+      if [ "$current_base" != "$current_head" ]; then
+        echo "  ⚠️  HEAD 已偏离 base-v1（开发了新版本）"
+      fi
+    fi
+    echo ""
+    echo "  按 Enter 继续（替换 base），Ctrl+C 取消"
+    read -r _ < /dev/tty || { echo "[deploy] 取消"; exit 1; }
     rm -rf dist-c
     VITE_CANVAS_MODE=c npx vite build --outDir dist-c
-    echo "[deploy] ✓ dist-c/ 已重建。手机刷新 http://192.168.31.134:5180/ 即可看到新版"
+    # NTFS 文件级只读（防止文件被误改，但 rm -rf 仍能删——主要靠流程控制保护）
+    python -c "import subprocess; subprocess.run(['attrib', '+R', 'dist-c', '/S', '/D'], capture_output=True, timeout=30)" 2>/dev/null || true
+    echo "[deploy] ✓ dist-c/ 已重建（base 已替换为新版本）。手机刷新 http://192.168.31.134:5180/ 即可看到新版"
+    echo "[deploy]    想恢复原 base：git checkout base-v1 -- dist-c/"
     ;;
   backup)
     echo "[deploy] build dist/ (方案 D 默认) + 发布到 5181"
-    echo "[deploy] 注意：5181 上的 vite preview 进程不会被重启"
-    echo "[deploy]       下次请求会从磁盘重读新版包"
+    echo ""
+    echo "  ⚠️  重要：此操作会替换当前 5181 上的 backup 版本！"
+    echo ""
+    echo "  按 Enter 继续（替换 backup），Ctrl+C 取消"
+    read -r _ < /dev/tty || { echo "[deploy] 取消"; exit 1; }
     rm -rf dist
     npm run build
-    echo "[deploy] ✓ dist/ 已重建。手机刷新 http://192.168.31.134:5181/ 即可看到新版"
+    python -c "import subprocess; subprocess.run(['attrib', '+R', 'dist', '/S', '/D'], capture_output=True, timeout=30)" 2>/dev/null || true
+    echo "[deploy] ✓ dist/ 已重建（backup 已替换为新版本）。手机刷新 http://192.168.31.134:5181/ 即可看到新版"
+    echo "[deploy]    想恢复原 backup：git checkout <last_backup_commit> -- dist/"
     ;;
   stop)
     echo "[deploy] stop all vite processes（⚠️ 危险：会杀 5173-5181 上所有 vite）"
@@ -71,11 +93,16 @@ case "$cmd" in
     echo ""
     echo "[deploy] 磁盘产物（vite preview 从磁盘读）"
     if [ -d dist ]; then
-      echo "  dist/   = $(ls dist/assets/*.js 2>/dev/null | xargs -n1 basename | head -1)  [backup]"
+      dist_hash=$(ls dist/assets/*.js 2>/dev/null | head -1 | xargs -n1 basename 2>/dev/null)
+      echo "  dist/   = $dist_hash  [backup]"
     fi
     if [ -d dist-c ]; then
-      echo "  dist-c/ = $(ls dist-c/assets/*.js 2>/dev/null | xargs -n1 basename | head -1)  [base]"
+      distc_hash=$(ls dist-c/assets/*.js 2>/dev/null | head -1 | xargs -n1 basename 2>/dev/null)
+      echo "  dist-c/ = $distc_hash  [base]"
     fi
+    echo ""
+    echo "[deploy] 冻结保护：base/backup 命令执行前要求交互确认（按 Enter 继续）"
+    echo "[deploy] 还原旧版本：git checkout base-v1 -- dist-c/  # dist/ 同理"
     ;;
   *)
     echo "Usage: $0 {dev|base|backup|status|stop}"
