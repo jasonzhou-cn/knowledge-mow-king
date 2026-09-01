@@ -104,17 +104,18 @@ case "$cmd" in
     fi
     echo ""
     echo "[deploy] 当前 base 与 git HEAD 对比"
-    if git rev-parse --verify base-v1 >/dev/null 2>&1; then
-      base_hash=$(git rev-list -n 1 base-v1 | head -c 8)
+    latest_base_tag=$(git tag -l 'base-v*' | sort -V | tail -1)
+    if [ -n "$latest_base_tag" ]; then
+      base_hash=$(git rev-list -n 1 "$latest_base_tag" | head -c 8)
       head_hash=$(git rev-parse HEAD | head -c 8)
       if [ "$base_hash" = "$head_hash" ]; then
-        echo "  HEAD ($head_hash) = base-v1 ($base_hash)  一致"
+        echo "  HEAD ($head_hash) = $latest_base_tag ($base_hash)  一致"
       else
-        echo "  HEAD ($head_hash) ≠ base-v1 ($base_hash)  有新提交未发布到 base"
-        echo "  发布：./scripts/deploy.sh base  →  还原：git checkout base-v1 -- dist-c/"
+        echo "  HEAD ($head_hash) ≠ $latest_base_tag ($base_hash)  有新提交未发布到 base"
+        echo "  发布：./scripts/deploy.sh base  →  还原：git checkout $latest_base_tag -- dist-c/"
       fi
     else
-      echo "  尚未打 base-v1 tag（首次发布后建议 git tag base-v1 标记快照）"
+      echo "  尚未打 base tag（首次发布后建议 git tag base-v1 标记快照）"
     fi
     echo ""
     echo "[deploy] 一致性验证（5173 vs 5180 必须相同才算 base 同步）"
