@@ -121,6 +121,18 @@ export class ResultScene extends Phaser.Scene {
       `范围加成 ×${payload.bonus.rangeMultiplier.toFixed(2)}`,
     ], s);
 
+    // T-020 答题质量透明化：在中栏下方画 breakdown 小字一行，展示「答得好→割得爽」核心绑定的
+    // 三个分项（正确率项×速度项×连对项），让玩家理解最终倍数怎么来的
+    const breakdown = payload.bonus.breakdown;
+    this.add
+      .text(
+        w / 2,
+        126 * s + 6 * 24 * s,
+        `加成来源  正确率项 ×${breakdown.accuracyTerm.toFixed(2)}  速度项 ×${breakdown.speedFactor.toFixed(2)}  连对项 ×${breakdown.comboFactor.toFixed(2)}`,
+        textStyle(Math.round(14 * s), css(Palette.text.hint)),
+      )
+      .setOrigin(0.5, 0);
+
     // 右栏：成长
     const need = progression.expToNextLevel;
     this.addColumn(w / 2 + 232 * s, 126 * s, '成长', [
