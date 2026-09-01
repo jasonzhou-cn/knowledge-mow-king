@@ -52,6 +52,21 @@
         justify-content: center;
         z-index: 1;
       }
+      /* 背景 canvas：铺满 #game-root（即整个视口），用 DPR 处理高清晰度 */
+      #bg-canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        display: block;
+      }
+      /* Phaser canvas（脚本自动创建）：在 #game-root 内 flex 居中，叠在背景之上 */
+      #game-root canvas:not(#bg-canvas) {
+        position: relative;
+        z-index: 1;
+        display: block;
+      }
       canvas {
         display: block;
       }
@@ -156,7 +171,12 @@
     </style>
   </head>
   <body>
-    <div id="game-root"></div>
+    <div id="game-root">
+      <!-- 背景 canvas：物理尺寸 = viewport × DPR，画草地场景延伸；
+           让 Phaser canvas 之外的所有视口区域都有内容（解决黑边 / "未铺满" 问题）。
+           Phaser canvas（脚本创建）会作为 #game-root 的另一子元素，z-index:1 叠在其上。 -->
+      <canvas id="bg-canvas"></canvas>
+    </div>
     <div id="rotate-overlay">
       <div class="rotate-phone"></div>
       <div class="rotate-title">请横屏游玩</div>
@@ -168,7 +188,55 @@
     </div>
     <script type="module" src="/src/main.ts"></script>
     <script>
-      // 横屏适配的 JS 兜底（与 CSS 媒体查询双保险）：
+      // === 背景 canvas 同步 ===
+      // 单 canvas 下 Phaser FIT 无法同时满足「铺满 viewport + 不变形」，
+      // 这里用一个独立的背景 canvas 画草地场景延伸，让 Phaser canvas 之外
+      // 的所有视口区域都有内容（彻底消除黑边 / 「未铺满」感）。
+      // 背景 canvas 与 Phaser canvas 各自独立，DPR 各自处理，互不干扰。
+      var syncBgCanvas = function () {
+        var bg = document.getElementById('bg-canvas');
+        if (!bg || !bg.getContext) return;
+        var dpr = window.devicePixelRatio || 1;
+        var w = window.innerWidth;
+        var h = window.innerHeight;
+        bg.width = Math.round(w * dpr);
+        bg.height = Math.round(h * dpr);
+        bg.style.width = w + 'px';
+        bg.style.height = h + 'px';
+        var ctx = bg.getContext('2d');
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        // 深色基底（与 Phaser canvas backgroundColor 一致：#0b1622）
+        ctx.fillStyle = '#0b1622';
+        ctx.fillRect(0, 0, w, h);
+
+        // 草地横纹（呼应 GrassCuttingScene 的草地条带，0.04 透明度不抢戏）
+        ctx.fillStyle = 'rgba(126, 200, 255, 0.04)';
+        for (var y = 0; y < h; y += 96) {
+          ctx.fillRect(0, y, w, 48);
+        }
+
+        // 底部深色草地
+        ctx.fillStyle = '#0a1118';
+        ctx.fillRect(0, h - 100, w, 100);
+
+        // 三角形草丛（呼应主菜单背景），用屏幕宽度均分
+        ctx.fillStyle = 'rgba(78, 154, 200, 0.5)';
+        for (var x = 0; x < w; x += 60) {
+          var tx = x + 30;
+          ctx.beginPath();
+          ctx.moveTo(tx - 18, h - 100);
+          ctx.lineTo(tx + 18, h - 100);
+          ctx.lineTo(tx, h - 130);
+          ctx.closePath();
+          ctx.fill();
+        }
+      };
+      syncBgCanvas();
+      window.addEventListener('resize', syncBgCanvas);
+      window.addEventListener('orientationchange', syncBgCanvas);
+
+      // === 横屏适配的 JS 兜底 ===
       // 部分 WebView / 嵌入式浏览器对 (pointer: coarse) 判定不准，
       // 这里用 navigator.maxTouchPoints 补充检测，并在方向变化时同步遮罩。
       var syncRotateOverlay = function () {
