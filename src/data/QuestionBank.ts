@@ -23,8 +23,8 @@ export interface DrawOptions {
   count: number;
   /** 难度权重，键为 "1" | "2" | "3"，值为权重 */
   difficultyWeights: Record<string, number>;
-  /** 需要排除的题目 id（避免同一轮重复） */
-  excludeIds?: string[];
+  /** 需要排除的题目 id（避免同一轮重复）；兼容数组与 Set 两种传法 */
+  excludeIds?: string[] | ReadonlySet<string>;
 }
 
 export class QuestionBankStore {
@@ -77,9 +77,15 @@ export class QuestionBankStore {
     if (!this.loaded) {
       throw new Error('题库尚未加载，请先调用 QuestionBankStore.load()');
     }
-    const pool = (this.bySubject.get(options.subject) ?? []).filter(
-      (q) => !options.excludeIds || !options.excludeIds.includes(q.id),
-    );
+    // 归一化 excludeIds：数组用 includes、Set 用 has，避免调用方误传 Set 时直接 TypeError 崩溃
+    const exclude = options.excludeIds;
+    const isExcluded = (id: string): boolean =>
+      exclude
+        ? Array.isArray(exclude)
+          ? exclude.includes(id)
+          : exclude.has(id)
+        : false;
+    const pool = (this.bySubject.get(options.subject) ?? []).filter((q) => !isExcluded(q.id));
     if (pool.length === 0) {
       throw new Error(
         `学科「${options.subject}」题库为空，无法出题。请检查 questionBank.json 是否包含该学科的题目。`,

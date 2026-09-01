@@ -10,6 +10,7 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "validate-config": "node scripts/validate-config.mjs",
+    "test": "node scripts/run-unit-tests.mjs",
     "smoke": "node scripts/run-smoke.mjs"
   },
   "dependencies": {
