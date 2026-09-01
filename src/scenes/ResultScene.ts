@@ -54,6 +54,12 @@ export class ResultScene extends Phaser.Scene {
 
     const w = this.scale.width;
     const h = this.scale.height;
+    /**
+     * 视口高度自适应缩放：矮屏（手机浏览器去 UI 后 h≈390-400）下整体压缩布局，
+     * 避免固定坐标导致按钮遮挡统计文字、奖励面板超出屏幕（实测反馈 2026-09-01）。
+     * h=500 及以上保持原始尺寸；下限 0.72 保证极矮屏仍可读。
+     */
+    const s = Phaser.Math.Clamp(h / 500, 0.72, 1);
 
     // ───── 结算与写档（先算后展示，保证展示的每一笔都已落盘） ─────
     const score = calculateScore(
@@ -85,61 +91,61 @@ export class ResultScene extends Phaser.Scene {
     const title = payload.cleared ? '关卡通过！' : '再来一次！';
     const titleColor = payload.cleared ? Palette.accent.primary : Palette.status.warning;
     this.add
-      .text(w / 2, 46, title, textStyle(42, css(titleColor), { fontStyle: 'bold' }))
+      .text(w / 2, 40 * s, title, textStyle(Math.round(42 * s), css(titleColor), { fontStyle: 'bold' }))
       .setOrigin(0.5, 0);
 
     this.add
       .text(
         w / 2,
-        100,
+        92 * s,
         `第 ${payload.level} 关 · ${payload.died ? '生命耗尽' : '时间结束'}`,
-        textStyle(19, css(Palette.text.secondary)),
+        textStyle(Math.round(18 * s), css(Palette.text.secondary)),
       )
       .setOrigin(0.5, 0);
 
     // 左栏：答题表现
-    this.addColumn(w / 2 - 232, 146, '答题表现', [
+    this.addColumn(w / 2 - 232 * s, 126 * s, '答题表现', [
       `答对 ${payload.quiz.correctCount} / ${payload.quiz.totalQuestions} 题`,
       `正确率 ${Math.round(payload.quiz.accuracy * 100)}%`,
       `平均每题 ${formatOneDecimal(payload.quiz.averageAnswerTime)} 秒`,
       `最大连对 ${payload.quiz.maxCombo}`,
       this.answerStatsLine(payload.quiz, useMissWording),
-    ]);
+    ], s);
 
     // 中栏：割草战果
-    this.addColumn(w / 2, 146, '割草战果', [
+    this.addColumn(w / 2, 126 * s, '割草战果', [
       `击杀 ${payload.kills}`,
       `最高连击 ${payload.maxCombo}`,
       `本关得分 ${score}`,
       `伤害加成 ×${payload.bonus.damageMultiplier.toFixed(2)}`,
       `范围加成 ×${payload.bonus.rangeMultiplier.toFixed(2)}`,
-    ]);
+    ], s);
 
     // 右栏：成长
     const need = progression.expToNextLevel;
-    this.addColumn(w / 2 + 232, 146, '成长', [
+    this.addColumn(w / 2 + 232 * s, 126 * s, '成长', [
       `等级 ${progression.level}`,
       `经验 ${Math.round(progression.exp)} / ${Number.isFinite(need) ? Math.round(need) : '已满级'}`,
       `本关获得经验 +${expGain}`,
       `累计得分 ${Math.round(progression.totalScore)}`,
-    ]);
+    ], s);
 
     // 奖励明细：来源逐条列出 + 上限状态
-    this.drawRewardPanel(w, 336, rewardConfig, calc, granted, dailyLimit);
+    this.drawRewardPanel(w, 272 * s, rewardConfig, calc, granted, dailyLimit, s);
 
     // 等级提升动画
-    if (levelUp) this.playLevelUpAnimation(w, levelUp.to);
+    if (levelUp) this.playLevelUpAnimation(w, levelUp.to, s);
 
-    // 按钮
-    this.createButton(w / 2 - 210, h - 74, payload.cleared ? '进入下一关' : '重玩本关', Palette.accent.primary, () => {
+    // 按钮（缩小尺寸 + 更贴底，确保不遮挡三栏统计与奖励面板）
+    this.createButton(w / 2 - 130 * s, h - 32 * s, payload.cleared ? '进入下一关' : '重玩本关', Palette.accent.primary, () => {
       const nextLevel = payload.cleared ? resolveNextLevel(levelConfig, payload.level) : payload.level;
       const data: LevelStartData = { level: nextLevel, bonusTime: granted };
       this.scene.start('QuestionScene', data);
-    });
+    }, s);
 
-    this.createButton(w / 2 + 210, h - 74, '返回主菜单', Palette.background.panelSoft, () => {
+    this.createButton(w / 2 + 130 * s, h - 32 * s, '返回主菜单', Palette.background.panelSoft, () => {
       this.scene.start('MenuScene');
-    });
+    }, s);
   }
 
   /** 计算本关经验：击杀 + 答对 + 通关奖励 */
@@ -175,14 +181,14 @@ export class ResultScene extends Phaser.Scene {
   }
 
   /** 绘制一个三栏数据卡片 */
-  private addColumn(x: number, y: number, title: string, lines: string[]): void {
+  private addColumn(x: number, y: number, title: string, lines: string[], s: number): void {
     this.add
-      .text(x, y, title, textStyle(20, css(Palette.accent.secondary), { fontStyle: 'bold' }))
+      .text(x, y, title, textStyle(Math.round(19 * s), css(Palette.accent.secondary), { fontStyle: 'bold' }))
       .setOrigin(0.5, 0);
     this.add
-      .text(x, y + 30, lines.join('\n'), textStyle(17, css(Palette.text.primary), {
+      .text(x, y + 26 * s, lines.join('\n'), textStyle(Math.round(16 * s), css(Palette.text.primary), {
         align: 'center',
-        lineSpacing: 7,
+        lineSpacing: 5,
       }))
       .setOrigin(0.5, 0);
   }
@@ -195,19 +201,21 @@ export class ResultScene extends Phaser.Scene {
     calc: ReturnType<typeof applyDailyCap>,
     granted: number,
     dailyLimit: number,
+    s: number,
   ): void {
     const panel = this.add.graphics();
+    const panelH = Math.round(132 * s);
     panel.fillStyle(Palette.background.panel, 0.9);
-    panel.fillRoundedRect(w / 2 - 452, y, 904, 152, 16);
+    panel.fillRoundedRect(w / 2 - 452 * s, y, 904 * s, panelH, 16);
     panel.lineStyle(2, Palette.accent.gold, 0.6);
-    panel.strokeRoundedRect(w / 2 - 452, y, 904, 152, 16);
+    panel.strokeRoundedRect(w / 2 - 452 * s, y, 904 * s, panelH, 16);
 
     this.add
-      .text(w / 2 - 424, y + 14, '游戏时间奖励明细', textStyle(19, css(Palette.accent.gold), { fontStyle: 'bold' }))
+      .text(w / 2 - 424 * s, y + 10 * s, '游戏时间奖励明细', textStyle(Math.round(17 * s), css(Palette.accent.gold), { fontStyle: 'bold' }))
       .setOrigin(0, 0);
 
     this.add
-      .text(w / 2 - 424, y + 46, formatRewardItems(calc.items), textStyle(16, css(Palette.text.primary), { lineSpacing: 5 }))
+      .text(w / 2 - 424 * s, y + 38 * s, formatRewardItems(calc.items), textStyle(Math.round(15 * s), css(Palette.text.primary), { lineSpacing: 4 }))
       .setOrigin(0, 0);
 
     const capLines = [
@@ -216,17 +224,17 @@ export class ResultScene extends Phaser.Scene {
       `实际发放 +${granted}s（下一关割草时长增加）`,
     ];
     this.add
-      .text(w / 2 + 424, y + 46, capLines.join('\n'), textStyle(16, css(Palette.text.secondary), {
+      .text(w / 2 + 424 * s, y + 38 * s, capLines.join('\n'), textStyle(Math.round(15 * s), css(Palette.text.secondary), {
         align: 'right',
-        lineSpacing: 6,
+        lineSpacing: 5,
       }))
       .setOrigin(1, 0);
   }
 
   /** 等级提升动画：横幅弹入 + 金色光环扩散 */
-  private playLevelUpAnimation(w: number, newLevel: number): void {
+  private playLevelUpAnimation(w: number, newLevel: number, s: number): void {
     const banner = this.add
-      .text(w / 2, 250, `等级提升！ Lv.${newLevel}`, textStyle(46, css(Palette.accent.gold), { fontStyle: 'bold' }))
+      .text(w / 2, 250 * s, `等级提升！ Lv.${newLevel}`, textStyle(Math.round(46 * s), css(Palette.accent.gold), { fontStyle: 'bold' }))
       .setOrigin(0.5)
       .setDepth(1400)
       .setScale(0.2)
@@ -241,7 +249,7 @@ export class ResultScene extends Phaser.Scene {
     });
     this.tweens.add({
       targets: banner,
-      y: 226,
+      y: 226 * s,
       alpha: 0,
       delay: 1500,
       duration: 620,
@@ -253,26 +261,27 @@ export class ResultScene extends Phaser.Scene {
     this.time.delayedCall(420, () => ripple(this, w / 2, 250, Palette.accent.gold, 320, 900));
   }
 
-  /** 创建一个通用按钮并返回句柄 */
+  /** 创建一个通用按钮并返回句柄（尺寸/字号随视口缩放系数 s 变化） */
   private createButton(
     x: number,
     y: number,
     label: string,
     color: number,
     onClick: () => void,
+    s: number,
   ): MenuButton {
-    const w = 260;
-    const h = 58;
+    const w = Math.round(210 * s);
+    const h = Math.round(46 * s);
     const container = this.add.container(x, y);
 
     const bg = this.add.graphics();
     bg.fillStyle(color, 1);
-    bg.fillRoundedRect(-w / 2, -h / 2, w, h, 14);
+    bg.fillRoundedRect(-w / 2, -h / 2, w, h, 12);
     bg.lineStyle(2, Palette.text.primary, 0.25);
-    bg.strokeRoundedRect(-w / 2, -h / 2, w, h, 14);
+    bg.strokeRoundedRect(-w / 2, -h / 2, w, h, 12);
 
     const text = this.add
-      .text(0, 0, label, textStyle(22, css(Palette.text.primary), { fontStyle: 'bold' }))
+      .text(0, 0, label, textStyle(Math.round(19 * s), css(Palette.text.primary), { fontStyle: 'bold' }))
       .setOrigin(0.5);
 
     container.add([bg, text]);

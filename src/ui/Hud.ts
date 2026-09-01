@@ -53,36 +53,36 @@ export class CombatHud {
 
     const w = opts.width;
 
-    // 顶部半透明底板，保证 HUD 在任何背景上都可读
+    // 顶部半透明底板：52px（原 64，手机端反馈垂直占用过大，缩窄并同步缩小字号/条形）
     this.bg = scene.add.graphics().setDepth(1000);
     this.bg.fillStyle(Palette.background.deep, 0.72);
-    this.bg.fillRect(0, 0, w, 64);
+    this.bg.fillRect(0, 0, w, 52);
     this.bg.lineStyle(2, Palette.accent.primaryDark, 0.5);
-    this.bg.lineBetween(0, 64, w, 64);
+    this.bg.lineBetween(0, 52, w, 52);
 
     this.hpBarFill = scene.add.graphics().setDepth(1001);
     this.timeBarFill = scene.add.graphics().setDepth(1001);
 
     this.levelText = scene.add
-      .text(16, 10, `第 ${opts.level} 关 · ${opts.levelName}`, textStyle(18, css(Palette.accent.secondary)))
+      .text(16, 6, `第 ${opts.level} 关 · ${opts.levelName}`, textStyle(16, css(Palette.accent.secondary)))
       .setDepth(1002);
 
     this.hpText = scene.add
-      .text(16, 36, '', textStyle(15, css(Palette.text.secondary)))
+      .text(16, 25, '', textStyle(13, css(Palette.text.secondary)))
       .setDepth(1002);
 
     this.timeText = scene.add
-      .text(w / 2, 12, '', textStyle(30, css(Palette.text.primary)))
+      .text(w / 2, 3, '', textStyle(24, css(Palette.text.primary)))
       .setOrigin(0.5, 0)
       .setDepth(1002);
 
     this.scoreText = scene.add
-      .text(w - 16, 10, '得分 0', textStyle(20, css(Palette.accent.gold)))
+      .text(w - 16, 5, '得分 0', textStyle(17, css(Palette.accent.gold)))
       .setOrigin(1, 0)
       .setDepth(1002);
 
     this.comboText = scene.add
-      .text(w - 16, 38, '', textStyle(16, css(Palette.accent.secondary)))
+      .text(w - 16, 26, '', textStyle(14, css(Palette.accent.secondary)))
       .setOrigin(1, 0)
       .setDepth(1002);
 
@@ -146,9 +146,9 @@ export class CombatHud {
   /** 重绘血条 */
   private redrawHp(): void {
     const x = 16;
-    const y = 58;
-    const w = 200;
-    const h = 12;
+    const y = 40;
+    const w = 180;
+    const h = 9;
     const ratio = clamp01(this.hp / this.maxHp);
 
     this.hpBarFill.clear();
@@ -171,10 +171,10 @@ export class CombatHud {
     const w = this.scene.scale.width;
     this.timeText.setText(formatClock(this.timeLeft));
 
-    const barW = 260;
-    const barH = 8;
+    const barW = 220;
+    const barH = 6;
     const x = (w - barW) / 2;
-    const y = 48;
+    const y = 33;
     const ratio = clamp01(this.timeLeft / this.totalTime);
 
     this.timeBarFill.clear();
