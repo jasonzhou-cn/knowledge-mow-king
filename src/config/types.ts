@@ -246,6 +246,29 @@ export interface PerformanceSettings {
   corpsePoolSize: number;
 }
 
+/**
+ * Boss 关数值（bossLevel=true 的关卡生效）。
+ * 数值全部外置（GDD 1.4），代码不写死任何 Boss 属性。
+ */
+export interface BossSettings {
+  /** Boss 生命值 */
+  hp: number;
+  /** 接触伤害 */
+  damage: number;
+  /** 移动速度（像素/秒） */
+  speed: number;
+  /** 碰撞半径（像素），也决定精灵显示尺寸 */
+  radius: number;
+  /** 击杀奖励分数 */
+  scoreOnKill: number;
+  /** 开局多少秒后生成 Boss */
+  spawnDelay: number;
+  /** Boss 存活期间，小怪每批刷新的间隔（秒） */
+  minionSpawnInterval: number;
+  /** Boss 存活期间，每批刷新的小怪数量 */
+  minionPerWave: number;
+}
+
 export interface SubjectCoefficientEntry {
   skillDamageCoefficient: number;
   skillRangeCoefficient: number;
@@ -280,6 +303,8 @@ export interface GrassCuttingConfig {
   comboSettings: ComboSettings;
   difficultySettings: DifficultySettings;
   performanceSettings: PerformanceSettings;
+  /** Boss 关数值（levelConfig 里 bossLevel=true 的关卡消费） */
+  bossSettings: BossSettings;
   subjectCoefficientSettings: Record<SubjectKey, SubjectCoefficientEntry>;
 }
 

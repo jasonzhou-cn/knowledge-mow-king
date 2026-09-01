@@ -654,6 +654,16 @@ function validateGrassCuttingConfig(raw: unknown): Validator {
     }
   }
 
+  const bs = v.object(root, 'bossSettings', 'grassCuttingConfig.bossSettings');
+  v.number(bs, 'hp', 'grassCuttingConfig.bossSettings.hp', { min: 1 });
+  v.number(bs, 'damage', 'grassCuttingConfig.bossSettings.damage', { min: 0 });
+  v.number(bs, 'speed', 'grassCuttingConfig.bossSettings.speed', { min: 1 });
+  v.number(bs, 'radius', 'grassCuttingConfig.bossSettings.radius', { min: 8 });
+  v.number(bs, 'scoreOnKill', 'grassCuttingConfig.bossSettings.scoreOnKill', { min: 0 });
+  v.number(bs, 'spawnDelay', 'grassCuttingConfig.bossSettings.spawnDelay', { min: 1 });
+  v.number(bs, 'minionSpawnInterval', 'grassCuttingConfig.bossSettings.minionSpawnInterval', { min: 1 });
+  v.integer(bs, 'minionPerWave', 'grassCuttingConfig.bossSettings.minionPerWave', { min: 1, max: 16 });
+
   const sc = v.object(root, 'subjectCoefficientSettings', 'grassCuttingConfig.subjectCoefficientSettings');
   for (const key of Object.keys(sc)) {
     const entry = v.object(sc, key, `grassCuttingConfig.subjectCoefficientSettings.${key}`);

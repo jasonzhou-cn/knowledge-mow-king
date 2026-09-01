@@ -6,7 +6,9 @@
  * 战斗形态（用户拍板）：
  *  - 瞄准自动、出手手动：武器自动锁定最近敌人，玩家按攻击键才出手；
  *  - 三把武器随时切：1/2/3 直切、Q/E 循环切，也可点底部武器栏；
- *  - 关卡是倒计时生存，难度随 t = 已用时间 / 总时长 连续爬升。
+ *  - 普通关是倒计时生存，难度随 t = 已用时间 / 总时长 连续爬升；
+ *  - Boss 关（levelConfig.bossLevel=true）：spawnDelay 秒后 BOSS 入场，
+ *    击杀 BOSS 即通关（提前进入结算）；Boss 免疫击退、不占小怪名额。
  *
  * 答题加成落点（GDD 1.3 核心绑定原则：答题质量必须决定割草爽感）：
  *  - damageMultiplier   → 武器伤害
@@ -139,6 +141,12 @@ export class GrassCuttingScene extends Phaser.Scene {
   private hud!: CombatHud;
   private weaponBar!: WeaponBar;
   private floaters!: FloatingTextPool;
+  /** Boss 关专属顶部血条（非 Boss 关为 null，全部路径短路） */
+  private bossBarBg: Phaser.GameObjects.Graphics | null = null;
+  private bossBarFill: Phaser.GameObjects.Graphics | null = null;
+  private bossBarLabel: Phaser.GameObjects.Text | null = null;
+  /** Boss 血条的几何（重绘 fill 时需要与底框严格对齐） */
+  private bossBarBox: { x: number; y: number; w: number; h: number } | null = null;
   /** 底部加成文案的左起始 x（触屏时右移以避让虚拟摇杆） */
   private bottomTextX = 16;
 
@@ -246,6 +254,8 @@ export class GrassCuttingScene extends Phaser.Scene {
       corpseLife: this.packed.killFx.corpseLife,
       corpseSpin: this.packed.killFx.corpseSpin,
       corpseDrag: this.packed.killFx.corpseDrag,
+      isBossLevel: this.packed.isBossLevel,
+      boss: this.packed.boss,
     });
 
     this.projectiles = new ProjectileSystem(this, {
@@ -311,6 +321,28 @@ export class GrassCuttingScene extends Phaser.Scene {
       onSelect: (index) => this.switchWeapon(index),
     });
 
+    // Boss 关：顶部 HUD（52px）下方加一条 Boss 血条，目标改为「击杀 Boss 即通关」
+    if (this.packed.isBossLevel) {
+      const barW = 400;
+      const barH = 16;
+      const bx = (hudWidth - barW) / 2;
+      const by = 60; // 52px 顶栏之下留 8px 间隙，不与现有 HUD 重叠
+
+      this.bossBarBg = this.add.graphics().setDepth(1005);
+      this.bossBarBg.fillStyle(Palette.background.panel, 0.85);
+      this.bossBarBg.fillRoundedRect(bx, by, barW, barH, 8);
+      this.bossBarBg.lineStyle(2, Palette.status.wrong, 0.8);
+      this.bossBarBg.strokeRoundedRect(bx, by, barW, barH, 8);
+
+      this.bossBarFill = this.add.graphics().setDepth(1006);
+
+      this.bossBarLabel = this.add
+        .text(bx + barW / 2, by + barH / 2, '', textStyle(13, css(Palette.text.primary)))
+        .setOrigin(0.5)
+        .setDepth(1007);
+      this.bossBarBox = { x: bx, y: by, w: barW, h: barH };
+    }
+
     this.setupInput();
 
     this.spawner.start();
@@ -353,6 +385,13 @@ export class GrassCuttingScene extends Phaser.Scene {
         // 摇杆状态快照：只读，供自动化验证区分「走位」与「攻击」两条输入通道
         get joystickActive(){ return self.joystick ? self.joystick.isActive : false; },
         get joystickVector(){ return self.joystick ? self.joystick.vector : null; },
+        // Boss 关状态：验证「Boss 生成 + 可被击杀 + 击杀即通关」的唯一入口，只读
+        get isBossLevel()  { return self.packed ? self.packed.isBossLevel : null; },
+        get bossSpawned()  { return self.spawner ? self.spawner.bossSpawned : null; },
+        get bossAlive()    { return self.spawner ? self.spawner.bossAlive : null; },
+        get bossHpRatio()  { return self.spawner ? self.spawner.bossHpRatio : null; },
+        get bossX()        { const p = self.spawner && self.spawner.bossPosition; return p ? p.x : null; },
+        get bossY()        { const p = self.spawner && self.spawner.bossPosition; return p ? p.y : null; },
       };
     }
   }
@@ -696,6 +735,22 @@ export class GrassCuttingScene extends Phaser.Scene {
    */
   private onMonsterKilled(monster: Monster, x: number, y: number, dirX: number, dirY: number): void {
     const gained = monster.score;
+
+    // Boss 击杀 = Boss 关通关：强化反馈 + 提前进入结算（cleared=true）
+    if (monster.isBoss) {
+      this.kills++;
+      this.score += gained;
+      sfx.play('levelUp');
+      this.floaters.spawn(x, y - 46, `BOSS 击破 +${gained}`, css(Palette.accent.gold), '★');
+      // 双层爆散拉开体量差距：金色主爆 + 精英色次爆
+      this.killFx.burst(x, y, Palette.accent.gold, dirX, dirY);
+      this.killFx.burst(x, y, Palette.combat.monsterElite, -dirY, dirX);
+      this.killFx.requestHitstop(this.weaponSystem.current.hitstopDuration);
+      this.killFx.shake(0.006, 160); // GDD 上限：0.006 / 160ms
+      this.finish(true, false);
+      return;
+    }
+
     this.kills++;
     sfx.play('kill');
     this.score += gained;
@@ -792,6 +847,27 @@ export class GrassCuttingScene extends Phaser.Scene {
     this.hud.updateCombo(this.combo.current);
     this.hud.setTimeWarning(this.timeLeft <= 10);
     this.weaponBar.update(this.cooldownProvider);
+    this.updateBossBar();
+  }
+
+  /** Boss 血条：未生成时显示倒计时文案，生成后按血量比例填充 */
+  private updateBossBar(): void {
+    const fill = this.bossBarFill;
+    const label = this.bossBarLabel;
+    const box = this.bossBarBox;
+    if (!fill || !label || !box) return;
+
+    const spawned = this.spawner.bossSpawned;
+    const ratio = this.spawner.bossHpRatio;
+
+    fill.clear();
+    if (spawned) {
+      fill.fillStyle(Palette.combat.monsterHpFill, 1);
+      if (ratio > 0) fill.fillRoundedRect(box.x, box.y, box.w * ratio, box.h, 8);
+      label.setText(`BOSS ${this.packed.levelEntry.name}`);
+    } else {
+      label.setText('BOSS 即将降临…');
+    }
   }
 
   // ───────────────────────── 场景搭建与收尾 ─────────────────────────
@@ -904,5 +980,12 @@ export class GrassCuttingScene extends Phaser.Scene {
     this.floaters?.destroy();
     this.hud?.destroy();
     this.weaponBar?.destroy();
+    this.bossBarBg?.destroy();
+    this.bossBarFill?.destroy();
+    this.bossBarLabel?.destroy();
+    this.bossBarBg = null;
+    this.bossBarFill = null;
+    this.bossBarLabel = null;
+    this.bossBarBox = null;
   }
 }

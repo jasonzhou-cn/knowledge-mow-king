@@ -14,7 +14,7 @@
  */
 
 import Phaser from 'phaser';
-import type { DifficultySettings } from '../config/types';
+import type { BossSettings, DifficultySettings } from '../config/types';
 import { Palette } from '../ui/Palette';
 import { clamp01, lerp } from '../utils/MathUtil';
 
@@ -28,6 +28,8 @@ export interface Monster {
   score: number;
   radius: number;
   alive: boolean;
+  /** 是否 Boss：不占小怪同屏名额、免疫击退、有专属血条与通关逻辑 */
+  isBoss: boolean;
   /** 击退速度（像素/秒） */
   knockbackX: number;
   knockbackY: number;
@@ -66,6 +68,10 @@ export interface MonsterSpawnerOptions {
   corpseLife: number;
   corpseSpin: number;
   corpseDrag: number;
+  /** 是否 Boss 关（levelConfig.bossLevel）；true 时按 boss 数值生成 Boss */
+  isBossLevel?: boolean;
+  /** Boss 数值（仅 isBossLevel 时消费） */
+  boss?: BossSettings;
 }
 
 export class MonsterSpawner {
@@ -77,6 +83,13 @@ export class MonsterSpawner {
 
   private spawnTimer = 0;
   private running = false;
+
+  /** Boss 关：Boss 本体（存活时在 activeList 里，isBoss=true） */
+  private bossMonster: Monster | null = null;
+  /** Boss 生成倒计时（秒） */
+  private bossSpawnTimer = 0;
+  /** Boss 是否已生成 */
+  private bossSpawnedFlag = false;
 
   /** 由 setProgress 计算出的当前难度值 */
   private spawnInterval = 1;
@@ -129,10 +142,35 @@ export class MonsterSpawner {
     return this.moveSpeedMultiplier;
   }
 
+  /** Boss 是否存活（生成且未被击杀） */
+  get bossAlive(): boolean {
+    return this.bossMonster !== null && this.bossMonster.alive;
+  }
+
+  /** Boss 是否已生成（用于区分「即将降临」与「战斗中」的 UI 文案） */
+  get bossSpawned(): boolean {
+    return this.bossSpawnedFlag;
+  }
+
+  /** Boss 当前血量比例 0~1；未生成或已死亡返回 0 */
+  get bossHpRatio(): number {
+    const b = this.bossMonster;
+    if (!b || !b.alive || b.maxHp <= 0) return 0;
+    return clamp01(b.hp / b.maxHp);
+  }
+
+  /** Boss 当前坐标；未生成或已死亡返回 null（供自动瞄准验证/调试） */
+  get bossPosition(): { x: number; y: number } | null {
+    const b = this.bossMonster;
+    if (!b || !b.alive) return null;
+    return { x: b.sprite.x, y: b.sprite.y };
+  }
+
   /** 开始刷怪 */
   start(): void {
     this.running = true;
     this.spawnTimer = 0;
+    this.bossSpawnTimer = 0;
   }
 
   /** 停止刷怪（关卡结束时调用） */
@@ -160,7 +198,10 @@ export class MonsterSpawner {
    * @param playerY 玩家 Y
    */
   update(dt: number, playerX: number, playerY: number): void {
-    if (this.running) this.updateSpawning(dt);
+    if (this.running) {
+      this.updateSpawning(dt);
+      this.updateBoss(dt);
+    }
     this.updateMonsters(dt, playerX, playerY);
     this.updateCorpses(dt);
   }
@@ -186,6 +227,8 @@ export class MonsterSpawner {
    * @param strength 击退速度（像素/秒）；缺省用配置的接触击退值
    */
   knockback(monster: Monster, dirX: number, dirY: number, strength?: number): void {
+    // Boss 免疫击退：既是体量感（打不动的庞然大物），也避免它被反复推走导致玩家无脑放风筝
+    if (monster.isBoss) return;
     monster.knockbackX = dirX * (strength ?? this.opts.knockback);
     monster.knockbackY = dirY * (strength ?? this.opts.knockback);
     monster.knockbackTime = this.opts.knockbackDuration;
@@ -205,6 +248,9 @@ export class MonsterSpawner {
     this.corpses.length = 0;
     this.running = false;
     this.spawnTimer = 0;
+    this.bossMonster = null;
+    this.bossSpawnTimer = 0;
+    this.bossSpawnedFlag = false;
   }
 
   /** 销毁对象池 */
@@ -232,6 +278,7 @@ export class MonsterSpawner {
         score: 0,
         radius: this.opts.radius,
         alive: false,
+        isBoss: false,
         knockbackX: 0,
         knockbackY: 0,
         knockbackTime: 0,
@@ -246,16 +293,29 @@ export class MonsterSpawner {
   private updateSpawning(dt: number): void {
     this.spawnTimer += dt;
 
+    // Boss 关：Boss 存活时改为「每 minionSpawnInterval 秒刷 minionPerWave 只」的固定节奏；
+    // 未生成前用现有难度曲线，但同屏上限压低到平时的 1/4，避免开局就被怪海淹没
+    const bossActive = this.opts.isBossLevel && this.bossSpawnedFlag;
+    const interval = bossActive ? this.opts.boss!.minionSpawnInterval : this.spawnInterval;
+    const perBatch = bossActive
+      ? this.opts.boss!.minionPerWave
+      : Math.max(1, Math.round(this.batchSize));
+
+    // 同屏上限（Boss 不占小怪名额）：bossAlive → 满额；boss 未生成 → 1/4 上限；普通关 → 满额
+    const cap = this.opts.isBossLevel && !this.bossSpawnedFlag
+      ? Math.max(2, Math.round(this.opts.maxAlive * 0.25))
+      : this.opts.maxAlive;
+
     // 上限保护：单帧最多补 8 批，避免长卡顿后一次性涌入造成掉帧
     let guard = 0;
-    while (this.spawnTimer >= this.spawnInterval && guard < 8) {
-      this.spawnTimer -= this.spawnInterval;
+    while (this.spawnTimer >= interval && guard < 8) {
+      this.spawnTimer -= interval;
       guard++;
 
-      const count = Math.max(1, Math.round(this.batchSize));
-      for (let i = 0; i < count; i++) {
-        // 同屏上限是硬红线：满了就等下一批，绝不超量生成
-        if (this.activeList.length >= this.opts.maxAlive) return;
+      for (let i = 0; i < perBatch; i++) {
+        // 同屏上限是硬红线：满了就等下一批，绝不超量生成（Boss 不占名额）
+        const minions = this.activeList.length - (this.bossAlive ? 1 : 0);
+        if (minions >= cap) return;
         this.spawnOne();
       }
     }
@@ -293,6 +353,9 @@ export class MonsterSpawner {
     monster.sprite.setRotation(0);
     monster.sprite.setAlpha(1);
     monster.sprite.setDisplaySize(radius * 2, radius * 2);
+    // 槽位可能被 Boss 用过，必须先归零再上色，否则 refreshTint 会按 Boss 配色染普通小怪
+    monster.isBoss = false;
+    monster.radius = this.opts.radius;
     this.refreshTint(monster);
 
     // 难度曲线的即时产物：新生成的小怪直接吃到当前的血量与移速倍率
@@ -310,6 +373,51 @@ export class MonsterSpawner {
     monster.corpseSpin = 0;
 
     this.activeList.push(monster);
+  }
+
+  /** Boss 关：开局计时，到点从屏幕正上方生成 Boss */
+  private updateBoss(dt: number): void {
+    if (!this.opts.isBossLevel || this.bossSpawnedFlag) return;
+    this.bossSpawnTimer += dt;
+    if (this.bossSpawnTimer >= this.opts.boss!.spawnDelay) {
+      this.spawnBoss();
+    }
+  }
+
+  /** 生成 Boss：从对象池取一只，扩成大体型、金色本体、Boss 数值 */
+  private spawnBoss(): void {
+    const b = this.opts.boss;
+    if (!b) return;
+
+    const monster = this.pool.find((m) => !m.alive && m.corpseTime <= 0);
+    if (!monster) return;
+
+    // 从屏幕正上方「压下来」，Boss 体型大，比侧边更醒目
+    monster.sprite.setPosition(this.opts.viewWidth / 2, -b.radius - 4);
+    monster.sprite.setActive(true).setVisible(true);
+    monster.sprite.setRotation(0);
+    monster.sprite.setAlpha(1);
+    monster.sprite.setDisplaySize(b.radius * 2, b.radius * 2);
+
+    monster.isBoss = true;
+    monster.radius = b.radius;
+    monster.hp = b.hp;
+    monster.maxHp = b.hp;
+    monster.damage = b.damage;
+    monster.speed = b.speed;
+    monster.score = b.scoreOnKill;
+    monster.alive = true;
+    monster.knockbackTime = 0;
+    monster.knockbackX = 0;
+    monster.knockbackY = 0;
+    monster.flashTime = 0;
+    monster.corpseTime = 0;
+    monster.corpseSpin = 0;
+    this.refreshTint(monster);
+
+    this.activeList.push(monster);
+    this.bossMonster = monster;
+    this.bossSpawnedFlag = true;
   }
 
   /** 驱动所有小怪追向玩家 */
@@ -407,6 +515,10 @@ export class MonsterSpawner {
   /** 回收到对象池 */
   private release(monster: Monster): void {
     monster.alive = false;
+    // 注意：不重置 isBoss！Boss 的 onKill 回调在 release() 之后才执行
+    //（CombatSystem.applyHit: kill → onKill），若在这里把 isBoss 清掉，
+    // 场景的 onMonsterKilled 会把它当普通小怪处理，Boss 击杀就不触发通关。
+    // isBoss 的归零由 spawnOne()（复用槽位刷普通小怪时）负责。
     monster.hp = 0;
     monster.knockbackTime = 0;
     monster.knockbackX = 0;
@@ -414,6 +526,7 @@ export class MonsterSpawner {
     monster.flashTime = 0;
     monster.corpseTime = 0;
     monster.corpseSpin = 0;
+    monster.radius = this.opts.radius;
     monster.sprite.setRotation(0);
     monster.sprite.setAlpha(1);
     monster.sprite.setDisplaySize(monster.radius * 2, monster.radius * 2);
@@ -423,6 +536,11 @@ export class MonsterSpawner {
   /** 按当前血量比例刷新颜色：血越少越接近精英色 */
   private refreshTint(monster: Monster): void {
     const ratio = Math.max(0.25, monster.maxHp > 0 ? monster.hp / monster.maxHp : 1);
+    if (monster.isBoss) {
+      // Boss 用金色本体 → 血量越低越红，与普通小怪的绿→橙区分开
+      monster.sprite.setTint(mixColor(Palette.accent.gold, Palette.status.wrong, 1 - ratio));
+      return;
+    }
     monster.sprite.setTint(mixColor(Palette.combat.monster, Palette.combat.monsterElite, 1 - ratio));
   }
 }

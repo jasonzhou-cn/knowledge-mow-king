@@ -9,6 +9,7 @@
 import { ConfigLoader } from './ConfigLoader';
 import type {
   AutoAimSettings,
+  BossSettings,
   GameSettings,
   GrassCuttingBonus,
   GrassCuttingBonusSettings,
@@ -166,6 +167,10 @@ export interface ResolvedLevelPackage {
   difficultyScale: number;
   /** 是否呼吸关（难度回落关卡） */
   isBreatherLevel: boolean;
+  /** 是否 Boss 关（击杀 Boss 即通关） */
+  isBossLevel: boolean;
+  /** Boss 数值（仅 Boss 关消费，普通关不读取） */
+  boss: BossSettings;
   /** 升级到下一级所需经验 */
   expToNextLevel: number;
   /** 该等级的加成公式参数（供结算面板复用） */
@@ -402,6 +407,8 @@ export function resolveLevelPackage(
     },
     difficultyScale: scale,
     isBreatherLevel: levelEntry.breatherLevel,
+    isBossLevel: levelEntry.bossLevel,
+    boss: grassCuttingConfig.bossSettings,
     expToNextLevel: resolveExpToNextLevel(gameSettings, level),
     bonusSettings: gameSettings.grassCuttingBonusSettings,
   };

@@ -1,5 +1,5 @@
 {
-  "version": "1.1.0",
+  "version": "1.2.0",
   "touchSettings": {
     "joystickCenterX": 160,
     "joystickCenterY": 510,
@@ -57,6 +57,16 @@
     "shardPoolSize": 60,
     "ringPoolSize": 18,
     "corpsePoolSize": 12
+  },
+  "bossSettings": {
+    "hp": 2600,
+    "damage": 24,
+    "speed": 62,
+    "radius": 46,
+    "scoreOnKill": 500,
+    "spawnDelay": 8,
+    "minionSpawnInterval": 4,
+    "minionPerWave": 3
   },
   "subjectCoefficientSettings": {
     "math": {

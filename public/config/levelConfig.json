@@ -176,7 +176,7 @@
       "subject": "english",
       "unlockCondition": "level >= 13",
       "questionCount": 12,
-      "bossLevel": false,
+      "bossLevel": true,
       "breatherLevel": false,
       "difficultyScale": 2.4,
       "gameTime": 60,
