@@ -472,11 +472,14 @@ export class MonsterSpawner {
     if (!Array.isArray(phases) || phases.length === 0) return;
 
     const ratio = clamp01(b.hp / b.maxHp);
-    // phases 按 phaseIndex 升序排列（hpThreshold 自然递减）；
-    // 找到 ratio ≤ threshold 的最远阶段（最高 phaseIndex）。
+    // phases 按 phaseIndex 升序排列（hpThreshold 自然递减）。
+    // 从最高阶段向低扫，**首次** ratio ≤ threshold 时锁定 nextPhaseIndex 并跳出。
     let nextPhaseIndex = this.bossCurrentPhase;
     for (let i = phases.length - 1; i >= 0; i--) {
-      if (ratio <= phases[i].hpThreshold) nextPhaseIndex = i;
+      if (ratio <= phases[i].hpThreshold) {
+        nextPhaseIndex = i;
+        break;
+      }
     }
     if (nextPhaseIndex === this.bossCurrentPhase) return;
 
