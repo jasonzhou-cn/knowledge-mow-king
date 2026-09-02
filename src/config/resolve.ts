@@ -9,7 +9,9 @@
 import { ConfigLoader } from './ConfigLoader';
 import type {
   AutoAimSettings,
+  BossRoster,
   BossSettings,
+  BossTemplate,
   GameSettings,
   GrassCuttingBonus,
   GrassCuttingBonusSettings,
@@ -169,8 +171,10 @@ export interface ResolvedLevelPackage {
   isBreatherLevel: boolean;
   /** 是否 Boss 关（击杀 Boss 即通关） */
   isBossLevel: boolean;
-  /** Boss 数值（仅 Boss 关消费，普通关不读取） */
-  boss: BossSettings;
+  /** Boss 数值（仅 Boss 关消费，普通关不读取）。
+   *  T-022：升级为 ResolvedBossTemplate，包含阶段 + 技能字典，
+   *  与旧 BossSettings 字段兼容（hp/damage/speed/radius/scoreOnKill 等） */
+  boss: ResolvedBossTemplate;
   /** 升级到下一级所需经验 */
   expToNextLevel: number;
   /** 该等级的加成公式参数（供结算面板复用） */
@@ -255,14 +259,135 @@ export function resolveLevelEntry(levelConfig: LevelConfig, level: number): Leve
   return found;
 }
 
-/** 下一关的关卡号；已是最后一关则返回自身（循环推进） */
-export function resolveNextLevel(levelConfig: LevelConfig, level: number): number {
-  const levels = levelConfig.levels;
-  const last = levels[levels.length - 1];
-  for (const entry of levels) {
-    if (entry.level > level) return entry.level;
+/**
+ * 解析后的 Boss 单阶段数据：phase 已乘好 speedMult/damageMult/spawnDelay。
+ * 运行时（MonsterSpawner / BossSkillController）只读取，不再做任何数值换算。
+ */
+export interface ResolvedBossPhase {
+  phaseIndex: number;
+  hpThreshold: number;
+  speedMult: number;
+  damageMult: number;
+  spawnDelay: number;
+  skills: string[];
+}
+
+/**
+ * 解析后的 Boss 模板：JSON 原始数据 + 已按 level / subject 缩放的数值。
+ * 兼容旧 BossSettings 形态（hp/damage/speed/radius/scoreOnKill），
+ * 这样场景代码读 `boss.hp` 与 `boss.phases[].damageMult` 都能直接拿到值。
+ */
+export interface ResolvedBossTemplate extends BossSettings {
+  /** Boss 模板 id（来自 BossTemplate.id） */
+  bossId: string;
+  /** Boss 中文名（来自 BossTemplate.name） */
+  bossName: string;
+  /** Boss 学科 key */
+  subject: string;
+  /** 所在关卡号 */
+  levelNumber: number;
+  /** 阶段表（数值已乘好 speedMult/damageMult） */
+  phases: ResolvedBossPhase[];
+  /** 技能字典（原样透传，运行时按 skillId 索引） */
+  skills: BossTemplate['skills'];
+}
+
+/**
+ * 解析 Boss 全集（grassCuttingConfig.bossRoster）。本函数对原始 JSON 做最少量的合法性补全：
+ *  - 保证每个阶段 phaseIndex 与数组下标一致；
+ *  - 保证 phases 按 hpThreshold 严格递减（更高阶段阈值更小）；
+ *  - 保证每条引用的 skillId 都能在 skills 字典里找到。
+ * 真实校验交由 validator.ts 的强类型校验器负责，本函数只是为运行时构造便利的 Resolved 形态。
+ */
+export function resolveBossRoster(rawRoster: BossRoster | undefined, fallback: BossSettings): ResolvedBossTemplate[] {
+  if (!rawRoster || !Array.isArray(rawRoster.roster)) {
+    // 兼容旧版 JSON：只有单 bossSettings，没有 bossRoster 时回退到「单 Boss 列表」
+    return [
+      {
+        ...fallback,
+        bossId: 'boss_legacy_default',
+        bossName: 'Boss',
+        subject: 'default',
+        levelNumber: 0,
+        phases: [
+          { phaseIndex: 0, hpThreshold: 1.0, speedMult: 1.0, damageMult: 1.0, spawnDelay: fallback.spawnDelay, skills: [] },
+        ],
+        skills: {},
+      },
+    ];
   }
-  return last.level;
+
+  return rawRoster.roster.map((template) => {
+    // 阶段按 phaseIndex 升序（0→n），hpThreshold 自然递减；如声明里 phaseIndex 缺失就按数组下标推
+    const phases: ResolvedBossPhase[] = template.phases
+      .slice()
+      .sort((a, b) => (a.phaseIndex ?? 0) - (b.phaseIndex ?? 0))
+      .map((p, idx) => ({
+        phaseIndex: p.phaseIndex ?? idx,
+        hpThreshold: p.hpThreshold,
+        speedMult: p.speedMult,
+        damageMult: p.damageMult,
+        spawnDelay: p.spawnDelay,
+        skills: p.skills.filter((sid) => Boolean(template.skills[sid])),
+      }));
+
+    return {
+      // BossSettings 兼容字段
+      hp: template.hp,
+      damage: template.damage,
+      speed: template.speed,
+      radius: template.radius,
+      scoreOnKill: template.scoreOnKill,
+      spawnDelay: template.spawnDelay,
+      minionSpawnInterval: template.minionSpawnInterval,
+      minionPerWave: template.minionPerWave,
+      // T-022 新增字段
+      bossId: template.id,
+      bossName: template.name,
+      subject: template.subject,
+      levelNumber: template.levelNumber,
+      phases,
+      skills: template.skills,
+    };
+  });
+}
+
+/**
+ * 按关卡号查找 Boss 模板（levelConfig.bossLevels → grassCuttingConfig.bossRoster.roster）。
+ * 找不到时回退到 roster 第 0 项（终极关不应有「没找到」的情况，但兜底不能崩）。
+ */
+export function resolveBossForLevel(
+  rawRoster: BossRoster | undefined,
+  bossLevels: Record<string, string> | undefined,
+  fallback: BossSettings,
+  level: number,
+): ResolvedBossTemplate {
+  const roster = resolveBossRoster(rawRoster, fallback);
+  const bossId = bossLevels?.[String(level)];
+  if (bossId) {
+    const found = roster.find((b) => b.bossId === bossId);
+    if (found) return found;
+  }
+  // 兜底：用关卡号匹配 levelNumber，找不到再退化到第 0 项
+  const byLevel = roster.find((b) => b.levelNumber === level);
+  if (byLevel) return byLevel;
+  return roster[0];
+}
+
+/**
+ * 下一关的关卡号；已是最后一关则返回自身（循环推进）
+ * T-022 重构过程中被误删，这里显式重导出。
+ */
+export { resolveNextLevel } from './levelNavigation';
+
+/**
+ * 便捷封装：直接从一个已加载好的 ConfigLoader + 关卡号解析 Boss 模板。
+ */
+export function resolveBossByLevel(level: number): ResolvedBossTemplate {
+  const loader = ConfigLoader.getInstance();
+  const grass = loader.getConfig('grassCuttingConfig');
+  const levels = loader.getConfig('levelConfig');
+  return resolveBossForLevel(grass.bossRoster, levels.bossLevels, grass.bossSettings, level);
 }
 
 /**
@@ -408,7 +533,8 @@ export function resolveLevelPackage(
     difficultyScale: scale,
     isBreatherLevel: levelEntry.breatherLevel,
     isBossLevel: levelEntry.bossLevel,
-    boss: grassCuttingConfig.bossSettings,
+    // T-022：Boss 关按 level → bossLevels[id] 选模板；普通关仍返回完整模板兜底
+    boss: resolveBossForLevel(grassCuttingConfig.bossRoster, levelConfig.bossLevels, grassCuttingConfig.bossSettings, level),
     expToNextLevel: resolveExpToNextLevel(gameSettings, level),
     bonusSettings: gameSettings.grassCuttingBonusSettings,
   };

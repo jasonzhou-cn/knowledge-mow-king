@@ -269,6 +269,161 @@ export interface BossSettings {
   minionPerWave: number;
 }
 
+// ───────────────────── T-022 5 Boss × 3 阶段化系统 ─────────────────────
+
+/** Boss 技能类型。代码只读取 type 字段并 switch 到对应实现，所有数值仍在 JSON 里 */
+export type BossSkillType =
+  | 'ranged'
+  | 'slam'
+  | 'summon'
+  | 'charge'
+  | 'doomZone'
+  | 'dashBarrage';
+
+/** 单条技能配置（union 形状：每种 type 关心的字段不同，用可选字段表达） */
+export interface SkillConfig {
+  /** 技能类型（dispatch 关键字） */
+  type: BossSkillType;
+  /** 冷却时间（秒） */
+  cooldown: number;
+  /** 技能展示色（#RRGGBB），运行时按此用 Graphics 程序化生成 */
+  color: string;
+
+  // ranged：远程弹丸
+  projectileSpeed?: number;
+  projectileRadius?: number;
+  /** 单次弹丸伤害 */
+  damage?: number;
+  /** 单发飞行最大距离 */
+  range?: number;
+  /** 多发撒射数量（ranged_spread 风格） */
+  pelletCount?: number;
+  /** 散布总张角（度） */
+  spread?: number;
+
+  // slam：AOE 范围攻击
+  duration?: number;
+  /** AOE / doomZone 半径（像素） */
+  radius?: number;
+
+  // charge / dashBarrage：冲刺
+  speed?: number;
+  /** dashBarrage 的冲刺次数 */
+  dashes?: number;
+  /** dashBarrage 单次冲刺时长（秒） */
+  dashDuration?: number;
+  /** dashBarrage 两次冲刺间隔（秒） */
+  dashGap?: number;
+  /** dashBarrage 单次冲刺速度（像素/秒，区别于 charge.speed 的「瞬时位移速度」） */
+  dashSpeed?: number;
+
+  // doomZone：持续伤害区域
+  /** 单跳伤害（player 站在区域内受到的伤害） */
+  tickInterval?: number;
+  /** 减速系数 0~1（可选，time_freeze_trap 用） */
+  slowFactor?: number;
+
+  // summon：召唤小怪
+  count?: number;
+  hpMultiplier?: number;
+}
+
+/** 单个 Boss 阶段配置 */
+export interface BossPhase {
+  /** 阶段序号 0..n（0 为初始阶段） */
+  phaseIndex: number;
+  /** HP 比例阈值：进入此阶段时 boss.hp/maxHp ≤ threshold */
+  hpThreshold: number;
+  /** 移速倍率 */
+  speedMult: number;
+  /** 伤害倍率 */
+  damageMult: number;
+  /** 该阶段 Boss 的攻击间隔（Boss 自身出手节拍） */
+  spawnDelay: number;
+  /** 该阶段激活的技能 id 列表 */
+  skills: string[];
+}
+
+/** 单个 Boss 模板（一整套数值 + 阶段 + 技能字典） */
+export interface BossTemplate {
+  id: string;
+  name: string;
+  /** 学科 key（'math' | 'english' | 'science' | 'ultimate'） */
+  subject: string;
+  /** 所在关卡 */
+  levelNumber: number;
+  hp: number;
+  damage: number;
+  speed: number;
+  radius: number;
+  scoreOnKill: number;
+  spawnDelay: number;
+  minionSpawnInterval: number;
+  minionPerWave: number;
+  /** 阶段表（hpThreshold 必须严格递增，phaseIndex 与数组下标一致） */
+  phases: BossPhase[];
+  /** 技能字典：key = skillId */
+  skills: Record<string, SkillConfig>;
+}
+
+/** Boss 公共配置：所有 Boss 共享的「相同时长类」参数 */
+export interface BossCommonConfig {
+  /** 最大阶段数（理论上不超过 4，4 给「考神」用） */
+  maxPhases: number;
+  /** 技能视觉默认存续（秒，DoomZone 之类以这个为占位） */
+  skillVisualTtl: number;
+  /** 技能施法警告持续（秒，预留） */
+  skillCastWarnDuration: number;
+}
+
+/** Boss 全集：common 公共配置 + roster 模板列表 */
+export interface BossRoster {
+  common: BossCommonConfig;
+  roster: BossTemplate[];
+}
+
+/** Boss 沙雕过场文案钩子（死亡/阶段切换/入场） */
+export interface BossDialogueEntry {
+  intro: Record<string, string>;
+  phase: Record<string, string[]>;
+  death: Record<string, string>;
+}
+
+/**
+ * 解析后的单阶段 Boss 运行时数据（由 BossTemplate 的某个 phase 展开而来）。
+ * 数值已乘上 phase 的 speedMult/damageMult/spawnDelay，可直接被 MonsterSpawner 消费。
+ */
+export interface ResolvedBossPhase {
+  phaseIndex: number;
+  hpThreshold: number;
+  speedMult: number;
+  damageMult: number;
+  spawnDelay: number;
+  skills: string[];
+}
+
+/**
+ * 解析后的 Boss 模板：JSON 原始数据 + 已按 level / subject 缩放的数值。
+ * 兼容旧 BossSettings 形态（hp/damage/speed/radius/scoreOnKill），
+ * 这样场景代码读 `boss.hp` 与 `boss.phases[].damageMult` 都能直接拿到值。
+ */
+export interface ResolvedBossTemplate {
+  bossId: string;
+  bossName: string;
+  subject: string;
+  levelNumber: number;
+  hp: number;
+  damage: number;
+  speed: number;
+  radius: number;
+  scoreOnKill: number;
+  spawnDelay: number;
+  minionSpawnInterval: number;
+  minionPerWave: number;
+  phases: ResolvedBossPhase[];
+  skills: Record<string, SkillConfig>;
+}
+
 export interface SubjectCoefficientEntry {
   skillDamageCoefficient: number;
   skillRangeCoefficient: number;
@@ -305,6 +460,10 @@ export interface GrassCuttingConfig {
   performanceSettings: PerformanceSettings;
   /** Boss 关数值（levelConfig 里 bossLevel=true 的关卡消费） */
   bossSettings: BossSettings;
+  /** T-022 Boss 全集：common 公共配置 + roster 模板列表 */
+  bossRoster?: BossRoster;
+  /** T-022 Boss 沙雕过场文案钩子（红线条目：内容由 T-024 content-builder 填，本任务先建 schema） */
+  bossDialogue?: BossDialogueEntry;
   subjectCoefficientSettings: Record<SubjectKey, SubjectCoefficientEntry>;
 }
 
@@ -439,6 +598,13 @@ export interface LevelConfig {
   version: string;
   levels: LevelEntry[];
   levelDifficultyGrowth: LevelDifficultyGrowth;
+  /**
+   * T-022：Boss 关 → Boss 模板 id 的索引。
+   * key 为字符串形式的关卡号（与 levelConfig.levels[].level 一致），
+   * value 为 grassCuttingConfig.bossRoster.roster[].id。
+   * Boss 关改用此索引定位模板，取代旧「单一 bossSettings」机制。
+   */
+  bossLevels?: Record<string, string>;
 }
 
 // ──────────────────────────── rewardConfig.json ────────────────────────────

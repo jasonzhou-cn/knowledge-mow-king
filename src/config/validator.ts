@@ -390,6 +390,27 @@ export function validateAllConfigs(raw: Record<ConfigModuleName, unknown>): void
     );
   }
 
+  // 9. T-022：bossLevels 引用的 Boss id 必须在 bossRoster 里能找到
+  const bossRosterRaw = asRecord(asRecord(raw.grassCuttingConfig).bossRoster);
+  const bossLevelsRaw = asRecord(asRecord(raw.levelConfig).bossLevels);
+  if (bossLevelsRaw && bossRosterRaw) {
+    const rosterList = readArray(bossRosterRaw.roster);
+    const validIds = new Set<string>();
+    for (const item of rosterList) {
+      const id = asString(asRecord(item).id);
+      if (id) validIds.add(id);
+    }
+    for (const lvl of Object.keys(bossLevelsRaw)) {
+      const ref = asString(bossLevelsRaw[lvl]);
+      if (ref && !validIds.has(ref)) {
+        cross.custom(
+          `levelConfig.bossLevels.${lvl}`,
+          `关卡 ${lvl} 引用的 Boss id "${ref}" 在 bossRoster.roster 里找不到，请先在 grassCuttingConfig.bossRoster.roster 中定义`,
+        );
+      }
+    }
+  }
+
   issues.push(...cross.issues);
 
   if (issues.length > 0) throw new ConfigValidationError(issues);
@@ -664,6 +685,133 @@ function validateGrassCuttingConfig(raw: unknown): Validator {
   v.number(bs, 'minionSpawnInterval', 'grassCuttingConfig.bossSettings.minionSpawnInterval', { min: 1 });
   v.integer(bs, 'minionPerWave', 'grassCuttingConfig.bossSettings.minionPerWave', { min: 1, max: 16 });
 
+  // ─────────────── T-022 bossRoster 校验（红线条目：扩展数据代码解耦） ───────────────
+  const br = asRecord(root.bossRoster);
+  if (br && Object.keys(br).length > 0) {
+    const base = 'grassCuttingConfig.bossRoster';
+    const common = v.object(br as Record<string, unknown>, 'common', `${base}.common`);
+    v.integer(common, 'maxPhases', `${base}.common.maxPhases`, { min: 1, max: 8 });
+    v.number(common, 'skillVisualTtl', `${base}.common.skillVisualTtl`, { min: 0 });
+    v.number(common, 'skillCastWarnDuration', `${base}.common.skillCastWarnDuration`, { min: 0 });
+
+    const rosterList = v.array(br as Record<string, unknown>, 'roster', `${base}.roster`, 1);
+    const idSet = new Set<string>();
+    const validSkillTypes = ['ranged', 'slam', 'summon', 'charge', 'doomZone', 'dashBarrage'];
+    rosterList.forEach((item, idx) => {
+      if (!v.isRecord(item)) {
+        v.custom(`${base}.roster[${idx}]`, 'Boss 模板应为对象');
+        return;
+      }
+      const p = `${base}.roster[${idx}]`;
+      const id = v.string(item, 'id', `${p}.id`);
+      v.string(item, 'name', `${p}.name`);
+      v.string(item, 'subject', `${p}.subject`);
+      v.integer(item, 'levelNumber', `${p}.levelNumber`, { min: 1, max: 999 });
+      v.number(item, 'hp', `${p}.hp`, { min: 1 });
+      v.number(item, 'damage', `${p}.damage`, { min: 0 });
+      v.number(item, 'speed', `${p}.speed`, { min: 1 });
+      v.number(item, 'radius', `${p}.radius`, { min: 8 });
+      v.number(item, 'scoreOnKill', `${p}.scoreOnKill`, { min: 0 });
+      v.number(item, 'spawnDelay', `${p}.spawnDelay`, { min: 1 });
+      v.number(item, 'minionSpawnInterval', `${p}.minionSpawnInterval`, { min: 1 });
+      v.integer(item, 'minionPerWave', `${p}.minionPerWave`, { min: 1, max: 16 });
+
+      // id 唯一
+      if (id) {
+        if (idSet.has(id)) v.custom(`${p}.id`, `Boss 模板 id "${id}" 重复，会导致关卡→模板索引错乱`);
+        idSet.add(id);
+      }
+
+      // phases：phaseIndex 0..n、hpThreshold 严格递减（数组下标与声明顺序一致）
+      const phasesList = v.array(item, 'phases', `${p}.phases`, 1);
+      let prevThreshold = Number.POSITIVE_INFINITY;
+      phasesList.forEach((ph, pi) => {
+        if (!v.isRecord(ph)) {
+          v.custom(`${p}.phases[${pi}]`, 'Boss 阶段应为对象');
+          return;
+        }
+        const pp = `${p}.phases[${pi}]`;
+        v.integer(ph, 'phaseIndex', `${pp}.phaseIndex`, { min: 0, max: 16 });
+        const th = v.number(ph, 'hpThreshold', `${pp}.hpThreshold`, { min: 0, max: 1 });
+        v.number(ph, 'speedMult', `${pp}.speedMult`, { min: 0.1, max: 5 });
+        v.number(ph, 'damageMult', `${pp}.damageMult`, { min: 0.1, max: 5 });
+        v.number(ph, 'spawnDelay', `${pp}.spawnDelay`, { min: 1 });
+        if (th > prevThreshold) {
+          v.custom(`${pp}.hpThreshold`, `hpThreshold 必须严格递减（前一项 ${prevThreshold}，当前 ${th}），阶段判定会失序`);
+        }
+        prevThreshold = th;
+      });
+
+      // skills：每个 skill 必填 type+cooldown+color；type 必须命中允许值
+      const skillsObj = v.object(item, 'skills', `${p}.skills`);
+      const skillIds: string[] = [];
+      for (const sk of Object.keys(skillsObj)) {
+        skillIds.push(sk);
+        const sObj = v.object(skillsObj, sk, `${p}.skills.${sk}`);
+        const t = v.string(sObj, 'type', `${p}.skills.${sk}.type`, validSkillTypes);
+        v.number(sObj, 'cooldown', `${p}.skills.${sk}.cooldown`, { min: 0.1 });
+        v.hexColor(sObj, 'color', `${p}.skills.${sk}.color`);
+        // 按 type 做最简校验（具体数值字段由运行时容错；这里只挡硬错误）
+        if (t === 'ranged') {
+          v.number(sObj, 'projectileSpeed', `${p}.skills.${sk}.projectileSpeed`, { min: 1 });
+          v.number(sObj, 'projectileRadius', `${p}.skills.${sk}.projectileRadius`, { min: 1 });
+          v.number(sObj, 'damage', `${p}.skills.${sk}.damage`, { min: 0 });
+          v.number(sObj, 'range', `${p}.skills.${sk}.range`, { min: 1 });
+        } else if (t === 'slam') {
+          v.number(sObj, 'radius', `${p}.skills.${sk}.radius`, { min: 1 });
+          v.number(sObj, 'damage', `${p}.skills.${sk}.damage`, { min: 0 });
+        } else if (t === 'charge' || t === 'dashBarrage') {
+          v.number(sObj, 'speed', `${p}.skills.${sk}.speed`, { min: 1 });
+          v.number(sObj, 'damage', `${p}.skills.${sk}.damage`, { min: 0 });
+        } else if (t === 'doomZone') {
+          v.number(sObj, 'radius', `${p}.skills.${sk}.radius`, { min: 1 });
+          v.number(sObj, 'duration', `${p}.skills.${sk}.duration`, { min: 0.1 });
+          v.number(sObj, 'tickInterval', `${p}.skills.${sk}.tickInterval`, { min: 0.1 });
+          v.number(sObj, 'damage', `${p}.skills.${sk}.damage`, { min: 0 });
+        } else if (t === 'summon') {
+          v.integer(sObj, 'count', `${p}.skills.${sk}.count`, { min: 1, max: 32 });
+          v.number(sObj, 'duration', `${p}.skills.${sk}.duration`, { min: 0.1 });
+          v.number(sObj, 'hpMultiplier', `${p}.skills.${sk}.hpMultiplier`, { min: 0, max: 5 });
+          v.number(sObj, 'speed', `${p}.skills.${sk}.speed`, { min: 1 });
+          v.number(sObj, 'damage', `${p}.skills.${sk}.damage`, { min: 0 });
+        }
+      }
+
+      // phase.skills 引用必须能在 skills 字典里找到
+      phasesList.forEach((ph, pi) => {
+        if (!v.isRecord(ph)) return;
+        const skillRefs = readArray((ph as Record<string, unknown>).skills);
+        for (const ref of skillRefs) {
+          if (typeof ref === 'string' && !skillIds.includes(ref)) {
+            v.custom(
+              `${p}.phases[${pi}].skills`,
+              `阶段引用了未定义的 skillId "${ref}"，必须在 skills 字典里先声明`,
+            );
+          }
+        }
+      });
+    });
+
+    // bossDialogue：仅校验结构（key 命中 roster.id）
+    const dialogue = asRecord(root.bossDialogue);
+    if (dialogue && Object.keys(dialogue).length > 0) {
+      const intro = asRecord(dialogue.intro);
+      const phase = asRecord(dialogue.phase);
+      const death = asRecord(dialogue.death);
+      for (const id of Object.keys(intro)) {
+        if (!idSet.has(id)) v.custom(`${base}.bossDialogue.intro.${id}`, `文案 key "${id}" 在 bossRoster 里找不到对应 Boss`);
+      }
+      for (const id of Object.keys(phase)) {
+        if (!idSet.has(id)) v.custom(`${base}.bossDialogue.phase.${id}`, `文案 key "${id}" 在 bossRoster 里找不到对应 Boss`);
+        const arr = readArray(phase[id]);
+        if (arr.length === 0) v.custom(`${base}.bossDialogue.phase.${id}`, `阶段文案数组不能为空（至少一个阶段）`);
+      }
+      for (const id of Object.keys(death)) {
+        if (!idSet.has(id)) v.custom(`${base}.bossDialogue.death.${id}`, `文案 key "${id}" 在 bossRoster 里找不到对应 Boss`);
+      }
+    }
+  }
+
   const sc = v.object(root, 'subjectCoefficientSettings', 'grassCuttingConfig.subjectCoefficientSettings');
   for (const key of Object.keys(sc)) {
     const entry = v.object(sc, key, `grassCuttingConfig.subjectCoefficientSettings.${key}`);
@@ -805,6 +953,17 @@ function validateLevelConfig(raw: unknown): Validator {
   v.number(lg, 'questionCountGrowth', 'levelConfig.levelDifficultyGrowth.questionCountGrowth', { min: 1 });
   v.number(lg, 'difficultyScaleStep', 'levelConfig.levelDifficultyGrowth.difficultyScaleStep', { min: 0, max: 0.3 });
   v.integer(lg, 'breatherInterval', 'levelConfig.levelDifficultyGrowth.breatherInterval', { min: 2, max: 10 });
+
+  // T-022：bossLevels 关卡→Boss id 索引校验
+  const bossLevels = asRecord(root.bossLevels);
+  if (bossLevels && Object.keys(bossLevels).length > 0) {
+    for (const lvl of Object.keys(bossLevels)) {
+      const ref = asString(bossLevels[lvl]);
+      if (ref.length === 0) {
+        v.custom(`levelConfig.bossLevels.${lvl}`, 'Boss id 应为非空字符串');
+      }
+    }
+  }
   return v;
 }
 

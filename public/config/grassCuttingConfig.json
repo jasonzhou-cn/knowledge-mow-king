@@ -1,5 +1,5 @@
 {
-  "version": "1.2.0",
+  "version": "1.3.0",
   "touchSettings": {
     "joystickCenterX": 160,
     "joystickCenterY": 510,
@@ -80,6 +80,316 @@
     "science": {
       "skillDamageCoefficient": 1.2,
       "skillRangeCoefficient": 1.1
+    }
+  },
+  "bossRoster": {
+    "common": {
+      "maxPhases": 4,
+      "skillVisualTtl": 1.2,
+      "skillCastWarnDuration": 0.5
+    },
+    "roster": [
+      {
+        "id": "boss_overwork_math",
+        "name": "内卷怪·加班老登",
+        "subject": "math",
+        "levelNumber": 5,
+        "hp": 1400,
+        "damage": 18,
+        "speed": 70,
+        "radius": 40,
+        "scoreOnKill": 480,
+        "spawnDelay": 6,
+        "minionSpawnInterval": 3.6,
+        "minionPerWave": 2,
+        "phases": [
+          { "phaseIndex": 0, "hpThreshold": 1.0,  "speedMult": 1.0, "damageMult": 1.0, "spawnDelay": 6,    "skills": ["charge_basic"] },
+          { "phaseIndex": 1, "hpThreshold": 0.6,  "speedMult": 1.15, "damageMult": 1.1, "spawnDelay": 5,    "skills": ["kpi_throw"] },
+          { "phaseIndex": 2, "hpThreshold": 0.3,  "speedMult": 1.35, "damageMult": 1.25, "spawnDelay": 4,   "skills": ["kpi_throw", "keyboard_smash"] }
+        ],
+        "skills": {
+          "charge_basic": {
+            "type": "charge",
+            "cooldown": 3.2,
+            "duration": 0.6,
+            "speed": 380,
+            "damage": 12,
+            "radius": 18,
+            "color": "#ff9f45"
+          },
+          "kpi_throw": {
+            "type": "ranged",
+            "cooldown": 2.4,
+            "projectileSpeed": 280,
+            "projectileRadius": 10,
+            "damage": 14,
+            "range": 480,
+            "color": "#ffcc4d"
+          },
+          "keyboard_smash": {
+            "type": "slam",
+            "cooldown": 4.2,
+            "duration": 0.4,
+            "radius": 140,
+            "damage": 22,
+            "color": "#ff6b6b"
+          }
+        }
+      },
+      {
+        "id": "boss_slacker_math",
+        "name": "躺平怪·摆烂王",
+        "subject": "math",
+        "levelNumber": 10,
+        "hp": 1900,
+        "damage": 22,
+        "speed": 54,
+        "radius": 44,
+        "scoreOnKill": 540,
+        "spawnDelay": 7,
+        "minionSpawnInterval": 4.2,
+        "minionPerWave": 3,
+        "phases": [
+          { "phaseIndex": 0, "hpThreshold": 1.0,  "speedMult": 0.85, "damageMult": 1.0,  "spawnDelay": 7,   "skills": ["charge_basic"] },
+          { "phaseIndex": 1, "hpThreshold": 0.6,  "speedMult": 0.7,  "damageMult": 1.1,  "spawnDelay": 6,   "skills": ["lazy_breath"] },
+          { "phaseIndex": 2, "hpThreshold": 0.3,  "speedMult": 0.55, "damageMult": 1.3,  "spawnDelay": 5,   "skills": ["lazy_breath", "dream_charge"] }
+        ],
+        "skills": {
+          "charge_basic": {
+            "type": "charge",
+            "cooldown": 3.6,
+            "duration": 0.55,
+            "speed": 320,
+            "damage": 12,
+            "radius": 18,
+            "color": "#a8c2d6"
+          },
+          "lazy_breath": {
+            "type": "doomZone",
+            "cooldown": 5.0,
+            "duration": 3.2,
+            "radius": 110,
+            "damage": 8,
+            "tickInterval": 0.6,
+            "color": "#c9a227"
+          },
+          "dream_charge": {
+            "type": "dashBarrage",
+            "cooldown": 4.6,
+            "dashes": 3,
+            "dashDuration": 0.45,
+            "dashGap": 0.5,
+            "dashSpeed": 360,
+            "speed": 360,
+            "damage": 16,
+            "radius": 22,
+            "color": "#7fd8ff"
+          }
+        }
+      },
+      {
+        "id": "boss_grammar_king_english",
+        "name": "完形克星·语法之王",
+        "subject": "english",
+        "levelNumber": 14,
+        "hp": 2600,
+        "damage": 24,
+        "speed": 62,
+        "radius": 46,
+        "scoreOnKill": 600,
+        "spawnDelay": 8,
+        "minionSpawnInterval": 4,
+        "minionPerWave": 3,
+        "phases": [
+          { "phaseIndex": 0, "hpThreshold": 1.0,  "speedMult": 1.0,  "damageMult": 1.0,  "spawnDelay": 8,   "skills": ["rune_bolt"] },
+          { "phaseIndex": 1, "hpThreshold": 0.6,  "speedMult": 1.05, "damageMult": 1.15, "spawnDelay": 7,   "skills": ["rune_bolt", "spell_shake"] },
+          { "phaseIndex": 2, "hpThreshold": 0.3,  "speedMult": 1.15, "damageMult": 1.3,  "spawnDelay": 5,   "skills": ["rune_bolt", "spell_shake", "wrong_barrage"] }
+        ],
+        "skills": {
+          "rune_bolt": {
+            "type": "ranged",
+            "cooldown": 2.0,
+            "projectileSpeed": 300,
+            "projectileRadius": 11,
+            "damage": 16,
+            "range": 540,
+            "color": "#7fd8ff"
+          },
+          "spell_shake": {
+            "type": "slam",
+            "cooldown": 4.0,
+            "duration": 0.5,
+            "radius": 180,
+            "damage": 18,
+            "color": "#35d0a5"
+          },
+          "wrong_barrage": {
+            "type": "ranged",
+            "cooldown": 3.2,
+            "projectileSpeed": 340,
+            "projectileRadius": 9,
+            "damage": 12,
+            "range": 520,
+            "color": "#ff6b6b",
+            "pelletCount": 5,
+            "spread": 60
+          }
+        }
+      },
+      {
+        "id": "boss_element_science",
+        "name": "元素怪·化合狂魔",
+        "subject": "science",
+        "levelNumber": 17,
+        "hp": 3200,
+        "damage": 28,
+        "speed": 66,
+        "radius": 48,
+        "scoreOnKill": 720,
+        "spawnDelay": 8,
+        "minionSpawnInterval": 3.5,
+        "minionPerWave": 4,
+        "phases": [
+          { "phaseIndex": 0, "hpThreshold": 1.0,  "speedMult": 1.0,  "damageMult": 1.0,  "spawnDelay": 8,   "skills": ["acid_mist"] },
+          { "phaseIndex": 1, "hpThreshold": 0.6,  "speedMult": 1.05, "damageMult": 1.2,  "spawnDelay": 6,   "skills": ["acid_mist", "elemental_summon"] },
+          { "phaseIndex": 2, "hpThreshold": 0.3,  "speedMult": 1.1,  "damageMult": 1.35, "spawnDelay": 5,   "skills": ["acid_mist", "elemental_summon", "acid_mist_burst"] }
+        ],
+        "skills": {
+          "acid_mist": {
+            "type": "doomZone",
+            "cooldown": 4.5,
+            "duration": 3.6,
+            "radius": 130,
+            "damage": 10,
+            "tickInterval": 0.5,
+            "color": "#3ddc84"
+          },
+          "elemental_summon": {
+            "type": "summon",
+            "cooldown": 6.0,
+            "count": 3,
+            "duration": 8.0,
+            "hpMultiplier": 0.5,
+            "speed": 100,
+            "damage": 8,
+            "radius": 12,
+            "color": "#35d0a5"
+          },
+          "acid_mist_burst": {
+            "type": "doomZone",
+            "cooldown": 5.5,
+            "duration": 4.0,
+            "radius": 160,
+            "damage": 14,
+            "tickInterval": 0.45,
+            "color": "#1f9c78"
+          }
+        }
+      },
+      {
+        "id": "boss_exam_god_ultimate",
+        "name": "深渊试炼·考神",
+        "subject": "ultimate",
+        "levelNumber": 20,
+        "hp": 4200,
+        "damage": 32,
+        "speed": 72,
+        "radius": 52,
+        "scoreOnKill": 1000,
+        "spawnDelay": 9,
+        "minionSpawnInterval": 3.0,
+        "minionPerWave": 4,
+        "phases": [
+          { "phaseIndex": 0, "hpThreshold": 1.0,  "speedMult": 1.0,  "damageMult": 1.0,  "spawnDelay": 9,   "skills": ["rune_bolt", "acid_mist"] },
+          { "phaseIndex": 1, "hpThreshold": 0.5,  "speedMult": 1.1,  "damageMult": 1.2,  "spawnDelay": 6,   "skills": ["past_boss_summon", "rune_bolt"] },
+          { "phaseIndex": 2, "hpThreshold": 0.25, "speedMult": 1.2,  "damageMult": 1.4,  "spawnDelay": 5,   "skills": ["time_freeze_trap", "wrong_barrage"] },
+          { "phaseIndex": 3, "hpThreshold": 0.1,  "speedMult": 1.4,  "damageMult": 1.7,  "spawnDelay": 4,   "skills": ["explosive_dash", "rune_bolt"] }
+        ],
+        "skills": {
+          "rune_bolt": {
+            "type": "ranged",
+            "cooldown": 1.8,
+            "projectileSpeed": 320,
+            "projectileRadius": 12,
+            "damage": 18,
+            "range": 580,
+            "color": "#ffcc4d"
+          },
+          "acid_mist": {
+            "type": "doomZone",
+            "cooldown": 4.0,
+            "duration": 3.8,
+            "radius": 150,
+            "damage": 12,
+            "tickInterval": 0.45,
+            "color": "#3ddc84"
+          },
+          "past_boss_summon": {
+            "type": "summon",
+            "cooldown": 7.0,
+            "count": 4,
+            "duration": 10.0,
+            "hpMultiplier": 0.35,
+            "speed": 110,
+            "damage": 10,
+            "radius": 14,
+            "color": "#ff6b6b"
+          },
+          "time_freeze_trap": {
+            "type": "doomZone",
+            "cooldown": 5.0,
+            "duration": 2.6,
+            "radius": 100,
+            "damage": 0,
+            "tickInterval": 1.0,
+            "slowFactor": 0.5,
+            "color": "#7fd8ff"
+          },
+          "wrong_barrage": {
+            "type": "ranged",
+            "cooldown": 2.6,
+            "projectileSpeed": 360,
+            "projectileRadius": 10,
+            "damage": 14,
+            "range": 540,
+            "color": "#ff6b6b",
+            "pelletCount": 7,
+            "spread": 75
+          },
+          "explosive_dash": {
+            "type": "charge",
+            "cooldown": 2.4,
+            "duration": 0.5,
+            "speed": 520,
+            "damage": 26,
+            "radius": 24,
+            "color": "#ffa94d"
+          }
+        }
+      }
+    ]
+  },
+  "bossDialogue": {
+    "intro": {
+      "boss_overwork_math": "",
+      "boss_slacker_math": "",
+      "boss_grammar_king_english": "",
+      "boss_element_science": "",
+      "boss_exam_god_ultimate": ""
+    },
+    "phase": {
+      "boss_overwork_math": ["", "", ""],
+      "boss_slacker_math": ["", "", ""],
+      "boss_grammar_king_english": ["", "", ""],
+      "boss_element_science": ["", "", ""],
+      "boss_exam_god_ultimate": ["", "", "", ""]
+    },
+    "death": {
+      "boss_overwork_math": "",
+      "boss_slacker_math": "",
+      "boss_grammar_king_english": "",
+      "boss_element_science": "",
+      "boss_exam_god_ultimate": ""
     }
   }
 }

@@ -1,5 +1,12 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
+  "bossLevels": {
+    "5":  "boss_overwork_math",
+    "10": "boss_slacker_math",
+    "14": "boss_grammar_king_english",
+    "17": "boss_element_science",
+    "20": "boss_exam_god_ultimate"
+  },
   "levels": [
     {
       "level": 1,
@@ -59,7 +66,7 @@
       "subject": "math",
       "unlockCondition": "level >= 4",
       "questionCount": 6,
-      "bossLevel": false,
+      "bossLevel": true,
       "breatherLevel": false,
       "difficultyScale": 1.45,
       "gameTime": 60,
@@ -124,7 +131,7 @@
       "subject": "english",
       "unlockCondition": "level >= 9",
       "questionCount": 11,
-      "bossLevel": false,
+      "bossLevel": true,
       "breatherLevel": false,
       "difficultyScale": 1.95,
       "gameTime": 60,
@@ -215,7 +222,7 @@
       "subject": "science",
       "unlockCondition": "level >= 16",
       "questionCount": 6,
-      "bossLevel": false,
+      "bossLevel": true,
       "breatherLevel": true,
       "difficultyScale": 1.0,
       "gameTime": 70,
@@ -254,7 +261,7 @@
       "subject": "science",
       "unlockCondition": "level >= 19",
       "questionCount": 15,
-      "bossLevel": false,
+      "bossLevel": true,
       "breatherLevel": false,
       "difficultyScale": 3.15,
       "gameTime": 60,

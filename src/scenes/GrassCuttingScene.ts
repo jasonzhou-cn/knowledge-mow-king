@@ -34,6 +34,8 @@ import { KillFxSystem } from '../systems/KillFxSystem';
 import { MonsterSpawner, type Monster } from '../systems/MonsterSpawner';
 import { ProjectileSystem, type ProjectileHitPayload } from '../systems/ProjectileSystem';
 import { SafeArea, ENABLE_SAFE_AREA } from '../systems/SafeArea';
+import { DoomZoneSystem } from '../systems/DoomZone';
+import { BossSkillController } from '../systems/BossSkillController';
 import { getCanvasMode } from '../config/CanvasMode';
 import { sfx } from '../systems/SfxController';
 import { WeaponSystem, type AttackAction } from '../systems/WeaponSystem';
@@ -141,6 +143,12 @@ export class GrassCuttingScene extends Phaser.Scene {
   private hud!: CombatHud;
   private weaponBar!: WeaponBar;
   private floaters!: FloatingTextPool;
+  /** T-022：Boss 持续伤害区域系统（仅 Boss 关创建） */
+  private doomZone: DoomZoneSystem | null = null;
+  /** T-022：Boss 技能调度器（仅 Boss 关创建） */
+  private bossSkill: BossSkillController | null = null;
+  /** T-022：阶段切换与 Boss 死亡的解绑函数（resetRunState 时调用） */
+  private bossUnsubFns: Array<() => void> = [];
   /** Boss 关专属顶部血条（非 Boss 关为 null，全部路径短路） */
   private bossBarBg: Phaser.GameObjects.Graphics | null = null;
   private bossBarFill: Phaser.GameObjects.Graphics | null = null;
@@ -341,6 +349,17 @@ export class GrassCuttingScene extends Phaser.Scene {
         .setOrigin(0.5)
         .setDepth(1007);
       this.bossBarBox = { x: bx, y: by, w: barW, h: barH };
+
+      // T-022：创建 DoomZoneSystem 与 BossSkillController
+      this.doomZone = new DoomZoneSystem(this, {
+        poolSize: 24,
+        depth: 95,
+        onTickPlayer: (damage) => {
+          // 持续伤害走无敌帧 + 玩家扣血；跳帧判断交给 CombatSystem.shouldCheckThisFrame()
+          if (damage > 0) this.applyDoomZoneDamage(damage);
+        },
+      });
+      // 等 Boss 生成后再 start() BossSkillController（在 updateBoss 时机）
     }
 
     this.setupInput();
@@ -390,8 +409,11 @@ export class GrassCuttingScene extends Phaser.Scene {
         get bossSpawned()  { return self.spawner ? self.spawner.bossSpawned : null; },
         get bossAlive()    { return self.spawner ? self.spawner.bossAlive : null; },
         get bossHpRatio()  { return self.spawner ? self.spawner.bossHpRatio : null; },
+        get bossPhaseIndex() { return self.spawner ? self.spawner.bossPhaseIndex : null; },
         get bossX()        { const p = self.spawner && self.spawner.bossPosition; return p ? p.x : null; },
         get bossY()        { const p = self.spawner && self.spawner.bossPosition; return p ? p.y : null; },
+        // T-022：DoomZone 活动区数量（debug/verify 用）
+        get doomZoneCount() { return self.doomZone ? self.doomZone.size : 0; },
       };
     }
   }
@@ -404,6 +426,16 @@ export class GrassCuttingScene extends Phaser.Scene {
    * 必须与字段声明处的初始值保持一致。
    */
   private resetRunState(): void {
+    // T-022：解绑 Boss 阶段 / 死亡回调，避免上一局的订阅泄漏到下一局
+    for (const fn of this.bossUnsubFns) {
+      try { fn(); } catch { /* 忽略解绑异常 */ }
+    }
+    this.bossUnsubFns = [];
+    this.bossSkill?.destroy();
+    this.bossSkill = null;
+    this.doomZone?.destroy();
+    this.doomZone = null;
+
     this.ended = false;
     this.score = 0;
     this.kills = 0;
@@ -443,14 +475,105 @@ export class GrassCuttingScene extends Phaser.Scene {
     this.spawner.setProgress(progress);
     this.spawner.update(dt, this.player.x, this.player.y);
 
+    // T-022：Boss 出生后启动技能调度器（懒启动：update 循环里等 Boss 真正出现）
+    this.maybeStartBossSkillController();
+
     this.projectiles.update(dt, this.spawner.monsters, (payload) => this.onProjectileHit(payload));
 
     this.combat.update();
     this.updateContact(dt);
     this.killFx.updateFx(dt);
 
+    // T-022：推进 Boss 技能调度与 DoomZone（按缩放 dt，与战斗同步）
+    this.bossSkill?.update(dt);
+    this.doomZone?.update(dt, this.player.x, this.player.y);
+
     this.updateTimer(dt);
     this.updateHud();
+  }
+
+  /**
+   * T-022：Boss 一旦生成就立刻构建 BossSkillController 并 start()。
+   * 用懒启动避免在 create() 时还未生成 Boss 时引用 bossMonster。
+   * 同时挂阶段切换 / 死亡的回调钩子（含退订函数）。
+   */
+  private maybeStartBossSkillController(): void {
+    if (!this.packed.isBossLevel) return;
+    if (!this.spawner.bossSpawned) return;
+    if (this.bossSkill !== null) return;
+    if (!this.doomZone) return;
+    const bossMonster = this.spawner.monsters.find((m) => m.isBoss && m.alive);
+    if (!bossMonster) return;
+    const bossTemplate = this.packed.boss;
+    // ResolvedBossTemplate 应有 phases / skills；如果 phases 为空（旧形态）就退化为不调度
+    if (!bossTemplate.phases || bossTemplate.phases.length === 0) return;
+
+    const unloadText = (kind: 'death' | 'phase', phaseIndex?: number): string => {
+      try {
+        const loader = ConfigLoader.getInstance();
+        const dialogue = loader.getConfig('grassCuttingConfig').bossDialogue;
+        if (!dialogue) return '';
+        if (kind === 'death') return dialogue.death?.[bossTemplate.bossId] ?? '';
+        return dialogue.phase?.[bossTemplate.bossId]?.[phaseIndex ?? 0] ?? '';
+      } catch {
+        return '';
+      }
+    };
+
+    this.bossSkill = new BossSkillController({
+      scene: this,
+      boss: {
+        id: bossTemplate.bossId,
+        name: bossTemplate.bossName,
+        subject: bossTemplate.subject,
+        levelNumber: bossTemplate.levelNumber,
+        hp: bossTemplate.hp,
+        damage: bossTemplate.damage,
+        speed: bossTemplate.speed,
+        radius: bossTemplate.radius,
+        scoreOnKill: bossTemplate.scoreOnKill,
+        spawnDelay: bossTemplate.spawnDelay,
+        minionSpawnInterval: bossTemplate.minionSpawnInterval,
+        minionPerWave: bossTemplate.minionPerWave,
+        phases: bossTemplate.phases.map((p) => ({
+          phaseIndex: p.phaseIndex,
+          hpThreshold: p.hpThreshold,
+          speedMult: p.speedMult,
+          damageMult: p.damageMult,
+          spawnDelay: p.spawnDelay,
+          skills: p.skills,
+        })),
+        skills: bossTemplate.skills,
+      },
+      bossSprite: bossMonster.sprite,
+      getPlayerPosition: () => ({ x: this.player.x, y: this.player.y }),
+      projectileSystem: this.projectiles,
+      monsterSpawner: this.spawner,
+      doomZoneSystem: this.doomZone,
+      onDoomZoneHit: (damage) => this.applyDoomZoneDamage(damage),
+      hooks: {
+        onPhaseChange: (newPhase) => {
+          const line = unloadText('phase', newPhase);
+          if (line) this.floaters.spawn(this.player.x, this.player.y - 80, line, css(Palette.accent.gold), '⚡');
+        },
+      },
+    });
+    this.bossSkill.start();
+
+    // 订阅阶段切换与 Boss 死亡回调（把退订函数存起来，resetRunState 时调用）
+    this.bossUnsubFns.push(
+      this.spawner.onBossPhaseChange((newPhase) => {
+        if (!this.bossSkill) return;
+        this.bossSkill.switchPhase(newPhase);
+      }),
+    );
+    this.bossUnsubFns.push(
+      this.spawner.onBossDeath(() => {
+        this.bossSkill?.stop();
+        const line = unloadText('death');
+        if (line) this.floaters.spawn(this.player.x, this.player.y - 60, line, css(Palette.accent.gold), '★');
+      }),
+    );
   }
 
   // ───────────────────────── 输入 ─────────────────────────
@@ -830,6 +953,13 @@ export class GrassCuttingScene extends Phaser.Scene {
     }
   }
 
+  /** T-022：DoomZone 对玩家的伤害（走无敌帧 + 接触冷却，避免一次性炸死） */
+  private applyDoomZoneDamage(amount: number): void {
+    if (this.invulnerableTimer <= 0 && this.contactCooldown <= 0) {
+      this.applyDamageToPlayer(amount);
+    }
+  }
+
   /** 倒计时推进 */
   private updateTimer(dt: number): void {
     this.timeLeft -= dt;
@@ -946,6 +1076,9 @@ export class GrassCuttingScene extends Phaser.Scene {
     this.projectiles.clear();
     // 必须清空特效并恢复时间缩放，否则会带着慢动作与残留碎片进入结算场景
     this.killFx.clear();
+    // T-022：清空 DoomZone 与 BossSkillController，避免残留物进入结算场景
+    this.bossSkill?.stop();
+    this.doomZone?.clear();
 
     const data0 = this.data0;
     if (!data0) return;
@@ -966,6 +1099,16 @@ export class GrassCuttingScene extends Phaser.Scene {
 
   /** 场景销毁时清理系统资源 */
   shutdown(): void {
+    // T-022：先解绑回调，避免 destroy 后还有遗留订阅
+    for (const fn of this.bossUnsubFns) {
+      try { fn(); } catch { /* 忽略 */ }
+    }
+    this.bossUnsubFns = [];
+    this.bossSkill?.destroy();
+    this.bossSkill = null;
+    this.doomZone?.destroy();
+    this.doomZone = null;
+
     this.input.off('pointerdown', this.onPointerDown);
     this.input.off('pointermove', this.onPointerMove);
     this.input.off('pointerup', this.onPointerUp);

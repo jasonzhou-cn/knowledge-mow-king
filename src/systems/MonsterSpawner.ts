@@ -14,7 +14,7 @@
  */
 
 import Phaser from 'phaser';
-import type { BossSettings, DifficultySettings } from '../config/types';
+import type { BossSettings, DifficultySettings, ResolvedBossTemplate } from '../config/types';
 import { Palette } from '../ui/Palette';
 import { clamp01, lerp } from '../utils/MathUtil';
 
@@ -70,8 +70,9 @@ export interface MonsterSpawnerOptions {
   corpseDrag: number;
   /** 是否 Boss 关（levelConfig.bossLevel）；true 时按 boss 数值生成 Boss */
   isBossLevel?: boolean;
-  /** Boss 数值（仅 isBossLevel 时消费） */
-  boss?: BossSettings;
+  /** Boss 数值（仅 isBossLevel 时消费）。
+   *  T-022 升级：兼容旧 BossSettings 形态，新接口消费 ResolvedBossTemplate（含阶段 + 技能）。 */
+  boss?: BossSettings | ResolvedBossTemplate;
 }
 
 export class MonsterSpawner {
@@ -90,6 +91,12 @@ export class MonsterSpawner {
   private bossSpawnTimer = 0;
   /** Boss 是否已生成 */
   private bossSpawnedFlag = false;
+  /** T-022：Boss 当前阶段序号（0..n，未生成或已死亡时 = 0） */
+  private bossCurrentPhase = 0;
+  /** T-022：Boss 阶段切换回调列表（按订阅顺序触发） */
+  private phaseChangeListeners: Array<(newPhaseIndex: number) => void> = [];
+  /** T-022：Boss 死亡回调列表（用于 BossSkillController 停止调度） */
+  private bossDeathListeners: Array<() => void> = [];
 
   /** 由 setProgress 计算出的当前难度值 */
   private spawnInterval = 1;
@@ -159,6 +166,30 @@ export class MonsterSpawner {
     return clamp01(b.hp / b.maxHp);
   }
 
+  /** T-022：Boss 当前阶段序号（0..n） */
+  get bossPhaseIndex(): number {
+    return this.bossCurrentPhase;
+  }
+
+  /** T-022：注册 Boss 阶段切换回调（MonsterSpawner 在 hp 跨过阈值时触发）。
+   *  返回退订函数，避免外部忘记解绑造成泄漏。 */
+  onBossPhaseChange(listener: (newPhaseIndex: number) => void): () => void {
+    this.phaseChangeListeners.push(listener);
+    return () => {
+      const idx = this.phaseChangeListeners.indexOf(listener);
+      if (idx >= 0) this.phaseChangeListeners.splice(idx, 1);
+    };
+  }
+
+  /** T-022：注册 Boss 死亡回调（用于 BossSkillController 停止调度）。 */
+  onBossDeath(listener: () => void): () => void {
+    this.bossDeathListeners.push(listener);
+    return () => {
+      const idx = this.bossDeathListeners.indexOf(listener);
+      if (idx >= 0) this.bossDeathListeners.splice(idx, 1);
+    };
+  }
+
   /** Boss 当前坐标；未生成或已死亡返回 null（供自动瞄准验证/调试） */
   get bossPosition(): { x: number; y: number } | null {
     const b = this.bossMonster;
@@ -201,6 +232,7 @@ export class MonsterSpawner {
     if (this.running) {
       this.updateSpawning(dt);
       this.updateBoss(dt);
+      this.checkBossPhaseChange();
     }
     this.updateMonsters(dt, playerX, playerY);
     this.updateCorpses(dt);
@@ -215,6 +247,12 @@ export class MonsterSpawner {
     monster.hp -= amount;
     if (monster.hp <= 0) {
       this.kill(monster);
+      // T-022：Boss 死亡时通知外部停止技能调度
+      if (monster.isBoss) {
+        for (const fn of this.bossDeathListeners) {
+          try { fn(); } catch { /* 忽略回调异常，避免影响战斗 */ }
+        }
+      }
       return true;
     }
     // 血量越低颜色越暗，给玩家「快死了」的即时反馈（无需额外血条对象）
@@ -251,6 +289,8 @@ export class MonsterSpawner {
     this.bossMonster = null;
     this.bossSpawnTimer = 0;
     this.bossSpawnedFlag = false;
+    this.bossCurrentPhase = 0;
+    this.phaseChangeListeners.length = 0;
   }
 
   /** 销毁对象池 */
@@ -418,6 +458,40 @@ export class MonsterSpawner {
     this.activeList.push(monster);
     this.bossMonster = monster;
     this.bossSpawnedFlag = true;
+    this.bossCurrentPhase = 0;
+  }
+
+  /** T-022：检查 Boss HP 是否跨过阶段阈值；跨过则切换阶段 + 应用 phase.speedMult/damageMult + 通知监听者。 */
+  private checkBossPhaseChange(): void {
+    const b = this.bossMonster;
+    if (!b || !b.alive) return;
+    const boss = this.opts.boss;
+    if (!boss) return;
+    // 兼容旧 BossSettings（无 phases）：维持旧行为，不切阶段
+    const phases = (boss as ResolvedBossTemplate).phases;
+    if (!Array.isArray(phases) || phases.length === 0) return;
+
+    const ratio = clamp01(b.hp / b.maxHp);
+    // phases 按 phaseIndex 升序排列（hpThreshold 自然递减）；
+    // 找到 ratio ≤ threshold 的最远阶段（最高 phaseIndex）。
+    let nextPhaseIndex = this.bossCurrentPhase;
+    for (let i = phases.length - 1; i >= 0; i--) {
+      if (ratio <= phases[i].hpThreshold) nextPhaseIndex = i;
+    }
+    if (nextPhaseIndex === this.bossCurrentPhase) return;
+
+    const prevPhase = phases[this.bossCurrentPhase];
+    const newPhase = phases[nextPhaseIndex];
+    // 应用阶段乘数：与上一阶段相比的差量套用
+    const speedDelta = newPhase.speedMult - (prevPhase?.speedMult ?? 1);
+    const damageDelta = newPhase.damageMult - (prevPhase?.damageMult ?? 1);
+    b.speed = Math.max(1, b.speed * (1 + speedDelta));
+    b.damage = Math.max(0, b.damage * (1 + damageDelta));
+    this.bossCurrentPhase = nextPhaseIndex;
+
+    for (const fn of this.phaseChangeListeners) {
+      try { fn(nextPhaseIndex); } catch { /* 忽略回调异常，避免影响战斗 */ }
+    }
   }
 
   /** 驱动所有小怪追向玩家 */
