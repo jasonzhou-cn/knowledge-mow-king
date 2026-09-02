@@ -4501,6 +4501,156 @@
       "answerIndex": 0,
       "explanation": "树木草根能固土保水，植树造林是防治水土流失的有效措施；开荒、过牧、滥伐都会加剧流失。",
       "solution": "树根和草能牢牢抓住土壤、减缓水流冲刷，植树造林是防止水土流失最有效的办法。"
+    },
+    {
+      "id": "math-101",
+      "subject": "math",
+      "difficulty": 1,
+      "question": "如果你的暑假还剩 7 天，每天做 8 小时作业，几天能做完？",
+      "options": [
+        "7 天",
+        "永远做不完",
+        "交给『答案』",
+        "删游戏"
+      ],
+      "answerIndex": 0,
+      "explanation": "7 天 × 每天 8 小时 = 56 小时，正常情况 7 天内能做完（理论上）。",
+      "solution": "7 天 × 8 小时 = 56 小时，按计划是 7 天能做完。但现实往往是『永远做不完』——别真信沙雕选项，看清楚题目问的是数学不是人生。"
+    },
+    {
+      "id": "math-102",
+      "subject": "math",
+      "difficulty": 1,
+      "question": "小红期末考了 60 分，爸妈说『再加 20 分就奖励你』。需要再加多少分才能拿到奖励？",
+      "options": [
+        "20 分",
+        "不可能的任务",
+        "改试卷",
+        "换爸妈"
+      ],
+      "answerIndex": 0,
+      "explanation": "60 + 20 = 80 分，所以需要再加 20 分。",
+      "solution": "60 加 20 就是 80 分，刚好到奖励线。沙雕选项虽然诱人，但题目就是个加法，别被带跑。"
+    },
+    {
+      "id": "math-103",
+      "subject": "math",
+      "difficulty": 2,
+      "question": "一个班有 50 人，今天请病假 5 人，事假 3 人，剩下多少人到课？",
+      "options": [
+        "42 人",
+        "都到了",
+        "谁也别来",
+        "改成网课"
+      ],
+      "answerIndex": 0,
+      "explanation": "50 − 5 − 3 = 42 人。",
+      "solution": "总人数 50 减去病假 5 人再减事假 3 人：50 − 5 = 45，45 − 3 = 42。沙雕选项再诱人，也得先算减法。"
+    },
+    {
+      "id": "math-104",
+      "subject": "math",
+      "difficulty": 1,
+      "question": "小明零花钱 100 元，买奥特曼卡片花 65 元，还剩多少元？",
+      "options": [
+        "35 元",
+        "妈妈会补",
+        "偷爸爸的",
+        "下个月再说"
+      ],
+      "answerIndex": 0,
+      "explanation": "100 − 65 = 35 元。",
+      "solution": "100 减 65，个位 0 减不了借个 10，10 − 5 = 5；十位 9 − 6 = 3，所以是 35 元。"
+    },
+    {
+      "id": "english-101",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "'Homework' 的中文意思是？",
+      "options": [
+        "作业",
+        "不想做的",
+        "想撕掉的",
+        "消失的东西"
+      ],
+      "answerIndex": 0,
+      "explanation": "Homework = 家庭作业，简称『作业』。",
+      "solution": "Homework 是 home（家）+ work（工作），就是『家庭作业』。后面三个选项虽然扎心，但它们不是 homework 的中文意思。"
+    },
+    {
+      "id": "english-102",
+      "subject": "english",
+      "difficulty": 1,
+      "question": "老师上课说 'Open your books'，你应该做什么？",
+      "options": [
+        "打开课本",
+        "打开零食",
+        "打开手机",
+        "打开新世界"
+      ],
+      "answerIndex": 0,
+      "explanation": "Open your books = 打开你们的书，就是打开课本。",
+      "solution": "open 是『打开』，books 是『书本』。所以是让你打开课本。零食、手机、新世界都不算 books。"
+    },
+    {
+      "id": "english-103",
+      "subject": "english",
+      "difficulty": 2,
+      "question": "'I am tired.' 的中文意思是？",
+      "options": [
+        "我累了",
+        "我困了",
+        "我想躺平",
+        "我想退休"
+      ],
+      "answerIndex": 0,
+      "explanation": "I am tired = 我累了/我疲倦了，最贴切的中文是『我累了』。",
+      "solution": "tired 在这里是形容词『疲倦的』，主语是 I（我），所以最直接的中文是『我累了』。其他选项更像是内心戏不是翻译。"
+    },
+    {
+      "id": "science-101",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "水的化学式是？",
+      "options": [
+        "H₂O",
+        "HO",
+        "露水",
+        "眼泪"
+      ],
+      "answerIndex": 0,
+      "explanation": "水由 2 个氢原子和 1 个氧原子组成，化学式 H₂O。",
+      "solution": "水分子是 H₂O：H 代表氢，O 代表氧，下标 2 表示有 2 个氢原子。HO、露水、眼泪虽然也是『H₂O』，但不是化学式写法。"
+    },
+    {
+      "id": "science-102",
+      "subject": "science",
+      "difficulty": 1,
+      "question": "下列哪种现象属于物理变化？",
+      "options": [
+        "冰块化成水",
+        "纸张燃烧",
+        "铁生锈",
+        "牛奶变酸奶"
+      ],
+      "answerIndex": 0,
+      "explanation": "冰化成水只是状态改变（H₂O 没变），是物理变化；燃烧、生锈、变酸奶都生成了新物质，是化学变化。",
+      "solution": "看有没有新物质生成。冰→水都是 H₂O，只是固态变液态，没有新物质，所以是物理变化。燃烧、生锈、酸奶发酵都产生了新物质，是化学变化。"
+    },
+    {
+      "id": "science-103",
+      "subject": "science",
+      "difficulty": 2,
+      "question": "人呼吸时吸入的气体主要是？",
+      "options": [
+        "氧气",
+        "二氧化碳",
+        "氮气",
+        "仙气"
+      ],
+      "answerIndex": 0,
+      "explanation": "人呼吸是为了获取氧气（O₂），吸入的主要有效成分是氧气，排出的是二氧化碳。",
+      "solution": "呼吸是为了让氧气进入身体、二氧化碳排出体外。虽然空气里氮气最多（约 78%），但『吸入的主要气体』在生物意义上指的是氧气——人体真正要用的是它。"
     }
   ]
 }
