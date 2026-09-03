@@ -203,6 +203,15 @@ export interface QuizHudOptions {
   width: number;
   total: number;
   timeLimit: number;
+  /**
+   * viewport 缩放系数（与场景 vpScale = min(w/960, h/640) 一致）。
+   * HUD 的字号 / 间距 / 进度条尺寸全部随之缩放，避免固定像素在
+   * 方案 C（RESIZE）小视口下侵入题干卡片与反馈文字区（实测反馈 2026-09-03）。
+   */
+  scale: number;
+  /** 题干面板顶部 y 与高度：倒计时 / 进度条排在面板正下方，保证不与卡片、反馈文字重叠 */
+  panelTop: number;
+  panelHeight: number;
 }
 
 /**
@@ -214,25 +223,33 @@ export class QuizHud {
   private readonly comboText: Phaser.GameObjects.Text;
   private readonly timeText: Phaser.GameObjects.Text;
   private readonly bar: Phaser.GameObjects.Graphics;
-  private readonly barWidth = 320;
+  private readonly barWidth: number;
+  private readonly barH: number;
+  private readonly barY: number;
 
   constructor(private readonly scene: Phaser.Scene, opts: QuizHudOptions) {
     const w = opts.width;
+    const s = opts.scale;
 
     this.progressText = scene.add
-      .text(20, 14, `第 1 / ${opts.total} 题`, textStyle(20, css(Palette.text.primary)))
+      .text(16 * s, 10 * s, `第 1 / ${opts.total} 题`, textStyle(Math.round(20 * s), css(Palette.text.primary)))
       .setDepth(1002);
 
     this.comboText = scene.add
-      .text(w - 20, 14, '连对 0', textStyle(20, css(Palette.accent.gold)))
+      .text(w - 16 * s, 10 * s, '连对 0', textStyle(Math.round(20 * s), css(Palette.accent.gold)))
       .setOrigin(1, 0)
       .setDepth(1002);
 
+    // 倒计时 + 进度条：排在题干面板正下方（不再用固定 y=46/76 侵入卡片区）
+    const timeY = opts.panelTop + opts.panelHeight + 6 * s;
     this.timeText = scene.add
-      .text(w / 2, 46, '', textStyle(22, css(Palette.accent.secondary)))
+      .text(w / 2, timeY, '', textStyle(Math.round(22 * s), css(Palette.accent.secondary)))
       .setOrigin(0.5, 0)
       .setDepth(1002);
 
+    this.barWidth = 320 * s;
+    this.barH = 10 * s;
+    this.barY = timeY + 30 * s;
     this.bar = scene.add.graphics().setDepth(1002);
   }
 
@@ -256,13 +273,12 @@ export class QuizHud {
     const ratio = clamp01(seconds / Math.max(0.1, total));
     const w = this.scene.scale.width;
     const x = (w - this.barWidth) / 2;
-    const y = 76;
 
     this.bar.clear();
     this.bar.fillStyle(Palette.background.panel, 1);
-    this.bar.fillRoundedRect(x, y, this.barWidth, 10, 5);
+    this.bar.fillRoundedRect(x, this.barY, this.barWidth, this.barH, this.barH / 2);
     this.bar.fillStyle(ratio < 0.25 ? Palette.status.wrong : Palette.accent.primary, 1);
-    this.bar.fillRoundedRect(x, y, this.barWidth * ratio, 10, 5);
+    this.bar.fillRoundedRect(x, this.barY, this.barWidth * ratio, this.barH, this.barH / 2);
 
     this.timeText.setColor(ratio < 0.25 ? css(Palette.status.wrong) : css(Palette.accent.secondary));
   }

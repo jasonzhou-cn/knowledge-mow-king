@@ -55,6 +55,9 @@ export class QuestionScene extends Phaser.Scene {
   private resultText!: Phaser.GameObjects.Text;
   private hintText!: Phaser.GameObjects.Text;
   private panel!: Phaser.GameObjects.Graphics;
+  /** 题干面板几何（hud 布局与反馈文字定位都依赖它） */
+  private panelTop = 0;
+  private panelHeight = 0;
   private summaryContainer: Phaser.GameObjects.Container | null = null;
 
   private state: SceneState = 'moving';
@@ -99,24 +102,32 @@ export class QuestionScene extends Phaser.Scene {
     });
 
     this.engine = new QuizEngine({ questions, timeLimit: this.packed.questionTimeLimit });
-    this.hud = new QuizHud(this, {
-      width: this.scale.width,
-      total: questions.length,
-      timeLimit: this.packed.questionTimeLimit,
-    });
 
-    const a = this.questionConfig.answerSettings;
     // viewport 缩放：方案 C（Phaser RESIZE）下 960×640 拉伸到 viewport 物理尺寸，
     // UI 字号/位置/大小若不缩放会"挤在左上"。这里按 viewport 与 960×640 的最小比缩放。
     const vp = this.scale.width;
     const vpScale = Math.min(this.scale.width / 960, this.scale.height / 640);
+
+    this.hud = new QuizHud(this, {
+      width: this.scale.width,
+      total: questions.length,
+      timeLimit: this.packed.questionTimeLimit,
+      scale: vpScale,
+      panelTop: this.panelTop,
+      panelHeight: this.panelHeight,
+    });
+
+    const a = this.questionConfig.answerSettings;
+    // 选项区垂直中心：h/2 + 45·s 较原 20·s 下移，填充 19.5:9 / 小视口下中下部留白，
+    // 同时保证与反馈文字区（explanationText 底）保持间隙
+    const optionCenterY = this.scale.height / 2 + 45 * vpScale;
     if (a.mode === 'arrow') {
       // 箭头模式：答案固定，高亮框循环跳转（默认，儿童友好）
       // centerX/centerY 用 viewport 物理中心（绝对居中），
       // cardWidth/cardHeight 乘以 vpScale 让卡片尺寸随 viewport 等比缩放
       this.selector = new ArrowSelector(this, {
         centerX: vp / 2,
-        centerY: this.scale.height / 2 + 20 * vpScale,
+        centerY: optionCenterY,
         cardWidth: a.optionCardWidth * vpScale,
         cardHeight: a.optionCardHeight * vpScale,
         interval: a.arrowInterval,
@@ -127,7 +138,7 @@ export class QuestionScene extends Phaser.Scene {
       // 停住时按游标当前 x 落在哪张判定框内 → 选中对应答案
       this.cursorSel = new CursorSelector(this, {
         centerX: vp / 2,
-        centerY: this.scale.height / 2 + 20 * vpScale,
+        centerY: optionCenterY,
         cardWidth: a.optionCardWidth * vpScale,
         cardHeight: a.optionCardHeight * vpScale,
         cycleDuration: a.cursorCycleDuration,
@@ -139,7 +150,7 @@ export class QuestionScene extends Phaser.Scene {
       this.track = new AnswerTrack(this, {
         movementType: a.movementType,
         centerX: vp / 2,
-        centerY: this.scale.height / 2 + 20 * vpScale,
+        centerY: optionCenterY,
         radiusX: a.trackRadiusX * vpScale,
         radiusY: a.trackRadiusY * vpScale,
         linearSpan: a.linearTrackSpan * vpScale,
@@ -521,12 +532,16 @@ export class QuestionScene extends Phaser.Scene {
   /** 构建题干面板与各类提示文本 */
   private buildQuestionPanel(subjectName: string): void {
     const w = this.scale.width;
+    const h = this.scale.height;
     // 面板宽度按 viewport 缩放，方案 C 19.5:9 / 1024×540 下自然放大占满中央
-    const s = Math.min(w / 960, this.scale.height / 640);
+    const s = Math.min(w / 960, h / 640);
     const panelW = Math.min(840 * s, w * 0.9);
     const panelH = 80 * s;
+    // panelY = 40·s（原 32·s）：顶部让出 HUD 题号/连对行（10·s~30·s），不再压卡片顶边
+    const panelY = 40 * s;
+    this.panelTop = panelY;
+    this.panelHeight = panelH;
     const panelX = w / 2 - panelW / 2;
-    const panelY = 32 * s;
 
     // 题干面板
     this.panel = this.add.graphics();
@@ -547,13 +562,14 @@ export class QuestionScene extends Phaser.Scene {
       }))
       .setOrigin(0.5, 0.5);
 
-    // 反馈条：位于题干与轨道之间，不与选项卡片重叠
+    // 反馈条：位于题干下方 HUD 进度条（panelBottom + 36·s 处）之下，互不重叠
+    // 布局序列：卡片底 → +6·s 倒计时(≈26·s 高) → +36·s 进度条(10·s) → +64·s 反馈 → +96·s 解析
     this.resultText = this.add
-      .text(w / 2, panelY + panelH + 32 * s, '', textStyle(Math.round(24 * s), css(Palette.text.primary), { fontStyle: 'bold' }))
+      .text(w / 2, panelY + panelH + 64 * s, '', textStyle(Math.round(24 * s), css(Palette.text.primary), { fontStyle: 'bold' }))
       .setOrigin(0.5, 0.5);
 
     this.explanationText = this.add
-      .text(w / 2, panelY + panelH + 60 * s, '', textStyle(Math.round(15 * s), css(Palette.text.secondary), {
+      .text(w / 2, panelY + panelH + 96 * s, '', textStyle(Math.round(15 * s), css(Palette.text.secondary), {
         align: 'center',
         wordWrap: { width: panelW + 20 * s },
         lineSpacing: 3,
@@ -563,9 +579,9 @@ export class QuestionScene extends Phaser.Scene {
     this.hintText = this.add
       .text(
         w / 2,
-        this.scale.height - 40,
+        h - 24 * s,
         this.modeHint(),
-        textStyle(16, css(Palette.text.hint)),
+        textStyle(Math.round(16 * s), css(Palette.text.hint)),
       )
       .setOrigin(0.5, 1);
   }

@@ -57,9 +57,25 @@ export class ResultScene extends Phaser.Scene {
     /**
      * 视口高度自适应缩放：矮屏（手机浏览器去 UI 后 h≈390-400）下整体压缩布局，
      * 避免固定坐标导致按钮遮挡统计文字、奖励面板超出屏幕（实测反馈 2026-09-01）。
-     * h=500 及以上保持原始尺寸；下限 0.72 保证极矮屏仍可读。
+     * 高屏（方案 C 19.5:9 h≈1080）按同比例放大至 1.35，避免内容挤在上半屏、下部大面积留白
+     * （实测反馈 2026-09-03）。下限 0.72 保证极矮屏仍可读。
      */
-    const s = Phaser.Math.Clamp(h / 500, 0.72, 1);
+    const s = Phaser.Math.Clamp(h / 500, 0.72, 1.35);
+
+    // ───── 垂直弹性布局（消除遮挡 + 疏密均衡）─────
+    // 旧版所有 y 基于 h=500 设计且 s 封顶 1：高屏下内容全挤在上半屏，
+    // 且三栏 5 行文字底部（≈272·s）与奖励面板 y（272·s）压线，面板后绘制直接盖住文字。
+    const panelW = Math.min(Math.max(904 * s, w * 0.6), w - 48);
+    const colGap = Math.max(232 * s, panelW * 0.3);
+    const btnZone = 78 * s;               // 按钮高度 46·s + 底边距 32·s
+    const colY0 = 126 * s;
+    const colBlockH = 26 * s + 5 * 24 * s; // 三栏块高：标题行 + 最多 5 行数据
+    const panelH = 132 * s;
+    const slack = Math.max(0, h - btnZone - colY0 - colBlockH - panelH);
+    // slack 充足（高屏）时把三栏与面板往下摊开；矮屏（slack < 40·s）保持紧凑原布局
+    const spread = slack > 40 * s;
+    const colY = colY0 + (spread ? slack * 0.35 : 0);
+    const panelY = colY + colBlockH + (spread ? Math.min(slack * 0.3, 60 * s) : 0);
 
     // ───── 结算与写档（先算后展示，保证展示的每一笔都已落盘） ─────
     const score = calculateScore(
@@ -87,6 +103,10 @@ export class ResultScene extends Phaser.Scene {
 
     // ───── 展示 ─────
     this.drawBackdrop(w, h);
+    // 三栏统计区的中央高亮装饰块（跟随 panelW / colY，替代旧版 960×640 硬编码几何）
+    const deco = this.add.graphics();
+    deco.fillStyle(Palette.background.panel, 0.5);
+    deco.fillRoundedRect(w / 2 - panelW / 2, colY - 10 * s, panelW, colBlockH + 20 * s, 16);
 
     const title = payload.cleared ? '关卡通过！' : '再来一次！';
     const titleColor = payload.cleared ? Palette.accent.primary : Palette.status.warning;
@@ -104,7 +124,7 @@ export class ResultScene extends Phaser.Scene {
       .setOrigin(0.5, 0);
 
     // 左栏：答题表现
-    this.addColumn(w / 2 - 232 * s, 126 * s, '答题表现', [
+    this.addColumn(w / 2 - colGap, colY, '答题表现', [
       `答对 ${payload.quiz.correctCount} / ${payload.quiz.totalQuestions} 题`,
       `正确率 ${Math.round(payload.quiz.accuracy * 100)}%`,
       `平均每题 ${formatOneDecimal(payload.quiz.averageAnswerTime)} 秒`,
@@ -113,7 +133,7 @@ export class ResultScene extends Phaser.Scene {
     ], s);
 
     // 中栏：割草战果
-    this.addColumn(w / 2, 126 * s, '割草战果', [
+    this.addColumn(w / 2, colY, '割草战果', [
       `击杀 ${payload.kills}`,
       `最高连击 ${payload.maxCombo}`,
       `本关得分 ${score}`,
@@ -121,21 +141,15 @@ export class ResultScene extends Phaser.Scene {
       `范围加成 ×${payload.bonus.rangeMultiplier.toFixed(2)}`,
     ], s);
 
-    // T-020 答题质量透明化：在中栏下方画 breakdown 小字一行，展示「答得好→割得爽」核心绑定的
-    // 三个分项（正确率项×速度项×连对项），让玩家理解最终倍数怎么来的
+    // T-020 答题质量透明化：「加成来源」三行小字移入奖励面板右上角（旧版放在中栏下方，
+    // 与面板 y 压线被面板盖住——实测遮挡 2026-09-03），语义上本就属于奖励透明化的一部分
     const breakdown = payload.bonus.breakdown;
-    this.add
-      .text(
-        w / 2,
-        126 * s + 6 * 24 * s,
-        `加成来源  正确率项 ×${breakdown.accuracyTerm.toFixed(2)}  速度项 ×${breakdown.speedFactor.toFixed(2)}  连对项 ×${breakdown.comboFactor.toFixed(2)}`,
-        textStyle(Math.round(14 * s), css(Palette.text.hint)),
-      )
-      .setOrigin(0.5, 0);
+    const breakdownText =
+      `加成来源  正确率项 ×${breakdown.accuracyTerm.toFixed(2)}  速度项 ×${breakdown.speedFactor.toFixed(2)}  连对项 ×${breakdown.comboFactor.toFixed(2)}`;
 
     // 右栏：成长
     const need = progression.expToNextLevel;
-    this.addColumn(w / 2 + 232 * s, 126 * s, '成长', [
+    this.addColumn(w / 2 + colGap, colY, '成长', [
       `等级 ${progression.level}`,
       `经验 ${Math.round(progression.exp)} / ${Number.isFinite(need) ? Math.round(need) : '已满级'}`,
       `本关获得经验 +${expGain}`,
@@ -143,10 +157,10 @@ export class ResultScene extends Phaser.Scene {
     ], s);
 
     // 奖励明细：来源逐条列出 + 上限状态
-    this.drawRewardPanel(w, 272 * s, rewardConfig, calc, granted, dailyLimit, s);
+    this.drawRewardPanel(w, panelY, panelW, rewardConfig, calc, granted, dailyLimit, breakdownText, s);
 
     // 等级提升动画
-    if (levelUp) this.playLevelUpAnimation(w, levelUp.to, s);
+    if (levelUp) this.playLevelUpAnimation(w, levelUp.to, s, colY + colBlockH / 2);
 
     // 按钮（缩小尺寸 + 更贴底，确保不遮挡三栏统计与奖励面板）
     this.createButton(w / 2 - 130 * s, h - 32 * s, payload.cleared ? '进入下一关' : '重玩本关', Palette.accent.primary, () => {
@@ -170,13 +184,11 @@ export class ResultScene extends Phaser.Scene {
     );
   }
 
-  /** 绘制背景 */
+  /** 绘制背景（纯底色；三栏装饰块由 create 按实际布局几何绘制） */
   private drawBackdrop(w: number, h: number): void {
     const g = this.add.graphics();
     g.fillStyle(Palette.background.deep, 1);
     g.fillRect(0, 0, w, h);
-    g.fillStyle(Palette.background.panel, 0.5);
-    g.fillRoundedRect(w / 2 - 452, 130, 904, 200, 16);
   }
 
   /**
@@ -205,29 +217,39 @@ export class ResultScene extends Phaser.Scene {
       .setOrigin(0.5, 0);
   }
 
-  /** 绘制奖励面板：明细 + 上限状态，满足奖励规则透明化要求 */
+  /** 绘制奖励面板：明细 + 加成来源（右上角）+ 上限状态，满足奖励规则透明化要求 */
   private drawRewardPanel(
     w: number,
     y: number,
+    panelW: number,
     config: RewardConfig,
     calc: ReturnType<typeof applyDailyCap>,
     granted: number,
     dailyLimit: number,
+    breakdownText: string,
     s: number,
   ): void {
     const panel = this.add.graphics();
     const panelH = Math.round(132 * s);
+    const left = w / 2 - panelW / 2;
+    const right = w / 2 + panelW / 2;
+    const pad = 28 * s;
     panel.fillStyle(Palette.background.panel, 0.9);
-    panel.fillRoundedRect(w / 2 - 452 * s, y, 904 * s, panelH, 16);
+    panel.fillRoundedRect(left, y, panelW, panelH, 16);
     panel.lineStyle(2, Palette.accent.gold, 0.6);
-    panel.strokeRoundedRect(w / 2 - 452 * s, y, 904 * s, panelH, 16);
+    panel.strokeRoundedRect(left, y, panelW, panelH, 16);
 
     this.add
-      .text(w / 2 - 424 * s, y + 10 * s, '游戏时间奖励明细', textStyle(Math.round(17 * s), css(Palette.accent.gold), { fontStyle: 'bold' }))
+      .text(left + pad, y + 10 * s, '游戏时间奖励明细', textStyle(Math.round(17 * s), css(Palette.accent.gold), { fontStyle: 'bold' }))
       .setOrigin(0, 0);
 
+    // 加成来源：面板右上角小字（矮屏下不再与三栏/明细内容抢空间）
     this.add
-      .text(w / 2 - 424 * s, y + 38 * s, formatRewardItems(calc.items), textStyle(Math.round(15 * s), css(Palette.text.primary), { lineSpacing: 4 }))
+      .text(right - pad, y + 12 * s, breakdownText, textStyle(Math.round(13 * s), css(Palette.text.hint)))
+      .setOrigin(1, 0);
+
+    this.add
+      .text(left + pad, y + 40 * s, formatRewardItems(calc.items), textStyle(Math.round(15 * s), css(Palette.text.primary), { lineSpacing: 4 }))
       .setOrigin(0, 0);
 
     const capLines = [
@@ -236,17 +258,17 @@ export class ResultScene extends Phaser.Scene {
       `实际发放 +${granted}s（下一关割草时长增加）`,
     ];
     this.add
-      .text(w / 2 + 424 * s, y + 38 * s, capLines.join('\n'), textStyle(Math.round(15 * s), css(Palette.text.secondary), {
+      .text(right - pad, y + 40 * s, capLines.join('\n'), textStyle(Math.round(15 * s), css(Palette.text.secondary), {
         align: 'right',
         lineSpacing: 5,
       }))
       .setOrigin(1, 0);
   }
 
-  /** 等级提升动画：横幅弹入 + 金色光环扩散 */
-  private playLevelUpAnimation(w: number, newLevel: number, s: number): void {
+  /** 等级提升动画：横幅弹入 + 金色光环扩散（中心点由布局传入） */
+  private playLevelUpAnimation(w: number, newLevel: number, s: number, cy: number): void {
     const banner = this.add
-      .text(w / 2, 250 * s, `等级提升！ Lv.${newLevel}`, textStyle(Math.round(46 * s), css(Palette.accent.gold), { fontStyle: 'bold' }))
+      .text(w / 2, cy + 24 * s, `等级提升！ Lv.${newLevel}`, textStyle(Math.round(46 * s), css(Palette.accent.gold), { fontStyle: 'bold' }))
       .setOrigin(0.5)
       .setDepth(1400)
       .setScale(0.2)
@@ -261,7 +283,7 @@ export class ResultScene extends Phaser.Scene {
     });
     this.tweens.add({
       targets: banner,
-      y: 226 * s,
+      y: cy,
       alpha: 0,
       delay: 1500,
       duration: 620,
@@ -269,8 +291,8 @@ export class ResultScene extends Phaser.Scene {
     });
 
     // 金色扩散光环
-    ripple(this, w / 2, 250, Palette.accent.gold, 260, 900);
-    this.time.delayedCall(420, () => ripple(this, w / 2, 250, Palette.accent.gold, 320, 900));
+    ripple(this, w / 2, cy, Palette.accent.gold, 260, 900);
+    this.time.delayedCall(420, () => ripple(this, w / 2, cy, Palette.accent.gold, 320, 900));
   }
 
   /** 创建一个通用按钮并返回句柄（尺寸/字号随视口缩放系数 s 变化） */
