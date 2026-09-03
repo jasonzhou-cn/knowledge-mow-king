@@ -30,6 +30,8 @@ export const TextureKeys = {
   bolt: 'fx-bolt',
   pellet: 'fx-pellet',
   swing: 'fx-swing',
+  /** T-025 学霸 BUFF 掉落图标（书本，白色灰度图，运行期 tint 上色） */
+  book: 'tex-book',
 } as const;
 
 /**
@@ -108,6 +110,8 @@ export class BootScene extends Phaser.Scene {
     this.makeFxProjectiles();
     this.makeSwingArc();
     this.makeWeapons();
+    this.makeBook();
+    this.makeBossBodies();
   }
 
   /** 1x1 白色像素（放大后用于血条、进度条等纯色矩形） */
@@ -320,5 +324,83 @@ export class BootScene extends Phaser.Scene {
     sc.fillRect(10, 11, 24, 5); // 下管
     sc.generateTexture(`${WEAPON_TEXTURE_PREFIX}scatter`, 36, 21);
     sc.destroy();
+  }
+
+  /**
+   * T-025 学霸 BUFF 掉落图标：摊开的书本（白色灰度图，运行期 tint 成金色）。
+   * 两个对开书页 + 中缝阴影，9 岁玩家一眼能认出「书」。
+   */
+  private makeBook(): void {
+    const w = 26;
+    const h = 20;
+    const g = this.make.graphics({ x: 0, y: 0 }, false);
+    g.fillStyle(0xffffff, 1);
+    g.fillRoundedRect(2, 3, 10, 14, 2);
+    g.fillRoundedRect(14, 3, 10, 14, 2);
+    // 中缝阴影 + 页面横线，纯深色细节（与 makePlayer 的做法一致）
+    g.fillStyle(0x000000, 0.3);
+    g.fillRect(12, 3, 2, 14);
+    g.fillStyle(0x000000, 0.18);
+    for (let i = 0; i < 3; i++) {
+      g.fillRect(4, 6 + i * 4, 6, 1);
+      g.fillRect(16, 6 + i * 4, 6, 1);
+    }
+    g.generateTexture(TextureKeys.book, w, h);
+    g.destroy();
+  }
+
+  /**
+   * T-025 五个 Boss 的专属底型贴图（boss-visual-spec.md §1）：
+   * 内卷怪=圆角方（格子间工位） / 躺平怪=横躺椭圆 / 语法之王=正圆 /
+   * 化合狂魔=六边形（分子感） / 考神=正圆+内环（神性加强）。
+   * 全部为白色灰度图：MonsterSpawner.refreshTint 的 Boss 金→红血量 tint 照常生效，
+   * Boss 之间的辨识度由形状 + BossVisual 的配件与表情补足。
+   */
+  private makeBossBodies(): void {
+    const dark = 0x000000;
+
+    // 内卷怪：圆角方形（92×92，圆角 14），内部一圈弱描边传达「格子间」
+    const sq = this.make.graphics({ x: 0, y: 0 }, false);
+    sq.fillStyle(0xffffff, 1);
+    sq.fillRoundedRect(2, 2, 88, 88, 14);
+    sq.lineStyle(2, dark, 0.18);
+    sq.strokeRoundedRect(10, 10, 72, 72, 10);
+    sq.generateTexture('tex-boss-square', 92, 92);
+    sq.destroy();
+
+    // 躺平怪：横躺椭圆（110×70，圆角 35）
+    const ov = this.make.graphics({ x: 0, y: 0 }, false);
+    ov.fillStyle(0xffffff, 1);
+    ov.fillRoundedRect(2, 10, 106, 50, 25);
+    ov.generateTexture('tex-boss-oval', 110, 70);
+    ov.destroy();
+
+    // 语法之王：正圆（92×92）
+    const ci = this.make.graphics({ x: 0, y: 0 }, false);
+    ci.fillStyle(0xffffff, 1);
+    ci.fillCircle(46, 46, 44);
+    ci.generateTexture('tex-boss-circle', 92, 92);
+    ci.destroy();
+
+    // 化合狂魔：六边形（外接半径 44）
+    const he = this.make.graphics({ x: 0, y: 0 }, false);
+    he.fillStyle(0xffffff, 1);
+    const hexPoints: Phaser.Geom.Point[] = [];
+    for (let i = 0; i < 6; i++) {
+      const a = (i / 6) * Math.PI * 2 - Math.PI / 2;
+      hexPoints.push(new Phaser.Geom.Point(46 + Math.cos(a) * 44, 46 + Math.sin(a) * 44));
+    }
+    he.fillPoints(hexPoints, true);
+    he.generateTexture('tex-boss-hexagon', 92, 92);
+    he.destroy();
+
+    // 考神：正圆 + 内环（「神」的层次感）
+    const go = this.make.graphics({ x: 0, y: 0 }, false);
+    go.fillStyle(0xffffff, 1);
+    go.fillCircle(46, 46, 44);
+    go.lineStyle(2, dark, 0.22);
+    go.strokeCircle(46, 46, 34);
+    go.generateTexture('tex-boss-god', 92, 92);
+    go.destroy();
   }
 }

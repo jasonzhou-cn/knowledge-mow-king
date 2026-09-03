@@ -14,7 +14,9 @@ export type ConfigModuleName =
   | 'rewardConfig'
   | 'subjectConfig'
   | 'questionBank'
-  | 'weaponConfig';
+  | 'weaponConfig'
+  | 'bossDialogue'
+  | 'resultFlavor';
 
 /** 学科 key：刻意使用 string 而非字面量联合，保证新增学科只改 JSON 不改代码 */
 export type SubjectKey = string;
@@ -389,6 +391,64 @@ export interface BossDialogueEntry {
   death: Record<string, string>;
 }
 
+// ───────────────────── T-025 美术表现与趣味性打磨 ─────────────────────
+
+/** 场景主题装饰数量（控制同屏静态装饰与漂浮符号的规模） */
+export interface ThemeDecoSettings {
+  /** 草丛/装饰三角数量 */
+  tuftCount: number;
+  /** 漂浮学科符号数量 */
+  symbolCount: number;
+}
+
+/** 学霸 BUFF（随机击杀掉落书本，拾取后短暂提升攻速/移速） */
+export interface ScholarBuffSettings {
+  /** 每次击杀的掉落概率 0~1 */
+  dropChance: number;
+  /** 单关掉落次数上限 */
+  maxDropsPerLevel: number;
+  /** BUFF 持续时长（秒） */
+  duration: number;
+  /** 武器冷却倍率（<1 表示冷却走得更快 = 攻速提升） */
+  cooldownMultiplier: number;
+  /** 移速倍率（>1 = 移速提升） */
+  moveSpeedMultiplier: number;
+}
+
+/** T-025 打磨期全部视觉/趣味参数（数值解耦红线：一律进配置，不硬编码） */
+export interface PolishSettings {
+  /** 场景进入时的 fadeIn 时长（毫秒） */
+  sceneFadeInMs: number;
+  /** 结算界面元素依次弹入的间隔（毫秒） */
+  resultStaggerMs: number;
+  /** 结算界面单元素弹入时长（毫秒，≤400 不拖节奏） */
+  resultPopMs: number;
+  /** 玩家呼吸/移动 bob 的缩放振幅（相对 1 的比例，如 0.02 = ±2%） */
+  playerBobAmplitude: number;
+  /** 玩家呼吸周期（毫秒） */
+  playerBobPeriodMs: number;
+  /** 连击里程碑：达到这些连击数时屏幕中央弹字 + 相机 zoom pulse */
+  comboMilestones: number[];
+  /** 相机 zoom pulse 幅度（相对 1 的增量） */
+  comboZoomPulse: number;
+  /** 相机 zoom pulse 时长（毫秒） */
+  comboZoomPulseMs: number;
+  /** Boss 台词横幅总停留时长（毫秒） */
+  bossLineDurationMs: number;
+  /** Boss 台词字号 */
+  bossLineFontSize: number;
+  /** Boss 阶段切换全屏闪光的初始 alpha */
+  bossPhaseFlashAlpha: number;
+  /** Boss 阶段切换全屏闪光时长（毫秒） */
+  bossPhaseFlashMs: number;
+  /** 每级连击档位额外增加的击杀碎片数 */
+  killShardBonusPerTier: number;
+  /** 场景主题装饰数量 */
+  themeDeco: ThemeDecoSettings;
+  /** 学霸 BUFF 参数 */
+  scholarBuff: ScholarBuffSettings;
+}
+
 /**
  * 解析后的单阶段 Boss 运行时数据（由 BossTemplate 的某个 phase 展开而来）。
  * 数值已乘上 phase 的 speedMult/damageMult/spawnDelay，可直接被 MonsterSpawner 消费。
@@ -465,6 +525,8 @@ export interface GrassCuttingConfig {
   /** T-022 Boss 沙雕过场文案钩子（红线条目：内容由 T-024 content-builder 填，本任务先建 schema） */
   bossDialogue?: BossDialogueEntry;
   subjectCoefficientSettings: Record<SubjectKey, SubjectCoefficientEntry>;
+  /** T-025 打磨期视觉/趣味参数 */
+  polishSettings: PolishSettings;
 }
 
 // ──────────────────────────── weaponConfig.json ────────────────────────────
@@ -694,6 +756,45 @@ export interface GrassCuttingBonus {
   breakdown: import('./resolve').BonusBreakdown;
 }
 
+// ─────────────────────────── bossDialogue.json ───────────────────────────
+
+/** 单个 Boss 的台词条目（key 与 grassCuttingConfig.bossRoster.roster[].id 一致） */
+export interface BossDialogueRosterEntry {
+  bossId: string;
+  name: string;
+  /** 阶段台词，下标与 phaseIndex 对应 */
+  phaseLines: string[];
+  /** Boss 被击杀时的收场台词 */
+  deadLine: string;
+}
+
+/** Boss 台词库（T-024 落盘、T-025 接入运行时） */
+export interface BossDialogueConfig {
+  version: string;
+  description: string;
+  /** key = Boss 模板 id（白名单：必须存在于 bossRoster.roster） */
+  roster: Record<string, BossDialogueRosterEntry>;
+  /** Boss 出场台词，key 同上 */
+  introLines: Record<string, string>;
+}
+
+// ─────────────────────────── resultFlavor.json ───────────────────────────
+
+/** 结算表现档位规则：正确率 ≥ minAccuracy 时命中该档 */
+export interface ResultFlavorTierRule {
+  minAccuracy: number;
+}
+
+/** 结算趣味文案库（沙雕恶搞风格，按表现档位随机抽 1 条） */
+export interface ResultFlavorConfig {
+  version: string;
+  description: string;
+  /** 档位判定规则（fail/bad 档为兜底档，不需要 minAccuracy） */
+  tierRules: Record<string, ResultFlavorTierRule>;
+  /** 各档位文案池 */
+  byResult: Record<string, string[]>;
+}
+
 /** 所有配置模块的联合类型表，ConfigLoader.getConfig<T> 的索引来源 */
 export interface ConfigModuleMap {
   gameSettings: GameSettings;
@@ -704,4 +805,6 @@ export interface ConfigModuleMap {
   subjectConfig: SubjectConfig;
   questionBank: QuestionBank;
   weaponConfig: WeaponConfig;
+  bossDialogue: BossDialogueConfig;
+  resultFlavor: ResultFlavorConfig;
 }

@@ -82,6 +82,32 @@
       "skillRangeCoefficient": 1.1
     }
   },
+  "polishSettings": {
+    "sceneFadeInMs": 320,
+    "resultStaggerMs": 90,
+    "resultPopMs": 360,
+    "playerBobAmplitude": 0.02,
+    "playerBobPeriodMs": 1100,
+    "comboMilestones": [5, 10, 20, 35],
+    "comboZoomPulse": 0.012,
+    "comboZoomPulseMs": 200,
+    "bossLineDurationMs": 2000,
+    "bossLineFontSize": 30,
+    "bossPhaseFlashAlpha": 0.16,
+    "bossPhaseFlashMs": 260,
+    "killShardBonusPerTier": 3,
+    "themeDeco": {
+      "tuftCount": 90,
+      "symbolCount": 10
+    },
+    "scholarBuff": {
+      "dropChance": 0.05,
+      "maxDropsPerLevel": 4,
+      "duration": 5,
+      "cooldownMultiplier": 0.7,
+      "moveSpeedMultiplier": 1.25
+    }
+  },
   "bossRoster": {
     "common": {
       "maxPhases": 4,

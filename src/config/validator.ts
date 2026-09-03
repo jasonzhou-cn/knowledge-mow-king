@@ -211,6 +211,8 @@ export function validateAllConfigs(raw: Record<ConfigModuleName, unknown>): void
     'subjectConfig',
     'questionBank',
     'weaponConfig',
+    'bossDialogue',
+    'resultFlavor',
   ];
   for (const name of modules) {
     if (raw[name] === undefined || raw[name] === null) {
@@ -227,6 +229,8 @@ export function validateAllConfigs(raw: Record<ConfigModuleName, unknown>): void
   const subject = validateSubjectConfig(raw.subjectConfig);
   const bank = validateQuestionBank(raw.questionBank);
   const weapon = validateWeaponConfig(raw.weaponConfig);
+  const dialogue = validateBossDialogue(raw.bossDialogue);
+  const flavor = validateResultFlavor(raw.resultFlavor);
 
   issues.push(
     ...game.issues,
@@ -237,6 +241,8 @@ export function validateAllConfigs(raw: Record<ConfigModuleName, unknown>): void
     ...subject.issues,
     ...bank.issues,
     ...weapon.issues,
+    ...dialogue.issues,
+    ...flavor.issues,
   );
 
   // ───────────── 跨表关联校验（GDD 1.4 多表关联原则） ─────────────
@@ -406,6 +412,27 @@ export function validateAllConfigs(raw: Record<ConfigModuleName, unknown>): void
         cross.custom(
           `levelConfig.bossLevels.${lvl}`,
           `关卡 ${lvl} 引用的 Boss id "${ref}" 在 bossRoster.roster 里找不到，请先在 grassCuttingConfig.bossRoster.roster 中定义`,
+        );
+      }
+    }
+  }
+
+  // 10. T-025：bossDialogue 的 key 必须命中 bossRoster.roster 的 id（台词白名单），
+  //     否则运行时按 bossId 查台词会查空
+  const dialogueRaw = asRecord(raw.bossDialogue);
+  const dialogueRosterRaw = asRecord(dialogueRaw.roster);
+  const introLinesRaw = asRecord(dialogueRaw.introLines);
+  if (Object.keys(dialogueRosterRaw).length > 0 && bossRosterRaw) {
+    const validIds = new Set<string>();
+    for (const item of readArray(bossRosterRaw.roster)) {
+      const id = asString(asRecord(item).id);
+      if (id) validIds.add(id);
+    }
+    for (const key of [...Object.keys(dialogueRosterRaw), ...Object.keys(introLinesRaw)]) {
+      if (!validIds.has(key)) {
+        cross.custom(
+          `bossDialogue.roster.${key}`,
+          `台词 key "${key}" 在 grassCuttingConfig.bossRoster.roster 里找不到对应 Boss，允许的 id 为 [${[...validIds].join(', ')}]`,
         );
       }
     }
@@ -821,6 +848,43 @@ function validateGrassCuttingConfig(raw: unknown): Validator {
   if (Object.keys(sc).length === 0) {
     v.custom('grassCuttingConfig.subjectCoefficientSettings', '至少需要配置一个学科的 skillDamageCoefficient');
   }
+
+  // ─────────────── T-025 polishSettings 校验（打磨期视觉/趣味参数） ───────────────
+  const pl = v.object(root, 'polishSettings', 'grassCuttingConfig.polishSettings');
+  const pBase = 'grassCuttingConfig.polishSettings';
+  v.integer(pl, 'sceneFadeInMs', `${pBase}.sceneFadeInMs`, { min: 0, max: 2000 });
+  v.integer(pl, 'resultStaggerMs', `${pBase}.resultStaggerMs`, { min: 0, max: 500 });
+  v.integer(pl, 'resultPopMs', `${pBase}.resultPopMs`, { min: 80, max: 400 });
+  v.number(pl, 'playerBobAmplitude', `${pBase}.playerBobAmplitude`, { min: 0, max: 0.2 });
+  v.integer(pl, 'playerBobPeriodMs', `${pBase}.playerBobPeriodMs`, { min: 200, max: 5000 });
+  const milestones = v.array(pl, 'comboMilestones', `${pBase}.comboMilestones`, 1);
+  let prevMilestone = 0;
+  milestones.forEach((m, mi) => {
+    if (typeof m !== 'number' || !Number.isInteger(m) || m < 2) {
+      v.custom(`${pBase}.comboMilestones[${mi}]`, `连击里程碑应为 ≥2 的整数，实际为 ${describeType(m)}`);
+      return;
+    }
+    if (m <= prevMilestone) {
+      v.custom(`${pBase}.comboMilestones[${mi}]`, `连击里程碑必须严格递增（前一项 ${prevMilestone}，当前 ${m}）`);
+    }
+    prevMilestone = m;
+  });
+  v.number(pl, 'comboZoomPulse', `${pBase}.comboZoomPulse`, { min: 0, max: 0.1 });
+  v.integer(pl, 'comboZoomPulseMs', `${pBase}.comboZoomPulseMs`, { min: 50, max: 1000 });
+  v.integer(pl, 'bossLineDurationMs', `${pBase}.bossLineDurationMs`, { min: 500, max: 8000 });
+  v.integer(pl, 'bossLineFontSize', `${pBase}.bossLineFontSize`, { min: 12, max: 96 });
+  v.number(pl, 'bossPhaseFlashAlpha', `${pBase}.bossPhaseFlashAlpha`, { min: 0, max: 0.6 });
+  v.integer(pl, 'bossPhaseFlashMs', `${pBase}.bossPhaseFlashMs`, { min: 50, max: 1500 });
+  v.integer(pl, 'killShardBonusPerTier', `${pBase}.killShardBonusPerTier`, { min: 0, max: 16 });
+  const deco = v.object(pl, 'themeDeco', `${pBase}.themeDeco`);
+  v.integer(deco, 'tuftCount', `${pBase}.themeDeco.tuftCount`, { min: 0, max: 200 });
+  v.integer(deco, 'symbolCount', `${pBase}.themeDeco.symbolCount`, { min: 0, max: 30 });
+  const buff = v.object(pl, 'scholarBuff', `${pBase}.scholarBuff`);
+  v.number(buff, 'dropChance', `${pBase}.scholarBuff.dropChance`, { min: 0, max: 1 });
+  v.integer(buff, 'maxDropsPerLevel', `${pBase}.scholarBuff.maxDropsPerLevel`, { min: 0, max: 50 });
+  v.number(buff, 'duration', `${pBase}.scholarBuff.duration`, { min: 0.5, max: 60 });
+  v.number(buff, 'cooldownMultiplier', `${pBase}.scholarBuff.cooldownMultiplier`, { min: 0.2, max: 1 });
+  v.number(buff, 'moveSpeedMultiplier', `${pBase}.scholarBuff.moveSpeedMultiplier`, { min: 1, max: 2 });
   return v;
 }
 
@@ -1081,6 +1145,73 @@ function validateQuestionBank(raw: unknown): Validator {
     v.string(item, 'explanation', `${base}.explanation`);
     v.string(item, 'solution', `${base}.solution`);
   });
+  return v;
+}
+
+/** bossDialogue.json：Boss 台词库（阶段/死亡/出场文案，key 必须命中 bossRoster 白名单） */
+function validateBossDialogue(raw: unknown): Validator {
+  const v = new Validator('bossDialogue');
+  const root = v.isRecord(raw) ? raw : {};
+  v.string(root, 'version', 'bossDialogue.version');
+
+  const roster = v.object(root, 'roster', 'bossDialogue.roster');
+  if (Object.keys(roster).length === 0) {
+    v.custom('bossDialogue.roster', '至少需要配置一个 Boss 的台词');
+  }
+  for (const key of Object.keys(roster)) {
+    const entry = v.object(roster, key, `bossDialogue.roster.${key}`);
+    v.string(entry, 'bossId', `bossDialogue.roster.${key}.bossId`);
+    v.string(entry, 'name', `bossDialogue.roster.${key}.name`);
+    const lines = v.array(entry, 'phaseLines', `bossDialogue.roster.${key}.phaseLines`, 1);
+    lines.forEach((line, li) => {
+      if (typeof line !== 'string' || line.trim().length === 0) {
+        v.custom(`bossDialogue.roster.${key}.phaseLines[${li}]`, '阶段台词应为非空字符串');
+      }
+    });
+    v.string(entry, 'deadLine', `bossDialogue.roster.${key}.deadLine`);
+  }
+
+  const intro = v.object(root, 'introLines', 'bossDialogue.introLines');
+  for (const key of Object.keys(intro)) {
+    v.string(intro, key, `bossDialogue.introLines.${key}`);
+  }
+  return v;
+}
+
+/** resultFlavor.json：结算趣味文案库（按表现档位随机抽 1 条） */
+function validateResultFlavor(raw: unknown): Validator {
+  const v = new Validator('resultFlavor');
+  const root = v.isRecord(raw) ? raw : {};
+  v.string(root, 'version', 'resultFlavor.version');
+
+  const allowedTiers = ['perfect', 'good', 'ok', 'bad', 'fail'];
+  const byResult = v.object(root, 'byResult', 'resultFlavor.byResult');
+  if (Object.keys(byResult).length === 0) {
+    v.custom('resultFlavor.byResult', '至少需要配置一个档位的文案');
+  }
+  for (const tier of Object.keys(byResult)) {
+    if (!allowedTiers.includes(tier)) {
+      v.custom(`resultFlavor.byResult.${tier}`, `档位名非法，允许值为 [${allowedTiers.join(' | ')}]`);
+    }
+    const lines = v.array(byResult, tier, `resultFlavor.byResult.${tier}`, 1);
+    lines.forEach((line, li) => {
+      if (typeof line !== 'string' || line.trim().length === 0) {
+        v.custom(`resultFlavor.byResult.${tier}[${li}]`, '文案应为非空字符串');
+      }
+    });
+  }
+
+  const rules = v.object(root, 'tierRules', 'resultFlavor.tierRules');
+  for (const tier of Object.keys(rules)) {
+    const rule = v.object(rules, tier, `resultFlavor.tierRules.${tier}`);
+    v.number(rule, 'minAccuracy', `resultFlavor.tierRules.${tier}.minAccuracy`, { min: 0, max: 1 });
+    if (!allowedTiers.includes(tier)) {
+      v.custom(`resultFlavor.tierRules.${tier}`, `档位名非法，允许值为 [${allowedTiers.join(' | ')}]`);
+    }
+    if (byResult[tier] === undefined) {
+      v.custom(`resultFlavor.tierRules.${tier}`, `档位 "${tier}" 在 byResult 里没有文案池`);
+    }
+  }
   return v;
 }
 

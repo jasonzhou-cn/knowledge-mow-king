@@ -24,6 +24,8 @@ const CONFIG_MODULES: ConfigModuleName[] = [
   'subjectConfig',
   'questionBank',
   'weaponConfig',
+  'bossDialogue',
+  'resultFlavor',
 ];
 
 /** 单个模块的加载结果：成功标记 + 原始数据 */

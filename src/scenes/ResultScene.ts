@@ -25,6 +25,14 @@ interface MenuButton {
   container: Phaser.GameObjects.Container;
 }
 
+/** T-025 stagger 弹入动画的目标约束（Graphics/Text/Container 均满足） */
+interface StaggerTarget {
+  alpha: number;
+  setAlpha(value: number): this;
+  scale: number;
+  setScale(value: number): this;
+}
+
 export class ResultScene extends Phaser.Scene {
   private payload: ResultSceneData | null = null;
 
@@ -102,19 +110,25 @@ export class ResultScene extends Phaser.Scene {
     }
 
     // ───── 展示 ─────
+    const staggerItems: Array<{ obj: StaggerTarget; pop: boolean }> = [];
+    const pushStagger = (obj: StaggerTarget, pop: boolean): void => {
+      staggerItems.push({ obj, pop });
+    };
     this.drawBackdrop(w, h);
     // 三栏统计区的中央高亮装饰块（跟随 panelW / colY，替代旧版 960×640 硬编码几何）
     const deco = this.add.graphics();
     deco.fillStyle(Palette.background.panel, 0.5);
     deco.fillRoundedRect(w / 2 - panelW / 2, colY - 10 * s, panelW, colBlockH + 20 * s, 16);
+    pushStagger(deco, false);
 
     const title = payload.cleared ? '关卡通过！' : '再来一次！';
     const titleColor = payload.cleared ? Palette.accent.primary : Palette.status.warning;
-    this.add
+    const titleText = this.add
       .text(w / 2, 40 * s, title, textStyle(Math.round(42 * s), css(titleColor), { fontStyle: 'bold' }))
       .setOrigin(0.5, 0);
+    pushStagger(titleText, true);
 
-    this.add
+    const subtitle = this.add
       .text(
         w / 2,
         92 * s,
@@ -122,6 +136,16 @@ export class ResultScene extends Phaser.Scene {
         textStyle(Math.round(18 * s), css(Palette.text.secondary)),
       )
       .setOrigin(0.5, 0);
+    pushStagger(subtitle, true);
+
+    // T-025：结算趣味文案——按表现档位从 resultFlavor.json 抽一条，放在副标题下方
+    const flavorLine = this.pickFlavorLine(payload);
+    if (flavorLine) {
+      const flavorText = this.add
+        .text(w / 2, 116 * s, flavorLine, textStyle(Math.round(17 * s), css(Palette.accent.gold)))
+        .setOrigin(0.5, 0);
+      pushStagger(flavorText, true);
+    }
 
     // 左栏：答题表现
     this.addColumn(w / 2 - colGap, colY, '答题表现', [
@@ -130,7 +154,7 @@ export class ResultScene extends Phaser.Scene {
       `平均每题 ${formatOneDecimal(payload.quiz.averageAnswerTime)} 秒`,
       `最大连对 ${payload.quiz.maxCombo}`,
       this.answerStatsLine(payload.quiz, useMissWording),
-    ], s);
+    ], s).forEach((o) => pushStagger(o, true));
 
     // 中栏：割草战果
     this.addColumn(w / 2, colY, '割草战果', [
@@ -139,7 +163,7 @@ export class ResultScene extends Phaser.Scene {
       `本关得分 ${score}`,
       `伤害加成 ×${payload.bonus.damageMultiplier.toFixed(2)}`,
       `范围加成 ×${payload.bonus.rangeMultiplier.toFixed(2)}`,
-    ], s);
+    ], s).forEach((o) => pushStagger(o, true));
 
     // T-020 答题质量透明化：「加成来源」三行小字移入奖励面板右上角（旧版放在中栏下方，
     // 与面板 y 压线被面板盖住——实测遮挡 2026-09-03），语义上本就属于奖励透明化的一部分
@@ -154,24 +178,81 @@ export class ResultScene extends Phaser.Scene {
       `经验 ${Math.round(progression.exp)} / ${Number.isFinite(need) ? Math.round(need) : '已满级'}`,
       `本关获得经验 +${expGain}`,
       `累计得分 ${Math.round(progression.totalScore)}`,
-    ], s);
+    ], s).forEach((o) => pushStagger(o, true));
 
     // 奖励明细：来源逐条列出 + 上限状态
-    this.drawRewardPanel(w, panelY, panelW, rewardConfig, calc, granted, dailyLimit, breakdownText, s);
+    this.drawRewardPanel(w, panelY, panelW, rewardConfig, calc, granted, dailyLimit, breakdownText, s)
+      .forEach((o) => pushStagger(o, true));
 
     // 等级提升动画
     if (levelUp) this.playLevelUpAnimation(w, levelUp.to, s, colY + colBlockH / 2);
 
     // 按钮（缩小尺寸 + 更贴底，确保不遮挡三栏统计与奖励面板）
-    this.createButton(w / 2 - 130 * s, h - 32 * s, payload.cleared ? '进入下一关' : '重玩本关', Palette.accent.primary, () => {
+    const nextBtn = this.createButton(w / 2 - 130 * s, h - 32 * s, payload.cleared ? '进入下一关' : '重玩本关', Palette.accent.primary, () => {
       const nextLevel = payload.cleared ? resolveNextLevel(levelConfig, payload.level) : payload.level;
       const data: LevelStartData = { level: nextLevel, bonusTime: granted };
       this.scene.start('QuestionScene', data);
     }, s);
-
-    this.createButton(w / 2 + 130 * s, h - 32 * s, '返回主菜单', Palette.background.panelSoft, () => {
+    const menuBtn = this.createButton(w / 2 + 130 * s, h - 32 * s, '返回主菜单', Palette.background.panelSoft, () => {
       this.scene.start('MenuScene');
     }, s);
+    staggerItems.push({ obj: nextBtn.container, pop: true }, { obj: menuBtn.container, pop: true });
+
+    // T-025：标题 / 三栏 / 面板 / 按钮依次弹入（间隔与时长来自 polishSettings）
+    const polish = ConfigLoader.getInstance().getConfig('grassCuttingConfig').polishSettings;
+    staggerItems.forEach((item, i) => {
+      item.obj.setAlpha(0);
+      if (item.pop) {
+        item.obj.setScale(0.92);
+        this.tweens.add({
+          targets: item.obj,
+          alpha: 1,
+          scale: 1,
+          delay: i * polish.resultStaggerMs,
+          duration: polish.resultPopMs,
+          ease: 'Back.easeOut',
+        });
+      } else {
+        this.tweens.add({
+          targets: item.obj,
+          alpha: 1,
+          delay: i * polish.resultStaggerMs,
+          duration: polish.resultPopMs,
+        });
+      }
+    });
+
+    // T-025：场景切换 fade 过渡
+    this.cameras.main.fadeIn(polish.sceneFadeInMs, 0, 0, 0);
+  }
+
+  /**
+   * T-025：按表现档位从 resultFlavor.json 抽一条趣味文案。
+   * 档位规则：死亡 → fail；否则按正确率从高到低取第一个命中的 tierRules 档；都不中走 bad 兜底。
+   */
+  private pickFlavorLine(payload: ResultSceneData): string {
+    try {
+      const flavor = ConfigLoader.getInstance().getConfig('resultFlavor');
+      let tier = 'bad';
+      if (payload.died) {
+        tier = 'fail';
+      } else {
+        const ordered = Object.entries(flavor.tierRules).sort(
+          (a, b) => (b[1]?.minAccuracy ?? 0) - (a[1]?.minAccuracy ?? 0),
+        );
+        for (const [name, rule] of ordered) {
+          if (payload.quiz.accuracy >= (rule?.minAccuracy ?? 1)) {
+            tier = name;
+            break;
+          }
+        }
+      }
+      const pool = flavor.byResult[tier] ?? [];
+      if (pool.length === 0) return '';
+      return pool[Math.floor(Math.random() * pool.length)];
+    } catch {
+      return '';
+    }
   }
 
   /** 计算本关经验：击杀 + 答对 + 通关奖励 */
@@ -204,20 +285,24 @@ export class ResultScene extends Phaser.Scene {
     return `没停准 ${quiz.missCount} 次 · 超时 ${quiz.timeoutCount} 次`;
   }
 
-  /** 绘制一个三栏数据卡片 */
-  private addColumn(x: number, y: number, title: string, lines: string[], s: number): void {
-    this.add
+  /** 绘制一个三栏数据卡片（返回卡片对象，供 stagger 弹入动画使用） */
+  private addColumn(x: number, y: number, title: string, lines: string[], s: number): Phaser.GameObjects.Text[] {
+    const titleText = this.add
       .text(x, y, title, textStyle(Math.round(19 * s), css(Palette.accent.secondary), { fontStyle: 'bold' }))
       .setOrigin(0.5, 0);
-    this.add
+    const bodyText = this.add
       .text(x, y + 26 * s, lines.join('\n'), textStyle(Math.round(16 * s), css(Palette.text.primary), {
         align: 'center',
         lineSpacing: 5,
       }))
       .setOrigin(0.5, 0);
+    return [titleText, bodyText];
   }
 
-  /** 绘制奖励面板：明细 + 加成来源（右上角）+ 上限状态，满足奖励规则透明化要求 */
+  /**
+   * 绘制奖励面板：明细 + 加成来源（右上角）+ 上限状态，满足奖励规则透明化要求。
+   * 返回面板全部显示对象，供 stagger 弹入动画使用。
+   */
   private drawRewardPanel(
     w: number,
     y: number,
@@ -228,7 +313,8 @@ export class ResultScene extends Phaser.Scene {
     dailyLimit: number,
     breakdownText: string,
     s: number,
-  ): void {
+  ): Array<Phaser.GameObjects.Graphics | Phaser.GameObjects.Text> {
+    const items: Array<Phaser.GameObjects.Graphics | Phaser.GameObjects.Text> = [];
     const panel = this.add.graphics();
     const panelH = Math.round(132 * s);
     const left = w / 2 - panelW / 2;
@@ -238,31 +324,41 @@ export class ResultScene extends Phaser.Scene {
     panel.fillRoundedRect(left, y, panelW, panelH, 16);
     panel.lineStyle(2, Palette.accent.gold, 0.6);
     panel.strokeRoundedRect(left, y, panelW, panelH, 16);
+    items.push(panel);
 
-    this.add
-      .text(left + pad, y + 10 * s, '游戏时间奖励明细', textStyle(Math.round(17 * s), css(Palette.accent.gold), { fontStyle: 'bold' }))
-      .setOrigin(0, 0);
+    items.push(
+      this.add
+        .text(left + pad, y + 10 * s, '游戏时间奖励明细', textStyle(Math.round(17 * s), css(Palette.accent.gold), { fontStyle: 'bold' }))
+        .setOrigin(0, 0),
+    );
 
     // 加成来源：面板右上角小字（矮屏下不再与三栏/明细内容抢空间）
-    this.add
-      .text(right - pad, y + 12 * s, breakdownText, textStyle(Math.round(13 * s), css(Palette.text.hint)))
-      .setOrigin(1, 0);
+    items.push(
+      this.add
+        .text(right - pad, y + 12 * s, breakdownText, textStyle(Math.round(13 * s), css(Palette.text.hint)))
+        .setOrigin(1, 0),
+    );
 
-    this.add
-      .text(left + pad, y + 40 * s, formatRewardItems(calc.items), textStyle(Math.round(15 * s), css(Palette.text.primary), { lineSpacing: 4 }))
-      .setOrigin(0, 0);
+    items.push(
+      this.add
+        .text(left + pad, y + 40 * s, formatRewardItems(calc.items), textStyle(Math.round(15 * s), css(Palette.text.primary), { lineSpacing: 4 }))
+        .setOrigin(0, 0),
+    );
 
     const capLines = [
       `本次应发 ${calc.singleCappedTotal}s　单次上限 ${config.rewardLimits.singleRewardTimeMax}s${calc.singleCapped ? '（已触发）' : ''}`,
       `今日已领 ${calc.dailyUsedAfter}s / ${dailyLimit}s${calc.dailyCapped ? '（已达每日上限）' : ''}`,
       `实际发放 +${granted}s（下一关割草时长增加）`,
     ];
-    this.add
-      .text(right - pad, y + 40 * s, capLines.join('\n'), textStyle(Math.round(15 * s), css(Palette.text.secondary), {
-        align: 'right',
-        lineSpacing: 5,
-      }))
-      .setOrigin(1, 0);
+    items.push(
+      this.add
+        .text(right - pad, y + 40 * s, capLines.join('\n'), textStyle(Math.round(15 * s), css(Palette.text.secondary), {
+          align: 'right',
+          lineSpacing: 5,
+        }))
+        .setOrigin(1, 0),
+    );
+    return items;
   }
 
   /** 等级提升动画：横幅弹入 + 金色光环扩散（中心点由布局传入） */

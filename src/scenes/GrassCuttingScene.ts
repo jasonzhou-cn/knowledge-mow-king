@@ -36,6 +36,9 @@ import { ProjectileSystem, type ProjectileHitPayload } from '../systems/Projecti
 import { SafeArea, ENABLE_SAFE_AREA } from '../systems/SafeArea';
 import { DoomZoneSystem } from '../systems/DoomZone';
 import { BossSkillController } from '../systems/BossSkillController';
+import { BossVisual } from '../systems/BossVisual';
+import { ScholarBuffSystem } from '../systems/ScholarBuffSystem';
+import { applySceneTheme } from '../systems/SceneTheme';
 import { getCanvasMode } from '../config/CanvasMode';
 import { sfx } from '../systems/SfxController';
 import { WeaponSystem, type AttackAction } from '../systems/WeaponSystem';
@@ -149,6 +152,17 @@ export class GrassCuttingScene extends Phaser.Scene {
   private bossSkill: BossSkillController | null = null;
   /** T-022：阶段切换与 Boss 死亡的解绑函数（resetRunState 时调用） */
   private bossUnsubFns: Array<() => void> = [];
+  /** T-025：Boss 专属视觉（底型贴图 + 表情 + 配件），仅 Boss 关创建 */
+  private bossVisual: BossVisual | null = null;
+  /** T-025：学霸 BUFF（击杀掉书 → 拾取后短暂攻速/移速提升） */
+  private scholar!: ScholarBuffSystem;
+  /** T-025：本关学科主题强调色（击杀碎片按主题色飞散） */
+  private themeAccent: number = Palette.combat.monsterElite;
+  /** T-025：Boss 台词横幅（出场/阶段/死亡共用一组，避免泄漏） */
+  private bossLineBg: Phaser.GameObjects.Graphics | null = null;
+  private bossLineText: Phaser.GameObjects.Text | null = null;
+  /** 玩家本帧是否在移动（呼吸/移动 bob 的表现分支用） */
+  private moving = false;
   /** Boss 关专属顶部血条（非 Boss 关为 null，全部路径短路） */
   private bossBarBg: Phaser.GameObjects.Graphics | null = null;
   private bossBarFill: Phaser.GameObjects.Graphics | null = null;
@@ -200,8 +214,9 @@ export class GrassCuttingScene extends Phaser.Scene {
     this.packed = resolveLevel(incoming.level, incoming.bonus);
     const bonus = incoming.bonus;
 
-    this.drawField();
-    this.drawGrassTufts();
+    // T-025：学科主题（地面/草丛/装饰/漂浮符号随关卡学科切换，Boss 关专属氛围）
+    const theme = applySceneTheme(this, this.packed.subject, this.packed.isBossLevel, this.packed.polish.themeDeco);
+    this.themeAccent = theme.accent;
 
     const px = this.scale.width / 2;
     const py = this.scale.height / 2 + 40;
@@ -294,6 +309,13 @@ export class GrassCuttingScene extends Phaser.Scene {
 
     this.floaters = new FloatingTextPool(this, this.packed.performance.maxHitTextAlive);
 
+    // T-025：学霸 BUFF（击杀概率掉书，拾取后短暂提升攻速/移速）
+    this.scholar = new ScholarBuffSystem(this, {
+      settings: this.packed.polish.scholarBuff,
+      pickupRadius: this.packed.player.radius + 20,
+      playerRadius: this.packed.player.radius,
+    });
+
     // 虚拟摇杆只在触屏设备创建：PC 端 joystick 保持 null，观感与操作完全不变
     if (this.sys.game.device.input.touch) {
       this.joystick = new TouchJoystick(this, { settings: this.packed.touch });
@@ -379,6 +401,9 @@ export class GrassCuttingScene extends Phaser.Scene {
 
     this.showIntro();
 
+    // T-025：场景切换 fade 过渡（简单可靠的fadeIn，避免硬切）
+    this.cameras.main.fadeIn(this.packed.polish.sceneFadeInMs, 0, 0, 0);
+
     // 供无头浏览器（CDP）自动化验证读取运行时状态。仅在开发模式（vite dev）暴露，
     // 生产构建时 import.meta.env.DEV 为 false，整块被 tree-shaking 剔除。
     // 只读 getter，不驱动任何游戏逻辑；取不到就返回 null，不伪造值。
@@ -414,6 +439,10 @@ export class GrassCuttingScene extends Phaser.Scene {
         get bossY()        { const p = self.spawner && self.spawner.bossPosition; return p ? p.y : null; },
         // T-022：DoomZone 活动区数量（debug/verify 用）
         get doomZoneCount() { return self.doomZone ? self.doomZone.size : 0; },
+        // T-025：打磨期趣味系统状态（debug/verify 用，只读）
+        get scholarActive()  { return self.scholar ? self.scholar.active : null; },
+        get scholarDrops()   { return self.scholar ? self.scholar.dropsSpawnedCount : null; },
+        get themeAccent()    { return `#${self.themeAccent.toString(16).padStart(6, '0')}`; },
       };
     }
   }
@@ -449,6 +478,14 @@ export class GrassCuttingScene extends Phaser.Scene {
     this.pointerDown = false;
     this.joystickPointerId = null;
     this.attackPointerId = null;
+
+    // T-025：上一局的 Boss 视觉与台词横幅不能残留到下一局
+    this.bossVisual?.destroy();
+    this.bossVisual = null;
+    this.bossLineBg?.destroy();
+    this.bossLineBg = null;
+    this.bossLineText?.destroy();
+    this.bossLineText = null;
   }
 
   override update(_time: number, delta: number): void {
@@ -468,7 +505,8 @@ export class GrassCuttingScene extends Phaser.Scene {
     this.updateFacing(dt);
     this.updateWeaponVisual();
 
-    this.weaponSystem.update(dt);
+    // T-025：学霸 BUFF 激活时冷却走得更快（攻速提升）——只改 dt 缩放，不动伤害语义
+    this.weaponSystem.update(dt * this.scholar.cooldownFactor);
     this.updateAttack();
 
     const progress = clamp(this.elapsed / this.totalTime, 0, 1);
@@ -477,6 +515,15 @@ export class GrassCuttingScene extends Phaser.Scene {
 
     // T-022：Boss 出生后启动技能调度器（懒启动：update 循环里等 Boss 真正出现）
     this.maybeStartBossSkillController();
+
+    // T-025：Boss 视觉（脸 + 配件）跟随本体
+    if (this.bossVisual) {
+      const bp = this.spawner.bossPosition;
+      if (bp) this.bossVisual.update(bp.x, bp.y);
+    }
+
+    // T-025：学霸 BUFF 掉落拾取与计时
+    this.scholar.update(dt, this.player.x, this.player.y);
 
     this.projectiles.update(dt, this.spawner.monsters, (payload) => this.onProjectileHit(payload));
 
@@ -508,17 +555,28 @@ export class GrassCuttingScene extends Phaser.Scene {
     // ResolvedBossTemplate 应有 phases / skills；如果 phases 为空（旧形态）就退化为不调度
     if (!bossTemplate.phases || bossTemplate.phases.length === 0) return;
 
-    const unloadText = (kind: 'death' | 'phase', phaseIndex?: number): string => {
+    // T-025：台词读取走独立 bossDialogue 配置模块（key = bossRoster 的 bossId）
+    const unloadText = (kind: 'intro' | 'phase' | 'death', phaseIndex?: number): string => {
       try {
-        const loader = ConfigLoader.getInstance();
-        const dialogue = loader.getConfig('grassCuttingConfig').bossDialogue;
-        if (!dialogue) return '';
-        if (kind === 'death') return dialogue.death?.[bossTemplate.bossId] ?? '';
-        return dialogue.phase?.[bossTemplate.bossId]?.[phaseIndex ?? 0] ?? '';
+        const dialogue = ConfigLoader.getInstance().getConfig('bossDialogue');
+        const entry = dialogue.roster[bossTemplate.bossId];
+        if (!entry) return '';
+        if (kind === 'death') return entry.deadLine ?? '';
+        if (kind === 'intro') return dialogue.introLines?.[bossTemplate.bossId] ?? '';
+        return entry.phaseLines[phaseIndex ?? 0] ?? '';
       } catch {
         return '';
       }
     };
+
+    // T-025：Boss 专属视觉（底型贴图替换 + 表情 + 配件）+ 出场台词
+    this.bossVisual = new BossVisual(this, {
+      bossId: bossTemplate.bossId,
+      radius: bossMonster.radius,
+    });
+    this.bossVisual.attach(bossMonster.sprite);
+    const introLine = unloadText('intro');
+    if (introLine) this.showBossLine(introLine);
 
     this.bossSkill = new BossSkillController({
       scene: this,
@@ -553,8 +611,11 @@ export class GrassCuttingScene extends Phaser.Scene {
       onDoomZoneHit: (damage) => this.applyDoomZoneDamage(damage),
       hooks: {
         onPhaseChange: (newPhase) => {
+          // T-025：阶段切换三连——全屏轻微闪光 + Boss 外观变化 + 台词横幅弹出
+          this.playPhaseFlash();
+          this.bossVisual?.setPhase(newPhase);
           const line = unloadText('phase', newPhase);
-          if (line) this.floaters.spawn(this.player.x, this.player.y - 80, line, css(Palette.accent.gold), '⚡');
+          if (line) this.showBossLine(line);
         },
       },
     });
@@ -570,8 +631,9 @@ export class GrassCuttingScene extends Phaser.Scene {
     this.bossUnsubFns.push(
       this.spawner.onBossDeath(() => {
         this.bossSkill?.stop();
+        // T-025：Boss 死亡收场台词（金色横幅）
         const line = unloadText('death');
-        if (line) this.floaters.spawn(this.player.x, this.player.y - 60, line, css(Palette.accent.gold), '★');
+        if (line) this.showBossLine(line);
       }),
     );
   }
@@ -637,9 +699,11 @@ export class GrassCuttingScene extends Phaser.Scene {
   /** 玩家移动：键盘为主，虚拟摇杆只需替换 getMoveVector() 的实现 */
   private updateMovement(dt: number): void {
     const v = this.getMoveVector();
-    const speed = this.packed.player.moveSpeed;
+    // T-025：学霸 BUFF 激活时移速提升（倍率来自配置）
+    const speed = this.packed.player.moveSpeed * this.scholar.moveSpeedFactor;
     const len = Math.sqrt(v.x * v.x + v.y * v.y);
-    if (len > 0.001) {
+    this.moving = len > 0.001;
+    if (this.moving) {
       const nx = v.x / len;
       const ny = v.y / len;
       this.player.x += nx * speed * dt;
@@ -690,9 +754,19 @@ export class GrassCuttingScene extends Phaser.Scene {
     );
   }
 
-  /** 把角色与武器贴图摆到当前朝向 */
+  /** 把角色与武器贴图摆到当前朝向（含 T-025 的呼吸/移动 bob） */
   private updateWeaponVisual(): void {
     this.player.setRotation(this.facing);
+
+    // T-025：呼吸感 + 移动 bob——用缩放表达，不碰 x/y（不影响战斗判定坐标）
+    const amp = this.packed.polish.playerBobAmplitude;
+    if (amp > 0) {
+      const phase = (this.elapsed * 1000) / Math.max(200, this.packed.polish.playerBobPeriodMs);
+      const breath = 1 + amp * Math.sin(phase * Math.PI * 2);
+      const wobble = this.moving ? 1 + amp * 0.6 * Math.sin(phase * Math.PI * 6) : 1;
+      this.player.setScale(breath * wobble);
+    }
+
     const hold = this.packed.player.radius;
     this.weaponSprite.setPosition(
       this.player.x + Math.cos(this.facing) * hold,
@@ -866,8 +940,8 @@ export class GrassCuttingScene extends Phaser.Scene {
       sfx.play('levelUp');
       this.floaters.spawn(x, y - 46, `BOSS 击破 +${gained}`, css(Palette.accent.gold), '★');
       // 双层爆散拉开体量差距：金色主爆 + 精英色次爆
-      this.killFx.burst(x, y, Palette.accent.gold, dirX, dirY);
-      this.killFx.burst(x, y, Palette.combat.monsterElite, -dirY, dirX);
+      this.killFx.burst(x, y, Palette.accent.gold, dirX, dirY, this.packed.polish.killShardBonusPerTier * 2);
+      this.killFx.burst(x, y, Palette.combat.monsterElite, -dirY, dirX, this.packed.polish.killShardBonusPerTier * 2);
       this.killFx.requestHitstop(this.weaponSystem.current.hitstopDuration);
       this.killFx.shake(0.006, 160); // GDD 上限：0.006 / 160ms
       this.finish(true, false);
@@ -885,10 +959,119 @@ export class GrassCuttingScene extends Phaser.Scene {
       this.floaters.combo(this.player.x, this.player.y - 42, nextCombo);
     }
 
-    // 击杀三件套：爆散 / 顿帧 / 震动，全部走对象池与可配置开关
-    this.killFx.burst(x, y, Palette.combat.monsterElite, dirX, dirY);
+    // T-025：击杀三件套升级——碎片按学科主题色飞散、连击档位越高碎片越多，
+    // 超大连击（tier 2）追加一道垂直方向的副爆，层次感拉满
+    const shardBonus = tier * this.packed.polish.killShardBonusPerTier;
+    this.killFx.burst(x, y, this.themeAccent, dirX, dirY, shardBonus);
+    if (tier >= 2) {
+      this.killFx.burst(x, y, Palette.accent.gold, -dirY, dirX, this.packed.polish.killShardBonusPerTier);
+    }
     this.killFx.requestHitstop(this.weaponSystem.current.hitstopDuration);
     this.killFx.shake(this.weaponSystem.current.shakeIntensity, 140);
+
+    // T-025：连击里程碑——屏幕中央弹字 + 相机 zoom pulse（阈值来自配置）
+    if (this.packed.polish.comboMilestones.includes(nextCombo)) {
+      this.playComboMilestone(nextCombo);
+    }
+
+    // T-025：学霸 BUFF——概率掉落书本，拾取后短暂提升攻速/移速
+    this.scholar.maybeDrop(x, y);
+  }
+
+  /** T-025：连击里程碑：中央弹字 + 相机 zoom pulse（全部参数来自 polishSettings） */
+  private playComboMilestone(combo: number): void {
+    const polish = this.packed.polish;
+    const label = this.add
+      .text(
+        this.scale.width / 2,
+        this.scale.height * 0.3,
+        `${combo} 连击！`,
+        textStyle(40, css(Palette.accent.gold), { fontStyle: 'bold' }),
+      )
+      .setOrigin(0.5)
+      .setDepth(1300)
+      .setScale(0.6)
+      .setAlpha(0);
+    this.tweens.add({
+      targets: label,
+      alpha: 1,
+      scale: 1.05,
+      duration: 200,
+      ease: 'Back.easeOut',
+    });
+    this.tweens.add({
+      targets: label,
+      alpha: 0,
+      y: '-=24',
+      delay: 620,
+      duration: 260,
+      ease: 'Quad.easeIn',
+      onComplete: () => label.destroy(),
+    });
+
+    const cam = this.cameras.main;
+    cam.zoomTo(1 + polish.comboZoomPulse, polish.comboZoomPulseMs, 'Sine.easeOut');
+    this.time.delayedCall(polish.comboZoomPulseMs, () =>
+      cam.zoomTo(1, polish.comboZoomPulseMs, 'Sine.easeIn'),
+    );
+  }
+
+  /**
+   * T-025：Boss 台词横幅（出场 / 阶段切换 / 死亡共用）。
+   * 金色大字 + 面板底，弹入 → 停留 → 淡出，总时长来自 bossLineDurationMs。
+   */
+  private showBossLine(line: string): void {
+    const polish = this.packed.polish;
+    if (!this.bossLineText || !this.bossLineBg) {
+      this.bossLineBg = this.add.graphics().setDepth(1300);
+      this.bossLineText = this.add
+        .text(0, 0, '', textStyle(polish.bossLineFontSize, css(Palette.accent.gold), { fontStyle: 'bold', align: 'center' }))
+        .setOrigin(0.5)
+        .setDepth(1301);
+    }
+    const bg = this.bossLineBg;
+    const text = this.bossLineText;
+    // 中断上一条台词的动画，横幅位置复用
+    this.tweens.killTweensOf([bg, text]);
+
+    const w = this.scale.width;
+    const y = Math.max(110, Math.min(this.scale.height * 0.22, 150));
+    text.setText(line);
+    text.setPosition(w / 2, y);
+    const boxW = Math.min(w - 60, text.width + 56);
+    const boxH = polish.bossLineFontSize + 28;
+    bg.clear();
+    bg.fillStyle(Palette.background.panel, 0.85);
+    bg.fillRoundedRect(w / 2 - boxW / 2, y - boxH / 2, boxW, boxH, 12);
+    bg.lineStyle(2, Palette.accent.gold, 0.7);
+    bg.strokeRoundedRect(w / 2 - boxW / 2, y - boxH / 2, boxW, boxH, 12);
+
+    text.setAlpha(0).setScale(0.7);
+    bg.setAlpha(0);
+    this.tweens.add({ targets: text, alpha: 1, scale: 1, duration: 240, ease: 'Back.easeOut' });
+    this.tweens.add({ targets: bg, alpha: 1, duration: 240, ease: 'Quad.easeOut' });
+    this.time.delayedCall(Math.max(300, polish.bossLineDurationMs - 260), () => {
+      this.tweens.add({ targets: [bg, text], alpha: 0, duration: 260, ease: 'Quad.easeIn' });
+    });
+  }
+
+  /** T-025：Boss 阶段切换的全屏轻微闪光（金色，alpha 与时长来自配置） */
+  private playPhaseFlash(): void {
+    const polish = this.packed.polish;
+    if (polish.bossPhaseFlashAlpha <= 0) return;
+    const flash = this.add
+      .image(this.scale.width / 2, this.scale.height / 2, TextureKeys.pixel)
+      .setDisplaySize(this.scale.width, this.scale.height)
+      .setTint(Palette.accent.gold)
+      .setDepth(1290)
+      .setAlpha(polish.bossPhaseFlashAlpha);
+    this.tweens.add({
+      targets: flash,
+      alpha: 0,
+      duration: polish.bossPhaseFlashMs,
+      ease: 'Quad.easeOut',
+      onComplete: () => flash.destroy(),
+    });
   }
 
   /** 伤害数字的视觉档位：0 普通 / 1 大连击 / 2 超大连击 */
@@ -1002,49 +1185,6 @@ export class GrassCuttingScene extends Phaser.Scene {
 
   // ───────────────────────── 场景搭建与收尾 ─────────────────────────
 
-  /** 绘制草地场地背景 */
-  private drawField(): void {
-    const w = this.scale.width;
-    const h = this.scale.height;
-    const g = this.add.graphics();
-    g.fillStyle(Palette.background.grassField, 1);
-    g.fillRect(0, 0, w, h);
-
-    // 交替色带，制造草地层次
-    g.fillStyle(Palette.background.grassFieldAlt, 1);
-    for (let y = 0; y < h; y += 96) {
-      g.fillRect(0, y, w, 48);
-    }
-    g.setDepth(-20);
-  }
-
-  /**
-   * 绘制装饰草丛。
-   * 性能说明：这些草丛是纯静态 Graphics，不注册任何碰撞体、不参与任何检测，
-   * 完全符合 GDD 1.2「无碰撞交互的装饰物必须关闭碰撞检测」的要求。
-   */
-  private drawGrassTufts(): void {
-    const w = this.scale.width;
-    const h = this.scale.height;
-    const g = this.add.graphics();
-    g.setDepth(-10);
-
-    // 用固定序列而非随机数，保证每次进入场景草地布局一致，避免视觉抖动
-    let seed = 20240501;
-    const next = (): number => {
-      seed = (seed * 1103515245 + 12345) & 0x7fffffff;
-      return seed / 0x7fffffff;
-    };
-
-    for (let i = 0; i < 90; i++) {
-      const x = next() * w;
-      const y = 64 + next() * (h - 64);
-      const height = 8 + next() * 14;
-      g.fillStyle(Palette.combat.monster, 0.22);
-      g.fillTriangle(x - 5, y, x + 5, y, x, y - height);
-    }
-  }
-
   /** 入场提示：让玩家立刻知道怎么打 */
   private showIntro(): void {
     const w = this.scale.width;
@@ -1123,6 +1263,13 @@ export class GrassCuttingScene extends Phaser.Scene {
     this.floaters?.destroy();
     this.hud?.destroy();
     this.weaponBar?.destroy();
+    this.bossVisual?.destroy();
+    this.bossVisual = null;
+    this.scholar?.destroy();
+    this.bossLineBg?.destroy();
+    this.bossLineBg = null;
+    this.bossLineText?.destroy();
+    this.bossLineText = null;
     this.bossBarBg?.destroy();
     this.bossBarFill?.destroy();
     this.bossBarLabel?.destroy();

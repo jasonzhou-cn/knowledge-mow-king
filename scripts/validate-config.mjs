@@ -29,6 +29,8 @@ const MODULES = [
   'subjectConfig',
   'questionBank',
   'weaponConfig',
+  'bossDialogue',
+  'resultFlavor',
 ];
 
 async function main() {

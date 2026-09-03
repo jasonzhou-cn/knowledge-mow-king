@@ -93,6 +93,12 @@ export class QuestionScene extends Phaser.Scene {
     this.drawBackdrop(subjectMeta ? subjectMeta.themeColor : '#3d7ea6');
     this.buildQuestionPanel(subjectMeta ? subjectMeta.displayName : subject);
 
+    // T-025：场景切换 fade 过渡（时长来自配置）
+    this.cameras.main.fadeIn(
+      ConfigLoader.getInstance().getConfig('grassCuttingConfig').polishSettings.sceneFadeInMs,
+      0, 0, 0,
+    );
+
     // 抽题：数量与难度权重全部来自配置
     const weights = pickDifficultyWeights(this.startData.level, this.questionConfig.difficultySelection);
     const questions: DrawnQuestion[] = questionBank.draw({

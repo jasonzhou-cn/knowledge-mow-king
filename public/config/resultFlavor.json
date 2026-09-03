@@ -1,6 +1,11 @@
 {
-  "version": "1.0.0",
-  "description": "结算界面沙雕文案库（沙雕恶搞风格）。按通关质量分档：perfect/good/ok/bad/fail。结算时随机抽 1 句展示。",
+  "version": "1.1.0",
+  "description": "结算界面沙雕文案库（沙雕恶搞风格）。按表现分档：perfect/good/ok/bad/fail。tierRules 定义正确率档位阈值（从高到低取第一个命中的档）；died 走 fail 档、其余未命中档位走 bad 兜底。结算时随机抽 1 句展示。",
+  "tierRules": {
+    "perfect": { "minAccuracy": 0.95 },
+    "good": { "minAccuracy": 0.8 },
+    "ok": { "minAccuracy": 0.55 }
+  },
   "byResult": {
     "perfect": [
       "满分！你的卷子就是参考答案！",

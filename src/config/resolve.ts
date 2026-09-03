@@ -20,6 +20,7 @@ import type {
   KillFxSettings,
   LevelConfig,
   LevelEntry,
+  PolishSettings,
   QuestionConfig,
   SubjectConfig,
   SubjectKey,
@@ -151,6 +152,8 @@ export interface ResolvedLevelPackage {
   autoAim: AutoAimSettings;
   /** 击杀打击感设置（原样透传） */
   killFx: KillFxSettings;
+  /** T-025 打磨期视觉/趣味参数（原样透传） */
+  polish: PolishSettings;
   /** 触屏操作设置（虚拟摇杆几何与透明度，原样透传） */
   touch: TouchSettings;
   /** 时间驱动难度曲线的起止值（插值在 MonsterSpawner 里按 t 做） */
@@ -508,6 +511,7 @@ export function resolveLevelPackage(
     weapons: resolveWeapons(weaponConfig, level, damageCoefficient, rangeCoefficient, bonus),
     autoAim: weaponConfig.autoAim,
     killFx: weaponConfig.killFx,
+    polish: grassCuttingConfig.polishSettings,
     touch: grassCuttingConfig.touchSettings,
     difficulty: {
       interpolation: ds.interpolation,

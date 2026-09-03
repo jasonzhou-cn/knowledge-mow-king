@@ -125,15 +125,17 @@ export class KillFxSystem {
   /**
    * 击杀爆散：碎片 + 扩散圆环 + 白闪。
    * @param dirX / dirY 命中方向的单位向量，碎片会沿此方向偏置，制造「被打飞」的方向感
+   * @param shardBonus T-025：连击档位带来的额外碎片数（对象池满时自动丢弃，不突破上限）
    */
-  burst(x: number, y: number, tint: number, dirX: number, dirY: number): void {
+  burst(x: number, y: number, tint: number, dirX: number, dirY: number, shardBonus = 0): void {
     const s = this.settings;
+    const count = Math.max(0, Math.min(32, s.shardCount + Math.round(shardBonus)));
 
-    for (let i = 0; i < s.shardCount; i++) {
+    for (let i = 0; i < count; i++) {
       const shard = this.acquire(this.shards);
       if (!shard) break;
 
-      const angle = (i / Math.max(1, s.shardCount)) * TAU + Phaser.Math.FloatBetween(-0.35, 0.35);
+      const angle = (i / Math.max(1, count)) * TAU + Phaser.Math.FloatBetween(-0.35, 0.35);
       // 环形飞散 + 命中方向偏置：既炸得开，又看得出是从哪一边打死的
       const bias = 0.55;
       shard.x = x;

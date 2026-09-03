@@ -140,6 +140,12 @@ export class MenuScene extends Phaser.Scene {
     this.selectedLevel = progression.unlockedLevel;
     this.refreshStats();
 
+    // T-025：场景切换 fade 过渡（时长来自配置）
+    this.cameras.main.fadeIn(
+      ConfigLoader.getInstance().getConfig('grassCuttingConfig').polishSettings.sceneFadeInMs,
+      0, 0, 0,
+    );
+
     // 关卡左右切换（限已解锁范围）
     this.input.keyboard?.on('keydown-LEFT', () => this.shiftLevel(-1));
     this.input.keyboard?.on('keydown-RIGHT', () => this.shiftLevel(1));
