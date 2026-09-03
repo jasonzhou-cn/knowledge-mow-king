@@ -32,6 +32,8 @@ export const TextureKeys = {
   swing: 'fx-swing',
   /** T-025 学霸 BUFF 掉落图标（书本，白色灰度图，运行期 tint 上色） */
   book: 'tex-book',
+  /** T-026 躺平 BUFF 掉落图标（胶囊，白色灰度图，运行期 tint 上色） */
+  lazyCapsule: 'tex-lazy-capsule',
 } as const;
 
 /**
@@ -111,6 +113,7 @@ export class BootScene extends Phaser.Scene {
     this.makeSwingArc();
     this.makeWeapons();
     this.makeBook();
+    this.makeLazyCapsule();
     this.makeBossBodies();
   }
 
@@ -346,6 +349,26 @@ export class BootScene extends Phaser.Scene {
       g.fillRect(16, 6 + i * 4, 6, 1);
     }
     g.generateTexture(TextureKeys.book, w, h);
+    g.destroy();
+  }
+
+  /**
+   * T-026 躺平 BUFF 掉落图标：横躺胶囊（白色灰度图，运行期 tint 成躺平蓝）。
+   * 两瓣胶囊体 + 中间分割线 + 左上高光，一眼能认出「药丸/胶囊 = 躺平解药」。
+   */
+  private makeLazyCapsule(): void {
+    const w = 28;
+    const h = 16;
+    const g = this.make.graphics({ x: 0, y: 0 }, false);
+    g.fillStyle(0xffffff, 1);
+    g.fillRoundedRect(2, 3, 24, 10, 5);
+    // 中间分割线：两瓣胶囊
+    g.fillStyle(0x000000, 0.3);
+    g.fillRect(13, 3, 2, 10);
+    // 左上高光
+    g.fillStyle(0x000000, 0.12);
+    g.fillRoundedRect(4, 5, 7, 2, 1);
+    g.generateTexture(TextureKeys.lazyCapsule, w, h);
     g.destroy();
   }
 

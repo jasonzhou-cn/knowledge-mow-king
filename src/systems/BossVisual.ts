@@ -30,8 +30,8 @@ export function bossTextureKey(bossId: string): string | null {
   return BOSS_TEXTURE_KEYS[bossId] ?? null;
 }
 
-/** 表情模式：普通 / 凶光（阶段 2+） */
-type FaceMode = 'idle' | 'angry';
+/** 表情模式：普通 / 凶光（阶段 2+）/ 死亡（翻白眼） */
+type FaceMode = 'idle' | 'angry' | 'death';
 
 export interface BossVisualOptions {
   bossId: string;
@@ -51,6 +51,8 @@ export class BossVisual {
   private extras: Phaser.GameObjects.Container | null = null;
   private mode: FaceMode = 'idle';
   private followTarget: Phaser.GameObjects.Image | null = null;
+  /** T-026 死亡演出中：容器脱离本体跟随，定格在死亡点等待场景播放消失动画 */
+  private dying = false;
 
   constructor(scene: Phaser.Scene, opts: BossVisualOptions) {
     this.scene = scene;
@@ -118,9 +120,39 @@ export class BossVisual {
     }
   }
 
-  /** 每帧跟随 Boss 本体坐标（由场景 update 调用） */
+  /**
+   * T-026 死亡收场：切「翻白眼 + 流口水」表情并把脸定格在死亡点。
+   * 本体精灵与脸容器的缩放旋转消失动画由场景统一编排（BossVisual 只管脸，不抢时序）。
+   */
+  playDeath(x: number, y: number): void {
+    if (!this.container) return;
+    this.dying = true;
+    this.mode = 'death';
+    this.container.setPosition(x, y);
+    this.container.setVisible(true);
+    this.drawFace();
+  }
+
+  /** T-026 消失动画：脸容器随本体一起缩放旋转淡出（由场景在 vanish 阶段调用） */
+  playVanish(durationMs: number): void {
+    if (!this.container) return;
+    this.scene.tweens.add({
+      targets: this.container,
+      scale: 0,
+      angle: 720,
+      alpha: 0,
+      duration: durationMs,
+      ease: 'Back.easeIn',
+    });
+  }
+
+  /** 每帧跟随 Boss 本体坐标（由场景 update 调用）；死亡演出期间冻结在死亡点 */
   update(x: number, y: number): void {
     if (!this.container || !this.followTarget) return;
+    if (this.dying) {
+      this.container.setVisible(true);
+      return;
+    }
     if (!this.followTarget.active || !this.followTarget.visible) {
       this.container.setVisible(false);
       return;
@@ -160,6 +192,23 @@ export class BossVisual {
       g.beginPath();
       g.arc(0, r * 0.1, r * 0.22, Phaser.Math.DegToRad(25), Phaser.Math.DegToRad(155), false);
       g.strokePath();
+      return;
+    }
+
+    if (this.mode === 'death') {
+      // T-026 死亡脸：翻白眼（白眼球 + 上沿小黑点）+ 张嘴流口水（boss-visual-spec §0.3 death）
+      g.fillStyle(white, 1);
+      g.fillCircle(-eyeX, eyeY, r * 0.12);
+      g.fillCircle(eyeX, eyeY, r * 0.12);
+      g.fillStyle(dark, 1);
+      g.fillCircle(-eyeX, eyeY - r * 0.05, r * 0.04);
+      g.fillCircle(eyeX, eyeY - r * 0.05, r * 0.04);
+      // 张开的小嘴
+      g.fillStyle(dark, 1);
+      g.fillEllipse(0, r * 0.16, r * 0.2, r * 0.14);
+      // 嘴角挂一条口水（静态即可，随后整个 Boss 会缩放消失）
+      g.fillStyle(white, 0.85);
+      g.fillRect(r * 0.06, r * 0.2, Math.max(1.5, r * 0.035), r * 0.16);
       return;
     }
 

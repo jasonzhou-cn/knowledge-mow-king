@@ -35,6 +35,8 @@ export interface GrassCuttingData {
   quiz: QuizResult;
   /** 上一关结算发放的奖励时间（秒） */
   bonusTime: number;
+  /** T-026 本轮答错的题目文案（「题干 → 正确答案」），割草场景用它渲染错题弹幕 */
+  wrongAnswers: string[];
 }
 
 /** 场景内部状态机 */
@@ -64,6 +66,8 @@ export class QuestionScene extends Phaser.Scene {
   private stateTimer = 0;
   private stateDuration = 0;
   private pendingAdvance = false;
+  /** T-026 本轮答错的题目文案（答错/超时各记一条，供割草场景错题弹幕使用） */
+  private wrongAnswers: string[] = [];
 
   constructor() {
     super({ key: 'QuestionScene' });
@@ -313,6 +317,8 @@ export class QuestionScene extends Phaser.Scene {
     // ── 答错：暂停答题流程，展示解题思路（T-016），等待小朋友看完后手动继续 ──
     // 答错时同时高亮正确答案，形成「我选了什么 / 正确是什么」的对照
     sfx.play('wrong');
+    // T-026：记入错题弹幕（快照 q，避免推进后指向下一题）
+    this.wrongAnswers.push(`${q.question} → ${q.correctText}`);
     if (this.selector) this.selector.setState(q.answerIndex, 'correct');
     else if (this.cursorSel) this.cursorSel.setState(q.answerIndex, 'correct');
     else this.track?.setState(q.answerIndex, 'correct');
@@ -349,6 +355,8 @@ export class QuestionScene extends Phaser.Scene {
     // 与 handleStop 同理：registerTimeout 内部会推进 index，先快照当前题
     const q = engine.current;
     engine.registerTimeout();
+    // T-026：超时也算答错，记入错题弹幕
+    this.wrongAnswers.push(`${q.question} → ${q.correctText}`);
     sfx.play('wrong');
     if (this.selector) this.selector.setState(q.answerIndex, 'correct');
     else if (this.cursorSel) this.cursorSel.setState(q.answerIndex, 'correct');
@@ -504,6 +512,7 @@ export class QuestionScene extends Phaser.Scene {
         bonus,
         quiz,
         bonusTime: this.startData.bonusTime ?? 0,
+        wrongAnswers: this.wrongAnswers.slice(),
       };
       this.scene.start('GrassCuttingScene', data);
     };
@@ -560,6 +569,9 @@ export class QuestionScene extends Phaser.Scene {
       .text(panelX + 16 * s, panelY + 6 * s, subjectName, textStyle(Math.round(15 * s), css(Palette.accent.secondary)))
       .setOrigin(0, 0);
     subjectTag.setDepth(2);
+
+    // 场景单例复用：每次重进答题必须清空上一轮的错题记录
+    this.wrongAnswers = [];
 
     this.questionText = this.add
       .text(w / 2, panelY + panelH / 2, '', textStyle(Math.round(28 * s), css(Palette.text.primary), {

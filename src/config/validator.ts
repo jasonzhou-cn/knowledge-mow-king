@@ -885,6 +885,36 @@ function validateGrassCuttingConfig(raw: unknown): Validator {
   v.number(buff, 'duration', `${pBase}.scholarBuff.duration`, { min: 0.5, max: 60 });
   v.number(buff, 'cooldownMultiplier', `${pBase}.scholarBuff.cooldownMultiplier`, { min: 0.2, max: 1 });
   v.number(buff, 'moveSpeedMultiplier', `${pBase}.scholarBuff.moveSpeedMultiplier`, { min: 1, max: 2 });
+
+  // ─────────────── T-026 polishSettings 新增段校验 ───────────────
+  const death = v.object(pl, 'bossDeath', `${pBase}.bossDeath`);
+  v.integer(death, 'hitstopMs', `${pBase}.bossDeath.hitstopMs`, { min: 0, max: 400 });
+  v.integer(death, 'vanishMs', `${pBase}.bossDeath.vanishMs`, { min: 200, max: 2000 });
+  v.integer(death, 'sequenceTotalMs', `${pBase}.bossDeath.sequenceTotalMs`, { min: 800, max: 3000 });
+  if (Number(death.sequenceTotalMs) < Number(death.hitstopMs) + Number(death.vanishMs)) {
+    v.custom(
+      `${pBase}.bossDeath.sequenceTotalMs`,
+      `死亡序列总时长（${death.sequenceTotalMs}ms）必须 ≥ hitstopMs + vanishMs（${Number(death.hitstopMs) + Number(death.vanishMs)}ms）`,
+    );
+  }
+
+  const danmaku = v.object(pl, 'wrongDanmaku', `${pBase}.wrongDanmaku`);
+  v.number(danmaku, 'speed', `${pBase}.wrongDanmaku.speed`, { min: 10, max: 600 });
+  v.integer(danmaku, 'fontSize', `${pBase}.wrongDanmaku.fontSize`, { min: 9, max: 40 });
+  v.number(danmaku, 'alpha', `${pBase}.wrongDanmaku.alpha`, { min: 0.1, max: 1 });
+  v.integer(danmaku, 'maxOnScreen', `${pBase}.wrongDanmaku.maxOnScreen`, { min: 0, max: 12 });
+  v.number(danmaku, 'spawnIntervalSec', `${pBase}.wrongDanmaku.spawnIntervalSec`, { min: 0.2, max: 10 });
+  v.number(danmaku, 'bandTopRatio', `${pBase}.wrongDanmaku.bandTopRatio`, { min: 0.3, max: 0.95 });
+  v.number(danmaku, 'bandBottomRatio', `${pBase}.wrongDanmaku.bandBottomRatio`, { min: 0.3, max: 0.98 });
+  if (Number(danmaku.bandBottomRatio) <= Number(danmaku.bandTopRatio)) {
+    v.custom(`${pBase}.wrongDanmaku.bandBottomRatio`, `弹幕带下沿（${danmaku.bandBottomRatio}）必须大于上沿（${danmaku.bandTopRatio}）`);
+  }
+
+  const lazy = v.object(pl, 'lazyBuff', `${pBase}.lazyBuff`);
+  v.number(lazy, 'dropChance', `${pBase}.lazyBuff.dropChance`, { min: 0, max: 1 });
+  v.integer(lazy, 'maxDropsPerLevel', `${pBase}.lazyBuff.maxDropsPerLevel`, { min: 0, max: 50 });
+  v.number(lazy, 'duration', `${pBase}.lazyBuff.duration`, { min: 0.5, max: 60 });
+  v.number(lazy, 'moveSpeedMultiplier', `${pBase}.lazyBuff.moveSpeedMultiplier`, { min: 0.3, max: 1 });
   return v;
 }
 

@@ -415,6 +415,46 @@ export interface ScholarBuffSettings {
   moveSpeedMultiplier: number;
 }
 
+/** T-026 Boss 死亡收场演出参数（hitstop → 表情定格 → 缩放旋转消失 → 切结算） */
+export interface BossDeathSettings {
+  /** Boss 死亡瞬间的全屏 hitstop 时长（毫秒） */
+  hitstopMs: number;
+  /** 缩放旋转消失动画时长（毫秒），从序列剩余时间等于该值时启动 */
+  vanishMs: number;
+  /** 死亡序列总时长（毫秒），结束后才切换结算场景 */
+  sequenceTotalMs: number;
+}
+
+/** T-026 错题弹幕参数（本轮答错的题目从屏幕右侧向左飘过） */
+export interface WrongDanmakuSettings {
+  /** 飘过速度（像素/秒） */
+  speed: number;
+  /** 字号（px） */
+  fontSize: number;
+  /** 文字透明度 0~1 */
+  alpha: number;
+  /** 同屏最大条数 */
+  maxOnScreen: number;
+  /** 两条弹幕的生成间隔（秒） */
+  spawnIntervalSec: number;
+  /** 弹幕活动带的上沿（相对屏高比例） */
+  bandTopRatio: number;
+  /** 弹幕活动带的下沿（相对屏高比例） */
+  bandBottomRatio: number;
+}
+
+/** T-026 躺平 BUFF 参数（随机掉落躺平胶囊，拾取后短暂无敌但移速下降） */
+export interface LazyBuffSettings {
+  /** 每次击杀的掉落概率 0~1 */
+  dropChance: number;
+  /** 单关掉落次数上限 */
+  maxDropsPerLevel: number;
+  /** BUFF 持续时长（秒） */
+  duration: number;
+  /** 移速倍率（<1 = 拾取后移速小幅降低，代价感） */
+  moveSpeedMultiplier: number;
+}
+
 /** T-025 打磨期全部视觉/趣味参数（数值解耦红线：一律进配置，不硬编码） */
 export interface PolishSettings {
   /** 场景进入时的 fadeIn 时长（毫秒） */
@@ -447,6 +487,12 @@ export interface PolishSettings {
   themeDeco: ThemeDecoSettings;
   /** 学霸 BUFF 参数 */
   scholarBuff: ScholarBuffSettings;
+  /** T-026 Boss 死亡收场演出参数 */
+  bossDeath: BossDeathSettings;
+  /** T-026 错题弹幕参数 */
+  wrongDanmaku: WrongDanmakuSettings;
+  /** T-026 躺平 BUFF 参数 */
+  lazyBuff: LazyBuffSettings;
 }
 
 /**

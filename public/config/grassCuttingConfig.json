@@ -106,6 +106,26 @@
       "duration": 5,
       "cooldownMultiplier": 0.7,
       "moveSpeedMultiplier": 1.25
+    },
+    "bossDeath": {
+      "hitstopMs": 120,
+      "vanishMs": 750,
+      "sequenceTotalMs": 1500
+    },
+    "wrongDanmaku": {
+      "speed": 90,
+      "fontSize": 16,
+      "alpha": 0.6,
+      "maxOnScreen": 4,
+      "spawnIntervalSec": 1.6,
+      "bandTopRatio": 0.66,
+      "bandBottomRatio": 0.86
+    },
+    "lazyBuff": {
+      "dropChance": 0.035,
+      "maxDropsPerLevel": 2,
+      "duration": 6,
+      "moveSpeedMultiplier": 0.85
     }
   },
   "bossRoster": {

@@ -38,6 +38,8 @@ import { DoomZoneSystem } from '../systems/DoomZone';
 import { BossSkillController } from '../systems/BossSkillController';
 import { BossVisual } from '../systems/BossVisual';
 import { ScholarBuffSystem } from '../systems/ScholarBuffSystem';
+import { LazyBuffSystem } from '../systems/LazyBuffSystem';
+import { WrongDanmakuSystem } from '../systems/WrongDanmakuSystem';
 import { applySceneTheme } from '../systems/SceneTheme';
 import { getCanvasMode } from '../config/CanvasMode';
 import { sfx } from '../systems/SfxController';
@@ -156,6 +158,16 @@ export class GrassCuttingScene extends Phaser.Scene {
   private bossVisual: BossVisual | null = null;
   /** T-025：学霸 BUFF（击杀掉书 → 拾取后短暂攻速/移速提升） */
   private scholar!: ScholarBuffSystem;
+  /** T-026：躺平 BUFF（击杀概率掉胶囊 → 拾取后短暂无敌但移速下降） */
+  private lazy!: LazyBuffSystem;
+  /** T-026：错题弹幕（本轮答错的题目从右向左飘过屏幕底部活动带） */
+  private danmaku!: WrongDanmakuSystem;
+  /** T-026：Boss 死亡收场序列剩余时间（秒，真实时间），> 0 表示演出中、世界冻结 */
+  private deathSeqRemaining = 0;
+  /** T-026：死亡消失动画是否已启动 */
+  private deathVanishStarted = false;
+  /** T-026：死亡演出中的 Boss 本体精灵（kill() 已回收，序列期间重新点亮定格） */
+  private deathBossSprite: Phaser.GameObjects.Image | null = null;
   /** T-025：本关学科主题强调色（击杀碎片按主题色飞散） */
   private themeAccent: number = Palette.combat.monsterElite;
   /** T-025：Boss 台词横幅（出场/阶段/死亡共用一组，避免泄漏） */
@@ -316,6 +328,20 @@ export class GrassCuttingScene extends Phaser.Scene {
       playerRadius: this.packed.player.radius,
     });
 
+    // T-026：躺平 BUFF（击杀概率掉胶囊，拾取后短暂无敌但移速小幅下降）
+    this.lazy = new LazyBuffSystem(this, {
+      settings: this.packed.polish.lazyBuff,
+      pickupRadius: this.packed.player.radius + 20,
+      playerRadius: this.packed.player.radius,
+    });
+
+    // T-026：错题弹幕（无错题时零弹幕，不打扰）
+    this.danmaku = new WrongDanmakuSystem(this, {
+      settings: this.packed.polish.wrongDanmaku,
+      items: incoming.wrongAnswers ?? [],
+      color: this.themeAccent,
+    });
+
     // 虚拟摇杆只在触屏设备创建：PC 端 joystick 保持 null，观感与操作完全不变
     if (this.sys.game.device.input.touch) {
       this.joystick = new TouchJoystick(this, { settings: this.packed.touch });
@@ -443,6 +469,14 @@ export class GrassCuttingScene extends Phaser.Scene {
         get scholarActive()  { return self.scholar ? self.scholar.active : null; },
         get scholarDrops()   { return self.scholar ? self.scholar.dropsSpawnedCount : null; },
         get themeAccent()    { return `#${self.themeAccent.toString(16).padStart(6, '0')}`; },
+        // T-026：Boss 死亡收场 / 错题弹幕 / 躺平 BUFF 状态（debug/verify 用，只读）
+        get bossDeathActive()   { return self.deathSeqRemaining > 0; },
+        get bossDeathRemaining(){ return self.deathSeqRemaining; },
+        get danmakuCount()      { return self.danmaku ? self.danmaku.activeCount : null; },
+        get danmakuItems()      { return self.danmaku ? self.danmaku.itemCount : null; },
+        get lazyActive()        { return self.lazy ? self.lazy.active : null; },
+        get lazyDrops()         { return self.lazy ? self.lazy.dropsSpawnedCount : null; },
+        get lazyRemaining()     { return self.lazy ? self.lazy.remaining : null; },
       };
     }
   }
@@ -486,6 +520,13 @@ export class GrassCuttingScene extends Phaser.Scene {
     this.bossLineBg = null;
     this.bossLineText?.destroy();
     this.bossLineText = null;
+
+    // T-026：上一局的躺平/弹幕系统与死亡序列状态一并复位（对象在 create 里重建）
+    this.lazy?.destroy();
+    this.danmaku?.destroy();
+    this.deathSeqRemaining = 0;
+    this.deathVanishStarted = false;
+    this.deathBossSprite = null;
   }
 
   override update(_time: number, delta: number): void {
@@ -494,6 +535,25 @@ export class GrassCuttingScene extends Phaser.Scene {
     // 顿帧必须用真实时间倒计时：若用被缩放的 dt，timeScale=0.05 会把 70ms 拉成 1.4 秒
     const rawDt = Math.min(delta, 100) / 1000;
     this.killFx.update(rawDt);
+
+    // T-026：Boss 死亡收场序列——真实时间推进，期间整个世界冻结
+    // （小怪停止刷新与移动、玩家不可再受伤、倒计时停住），结束后才移交结算场景
+    if (this.deathSeqRemaining > 0) {
+      this.deathSeqRemaining -= rawDt;
+      const vanishSec = this.packed.polish.bossDeath.vanishMs / 1000;
+      if (!this.deathVanishStarted && this.deathSeqRemaining <= vanishSec) {
+        this.deathVanishStarted = true;
+        this.playBossVanish();
+      }
+      // 序列期间击杀爆散照常飞（顿帧那一下仍然冻住，保持卡肉感）
+      this.killFx.updateFx(this.killFx.hitstopActive ? 0 : rawDt);
+      if (this.deathSeqRemaining <= 0) {
+        this.deathSeqRemaining = 0;
+        this.finish(true, false);
+        return;
+      }
+      return;
+    }
 
     // 其余系统全部走缩放后的 dt，顿帧期间整个世界一起「卡住」
     const dt = rawDt * this.time.timeScale;
@@ -524,6 +584,12 @@ export class GrassCuttingScene extends Phaser.Scene {
 
     // T-025：学霸 BUFF 掉落拾取与计时
     this.scholar.update(dt, this.player.x, this.player.y);
+
+    // T-026：躺平 BUFF 掉落拾取与计时
+    this.lazy.update(dt, this.player.x, this.player.y);
+
+    // T-026：错题弹幕推进
+    this.danmaku.update(dt);
 
     this.projectiles.update(dt, this.spawner.monsters, (payload) => this.onProjectileHit(payload));
 
@@ -699,8 +765,8 @@ export class GrassCuttingScene extends Phaser.Scene {
   /** 玩家移动：键盘为主，虚拟摇杆只需替换 getMoveVector() 的实现 */
   private updateMovement(dt: number): void {
     const v = this.getMoveVector();
-    // T-025：学霸 BUFF 激活时移速提升（倍率来自配置）
-    const speed = this.packed.player.moveSpeed * this.scholar.moveSpeedFactor;
+    // T-025：学霸 BUFF 激活时移速提升；T-026：躺平 BUFF 激活时移速小幅下降（倍率都来自配置）
+    const speed = this.packed.player.moveSpeed * this.scholar.moveSpeedFactor * this.lazy.moveSpeedFactor;
     const len = Math.sqrt(v.x * v.x + v.y * v.y);
     this.moving = len > 0.001;
     if (this.moving) {
@@ -933,7 +999,7 @@ export class GrassCuttingScene extends Phaser.Scene {
   private onMonsterKilled(monster: Monster, x: number, y: number, dirX: number, dirY: number): void {
     const gained = monster.score;
 
-    // Boss 击杀 = Boss 关通关：强化反馈 + 提前进入结算（cleared=true）
+    // Boss 击杀 = Boss 关通关：强化反馈 + 死亡收场演出后再进结算（cleared=true）
     if (monster.isBoss) {
       this.kills++;
       this.score += gained;
@@ -942,9 +1008,10 @@ export class GrassCuttingScene extends Phaser.Scene {
       // 双层爆散拉开体量差距：金色主爆 + 精英色次爆
       this.killFx.burst(x, y, Palette.accent.gold, dirX, dirY, this.packed.polish.killShardBonusPerTier * 2);
       this.killFx.burst(x, y, Palette.combat.monsterElite, -dirY, dirX, this.packed.polish.killShardBonusPerTier * 2);
-      this.killFx.requestHitstop(this.weaponSystem.current.hitstopDuration);
+      // T-026：死亡瞬间的全屏 hitstop（时长来自 polishSettings.bossDeath）
+      this.killFx.requestHitstop(this.packed.polish.bossDeath.hitstopMs);
       this.killFx.shake(0.006, 160); // GDD 上限：0.006 / 160ms
-      this.finish(true, false);
+      this.startBossDeathSequence(x, y, monster);
       return;
     }
 
@@ -976,6 +1043,49 @@ export class GrassCuttingScene extends Phaser.Scene {
 
     // T-025：学霸 BUFF——概率掉落书本，拾取后短暂提升攻速/移速
     this.scholar.maybeDrop(x, y);
+
+    // T-026：躺平 BUFF——概率掉落胶囊，拾取后短暂无敌但移速小幅下降
+    this.lazy.maybeDrop(x, y);
+  }
+
+  /**
+   * T-026：Boss 死亡收场序列启动（时序编排，参数全部来自 polishSettings.bossDeath）：
+   *  hitstopMs   —— 全屏 hitstop（Boss 定格在死亡脸，世界冻结）；
+   *  中段        —— 死亡台词横幅展示（onBossDeath 监听里已有）、金色爆散飞散；
+   *  vanishMs    —— 翻白眼 + 缩放旋转消失动画（playBossVanish）；
+   *  序列结束    —— 移交结算场景。序列期间 update() 提前返回，世界完全冻结。
+   */
+  private startBossDeathSequence(x: number, y: number, monster: Monster): void {
+    // Boss 本体在 kill() 时已被对象池回收（隐藏），这里重新点亮并定格在死亡点。
+    // 序列期间刷怪已冻结、结束后直接切场景，这个槽位不会被新怪复用。
+    monster.sprite.setActive(true).setVisible(true);
+    monster.sprite.setPosition(x, y);
+    monster.sprite.setTint(Palette.accent.gold);
+    this.deathBossSprite = monster.sprite;
+
+    // 死亡脸（翻白眼 + 流口水）定格：BossVisual 脱离本体跟随，冻结在死亡点
+    this.bossVisual?.playDeath(x, y);
+
+    this.deathSeqRemaining = this.packed.polish.bossDeath.sequenceTotalMs / 1000;
+    this.deathVanishStarted = false;
+  }
+
+  /** T-026：消失动画——Boss 本体与脸容器一起缩放旋转淡出，并补一发金色副爆 */
+  private playBossVanish(): void {
+    const ms = this.packed.polish.bossDeath.vanishMs;
+    const sprite = this.deathBossSprite;
+    if (sprite) {
+      this.tweens.add({
+        targets: sprite,
+        scale: 0,
+        angle: 720,
+        alpha: 0,
+        duration: ms,
+        ease: 'Back.easeIn',
+      });
+      this.killFx.burst(sprite.x, sprite.y, Palette.accent.gold, 0, -1, this.packed.polish.killShardBonusPerTier);
+    }
+    this.bossVisual?.playVanish(ms);
   }
 
   /** T-025：连击里程碑：中央弹字 + 相机 zoom pulse（全部参数来自 polishSettings） */
@@ -1112,6 +1222,8 @@ export class GrassCuttingScene extends Phaser.Scene {
 
   /** 玩家受伤处理 */
   private applyDamageToPlayer(amount: number): void {
+    // T-026：躺平 BUFF 激活期间无敌（接触伤害与 DoomZone 都从这里走），不消耗无敌帧
+    if (this.lazy?.active) return;
     this.hp -= amount;
     sfx.play('hurt');
     this.tookDamage = true;
@@ -1266,6 +1378,8 @@ export class GrassCuttingScene extends Phaser.Scene {
     this.bossVisual?.destroy();
     this.bossVisual = null;
     this.scholar?.destroy();
+    this.lazy?.destroy();
+    this.danmaku?.destroy();
     this.bossLineBg?.destroy();
     this.bossLineBg = null;
     this.bossLineText?.destroy();
