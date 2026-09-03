@@ -40,7 +40,7 @@ await sleep(1500);
 // 引导出现？截图步骤 1
 const hasOverlay = await page.evaluate(`(() => {
   const s = window.__KB_GAME__;
-  const active = s && s.scene ? s.scene.scenes.filter(w => w.sys && w.sys.settings && w.sys.settings.status === 3).map(w => w.key) : [];
+  const active = s && s.scene ? s.scene.scenes.filter(w => w.scene.isActive()).map(w => w.scene.key) : [];
   return active;
 })()`);
 console.log('点击开始后活跃场景:', JSON.stringify(hasOverlay), '（应为 MenuScene=引导在菜单内展示）');
@@ -59,7 +59,7 @@ await sleep(1500);
 // 应已进入 QuestionScene
 const active2 = await page.evaluate(`(() => {
   const g = window.__KB_GAME__;
-  return g.scene.scenes.filter(w => w.sys && w.sys.settings && w.sys.settings.status === 3).map(w => w.key);
+  return g.scene.scenes.filter(w => w.scene.isActive()).map(w => w.scene.key);
 })()`);
 console.log('引导完成后活跃场景:', JSON.stringify(active2));
 const tutDone = await page.evaluate(`localStorage.getItem('knowledge-mow-king.tutorial.v1')`);
@@ -69,13 +69,13 @@ await page.shot(path.join(OUT, 'after-tutorial-question.png'));
 // 返回菜单验证二次进入不显示引导：直接 reload（存档仍在，unlockedLevel=1）
 await page.send('Page.reload');
 await sleep(3500);
-const active3 = await page.evaluate(`(() => { const g = window.__KB_GAME__; return g.scene.scenes.filter(w => w.sys && w.sys.settings && w.sys.settings.status === 3).map(w => w.key); })()`);
+const active3 = await page.evaluate(`(() => { const g = window.__KB_GAME__; return g.scene.scenes.filter(w => w.scene.isActive()).map(w => w.scene.key); })()`);
 console.log('reload 后活跃场景:', JSON.stringify(active3), '（应为 MenuScene）');
 // 再点开始 → 应直接进 QuestionScene
 await page.send('Input.dispatchMouseEvent', { type: 'mousePressed', x: 512, y: 334, button: 'left', clickCount: 1 });
 await page.send('Input.dispatchMouseEvent', { type: 'mouseReleased', x: 512, y: 334, button: 'left', clickCount: 1 });
 await sleep(1800);
-const active4 = await page.evaluate(`(() => { const g = window.__KB_GAME__; return g.scene.scenes.filter(w => w.sys && w.sys.settings && w.sys.settings.status === 3).map(w => w.key); })()`);
+const active4 = await page.evaluate(`(() => { const g = window.__KB_GAME__; return g.scene.scenes.filter(w => w.scene.isActive()).map(w => w.scene.key); })()`);
 console.log('二次点击开始后活跃场景:', JSON.stringify(active4), tutDone === 'done' && active4.includes('QuestionScene') ? '✓ 不再显示引导' : '⚠️ 二次仍显示或未进入');
 await page.shot(path.join(OUT, 'second-entry-question.png'));
 
