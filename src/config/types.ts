@@ -455,6 +455,29 @@ export interface LazyBuffSettings {
   moveSpeedMultiplier: number;
 }
 
+/**
+ * T-027 考神召唤参数（fun-event-visual.md §4：Boss 关专属，Boss 生成时同时召唤
+ * 数个迷你 Boss 等距环绕、缓慢旋转，纯氛围装饰但可被玩家击杀，不攻击玩家）。
+ */
+export interface ExamSummonSettings {
+  /** 迷你 Boss 数量（0 = 关闭该事件） */
+  miniCount: number;
+  /** 迷你 Boss 碰撞半径（像素） */
+  radius: number;
+  /** 环绕半径（像素，相对 Boss 中心） */
+  orbitRadius: number;
+  /** 环绕一周的时长（毫秒） */
+  orbitPeriodMs: number;
+  /** 迷你 Boss 血量 = 普通小怪 hp × 该系数（可被打掉，但别太脆） */
+  hpFactor: number;
+  /** 逐个弹入的错峰间隔（毫秒） */
+  popStaggerMs: number;
+  /** 单个弹入动画时长（毫秒） */
+  popInMs: number;
+  /** Boss 死亡时迷你 Boss 哀悼消散时长（毫秒） */
+  fadeOutMs: number;
+}
+
 /** T-025 打磨期全部视觉/趣味参数（数值解耦红线：一律进配置，不硬编码） */
 export interface PolishSettings {
   /** 场景进入时的 fadeIn 时长（毫秒） */
@@ -493,6 +516,8 @@ export interface PolishSettings {
   wrongDanmaku: WrongDanmakuSettings;
   /** T-026 躺平 BUFF 参数 */
   lazyBuff: LazyBuffSettings;
+  /** T-027 考神召唤参数（Boss 关专属氛围事件） */
+  examSummon: ExamSummonSettings;
 }
 
 /**

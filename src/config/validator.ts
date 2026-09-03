@@ -915,6 +915,17 @@ function validateGrassCuttingConfig(raw: unknown): Validator {
   v.integer(lazy, 'maxDropsPerLevel', `${pBase}.lazyBuff.maxDropsPerLevel`, { min: 0, max: 50 });
   v.number(lazy, 'duration', `${pBase}.lazyBuff.duration`, { min: 0.5, max: 60 });
   v.number(lazy, 'moveSpeedMultiplier', `${pBase}.lazyBuff.moveSpeedMultiplier`, { min: 0.3, max: 1 });
+
+  // ─────────────── T-027 polishSettings 新增段校验 ───────────────
+  const summon = v.object(pl, 'examSummon', `${pBase}.examSummon`);
+  v.integer(summon, 'miniCount', `${pBase}.examSummon.miniCount`, { min: 0, max: 6 });
+  v.integer(summon, 'radius', `${pBase}.examSummon.radius`, { min: 8, max: 30 });
+  v.integer(summon, 'orbitRadius', `${pBase}.examSummon.orbitRadius`, { min: 20, max: 200 });
+  v.integer(summon, 'orbitPeriodMs', `${pBase}.examSummon.orbitPeriodMs`, { min: 2000, max: 20000 });
+  v.number(summon, 'hpFactor', `${pBase}.examSummon.hpFactor`, { min: 0.1, max: 1.5 });
+  v.integer(summon, 'popStaggerMs', `${pBase}.examSummon.popStaggerMs`, { min: 0, max: 1000 });
+  v.integer(summon, 'popInMs', `${pBase}.examSummon.popInMs`, { min: 100, max: 1000 });
+  v.integer(summon, 'fadeOutMs', `${pBase}.examSummon.fadeOutMs`, { min: 100, max: 1000 });
   return v;
 }
 

@@ -34,6 +34,8 @@ export const TextureKeys = {
   book: 'tex-book',
   /** T-026 躺平 BUFF 掉落图标（胶囊，白色灰度图，运行期 tint 上色） */
   lazyCapsule: 'tex-lazy-capsule',
+  /** T-027 考神召唤迷你 Boss 底型（白色正圆灰度图，运行期按原 Boss 主题色 tint） */
+  miniBoss: 'tex-buff-miniboss',
 } as const;
 
 /**
@@ -114,6 +116,7 @@ export class BootScene extends Phaser.Scene {
     this.makeWeapons();
     this.makeBook();
     this.makeLazyCapsule();
+    this.makeMiniBossBody();
     this.makeBossBodies();
   }
 
@@ -369,6 +372,20 @@ export class BootScene extends Phaser.Scene {
     g.fillStyle(0x000000, 0.12);
     g.fillRoundedRect(4, 5, 7, 2, 1);
     g.generateTexture(TextureKeys.lazyCapsule, w, h);
+    g.destroy();
+  }
+
+  /**
+   * T-027 考神召唤的迷你 Boss 底型（fun-event-visual.md §4/§9.1 tex_buff_miniboss）：
+   * 28×28 白色正圆 + 内圈弱描边，白色灰度图，运行期由 ExamSummonSystem 按原 Boss 主题色 tint。
+   */
+  private makeMiniBossBody(): void {
+    const g = this.make.graphics({ x: 0, y: 0 }, false);
+    g.fillStyle(0xffffff, 1);
+    g.fillCircle(14, 14, 13);
+    g.lineStyle(1.5, 0x000000, 0.16);
+    g.strokeCircle(14, 14, 10);
+    g.generateTexture(TextureKeys.miniBoss, 28, 28);
     g.destroy();
   }
 

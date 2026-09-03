@@ -126,6 +126,16 @@
       "maxDropsPerLevel": 2,
       "duration": 6,
       "moveSpeedMultiplier": 0.85
+    },
+    "examSummon": {
+      "miniCount": 4,
+      "radius": 14,
+      "orbitRadius": 60,
+      "orbitPeriodMs": 8000,
+      "hpFactor": 1.2,
+      "popStaggerMs": 150,
+      "popInMs": 300,
+      "fadeOutMs": 300
     }
   },
   "bossRoster": {

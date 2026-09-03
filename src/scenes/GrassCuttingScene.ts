@@ -39,6 +39,7 @@ import { BossSkillController } from '../systems/BossSkillController';
 import { BossVisual } from '../systems/BossVisual';
 import { ScholarBuffSystem } from '../systems/ScholarBuffSystem';
 import { LazyBuffSystem } from '../systems/LazyBuffSystem';
+import { ExamSummonSystem } from '../systems/ExamSummonSystem';
 import { WrongDanmakuSystem } from '../systems/WrongDanmakuSystem';
 import { applySceneTheme } from '../systems/SceneTheme';
 import { getCanvasMode } from '../config/CanvasMode';
@@ -162,6 +163,10 @@ export class GrassCuttingScene extends Phaser.Scene {
   private lazy!: LazyBuffSystem;
   /** T-026：错题弹幕（本轮答错的题目从右向左飘过屏幕底部活动带） */
   private danmaku!: WrongDanmakuSystem;
+  /** T-027：考神召唤（Boss 关专属：迷你 Boss 环绕氛围，可被击杀、不攻击） */
+  private examSummon: ExamSummonSystem | null = null;
+  /** T-027：上一击是否为迷你 Boss（registerKill 钩子跳过连击登记用） */
+  private minibossKillFlag = false;
   /** T-026：Boss 死亡收场序列剩余时间（秒，真实时间），> 0 表示演出中、世界冻结 */
   private deathSeqRemaining = 0;
   /** T-026：死亡消失动画是否已启动 */
@@ -181,6 +186,8 @@ export class GrassCuttingScene extends Phaser.Scene {
   private bossBarLabel: Phaser.GameObjects.Text | null = null;
   /** Boss 血条的几何（重绘 fill 时需要与底框严格对齐） */
   private bossBarBox: { x: number; y: number; w: number; h: number } | null = null;
+  /** T-027：死亡序列已触发血条淡出（updateBossBar 停止重绘，避免盖掉淡出动画） */
+  private bossBarFading = false;
   /** 底部加成文案的左起始 x（触屏时右移以避让虚拟摇杆） */
   private bottomTextX = 16;
 
@@ -407,6 +414,13 @@ export class GrassCuttingScene extends Phaser.Scene {
           if (damage > 0) this.applyDoomZoneDamage(damage);
         },
       });
+      // T-027：考神召唤（fun-event-visual.md §4）：Boss 生成时召唤迷你 Boss 环绕
+      this.examSummon = new ExamSummonSystem({
+        scene: this,
+        spawner: this.spawner,
+        settings: this.packed.polish.examSummon,
+        baseMonsterHp: m.hp,
+      });
       // 等 Boss 生成后再 start() BossSkillController（在 updateBoss 时机）
     }
 
@@ -477,6 +491,11 @@ export class GrassCuttingScene extends Phaser.Scene {
         get lazyActive()        { return self.lazy ? self.lazy.active : null; },
         get lazyDrops()         { return self.lazy ? self.lazy.dropsSpawnedCount : null; },
         get lazyRemaining()     { return self.lazy ? self.lazy.remaining : null; },
+        // T-027：BUFF 优先级压制 / 考神召唤 / Boss 血条淡出状态（debug/verify 用，只读）
+        get lazySuppressed()    { return self.lazy ? self.lazy.isSuppressed : null; },
+        get examSummonTotal()   { return self.examSummon ? self.examSummon.totalSpawned : null; },
+        get examSummonAlive()   { return self.examSummon ? self.examSummon.aliveCount : null; },
+        get bossBarFading()     { return self.bossBarFading; },
       };
     }
   }
@@ -527,6 +546,12 @@ export class GrassCuttingScene extends Phaser.Scene {
     this.deathSeqRemaining = 0;
     this.deathVanishStarted = false;
     this.deathBossSprite = null;
+    // T-027：死亡血条淡出标记复位（血条组件在 create 里重建）
+    this.bossBarFading = false;
+    this.minibossKillFlag = false;
+    // T-027：上一局的考神召唤一并复位（Boss 关在 create 里重建）
+    this.examSummon?.destroy();
+    this.examSummon = null;
   }
 
   override update(_time: number, delta: number): void {
@@ -582,8 +607,18 @@ export class GrassCuttingScene extends Phaser.Scene {
       if (bp) this.bossVisual.update(bp.x, bp.y);
     }
 
+    // T-027：考神召唤的迷你 Boss 环绕跟随本体
+    if (this.examSummon) {
+      const bp = this.spawner.bossPosition;
+      if (bp) this.examSummon.update(dt, bp.x, bp.y);
+    }
+
     // T-025：学霸 BUFF 掉落拾取与计时
     this.scholar.update(dt, this.player.x, this.player.y);
+
+    // T-027：BUFF 并存优先级（fun-event-visual.md §8）——学霸激活期间压制躺平
+    //（躺平视觉隐藏、无敌/移速暂停、剩余时间冻结，学霸结束后自动恢复）
+    this.lazy.setSuppressed(this.scholar.active);
 
     // T-026：躺平 BUFF 掉落拾取与计时
     this.lazy.update(dt, this.player.x, this.player.y);
@@ -641,6 +676,10 @@ export class GrassCuttingScene extends Phaser.Scene {
       radius: bossMonster.radius,
     });
     this.bossVisual.attach(bossMonster.sprite);
+
+    // T-027：考神召唤与 Boss 生成同时触发（fun-event-visual.md §4.1 不延迟）
+    this.examSummon?.spawnOnBoss(bossMonster.sprite.x, bossMonster.sprite.y);
+
     const introLine = unloadText('intro');
     if (introLine) this.showBossLine(introLine);
 
@@ -697,6 +736,8 @@ export class GrassCuttingScene extends Phaser.Scene {
     this.bossUnsubFns.push(
       this.spawner.onBossDeath(() => {
         this.bossSkill?.stop();
+        // T-027：Boss 死亡 → 迷你 Boss 哀悼消散（fun-event-visual.md §4.2）
+        this.examSummon?.playMourning();
         // T-025：Boss 死亡收场台词（金色横幅）
         const line = unloadText('death');
         if (line) this.showBossLine(line);
@@ -984,9 +1025,14 @@ export class GrassCuttingScene extends Phaser.Scene {
         this.spawner.flash(monster, this.packed.killFx.hitFlashDuration / 1000);
         this.floaters.damage(monster.sprite.x, monster.sprite.y - 12, amount, this.comboTier());
       },
-      onKill: (monster, x, y, dirX, dirY) => this.onMonsterKilled(monster, x, y, dirX, dirY),
+      onKill: (monster, x, y, dirX, dirY) => {
+        // T-027：迷你 Boss 击杀不进连击（不计分不掉经验的口径延伸），registerKill 钩子按此跳过
+        this.minibossKillFlag = monster.isMiniboss;
+        this.onMonsterKilled(monster, x, y, dirX, dirY);
+      },
       registerKill: () => {
-        this.combo.registerKill();
+        if (!this.minibossKillFlag) this.combo.registerKill();
+        this.minibossKillFlag = false;
       },
     };
   }
@@ -998,6 +1044,24 @@ export class GrassCuttingScene extends Phaser.Scene {
    */
   private onMonsterKilled(monster: Monster, x: number, y: number, dirX: number, dirY: number): void {
     const gained = monster.score;
+
+    // T-027：迷你 Boss（考神召唤的环绕分身）——可被击杀但不计分/不掉落（fun-event-visual.md §4.4），
+    // 命中反馈 = 现有 kill 音效 + 主题色小爆散；全灭/首杀播沙雕台词（§4.5）
+    if (monster.isMiniboss) {
+      sfx.play('kill');
+      const color = monster.baseTint !== 0 ? monster.baseTint : Palette.accent.gold;
+      this.killFx.burst(x, y, color, dirX, dirY, Math.max(2, this.packed.polish.killShardBonusPerTier));
+      if (this.examSummon) {
+        const remaining = this.examSummon.notifyKilled(monster);
+        const total = this.examSummon.totalSpawned;
+        if (total > 0 && remaining === total - 1 && remaining > 0) {
+          this.showBossLine('学神：这道题...我也错了');
+        } else if (remaining === 0 && total > 0) {
+          this.showBossLine('学神全灭！专心打 Boss');
+        }
+      }
+      return;
+    }
 
     // Boss 击杀 = Boss 关通关：强化反馈 + 死亡收场演出后再进结算（cleared=true）
     if (monster.isBoss) {
@@ -1056,6 +1120,18 @@ export class GrassCuttingScene extends Phaser.Scene {
    *  序列结束    —— 移交结算场景。序列期间 update() 提前返回，世界完全冻结。
    */
   private startBossDeathSequence(x: number, y: number, monster: Monster): void {
+    // T-027：死亡序列开始的瞬间把 Boss 血条淡出（200ms alpha→0），
+    // 让玩家视线聚焦死亡演出；序列结束直接切结算，无需恢复。
+    if (!this.bossBarFading) {
+      this.bossBarFading = true;
+      const barTargets = [this.bossBarBg, this.bossBarFill, this.bossBarLabel].filter(
+        (o): o is Phaser.GameObjects.Graphics | Phaser.GameObjects.Text => o !== null,
+      );
+      if (barTargets.length > 0) {
+        this.tweens.add({ targets: barTargets, alpha: 0, duration: 200, ease: 'Quad.easeOut' });
+      }
+    }
+
     // Boss 本体在 kill() 时已被对象池回收（隐藏），这里重新点亮并定格在死亡点。
     // 序列期间刷怪已冻结、结束后直接切场景，这个槽位不会被新怪复用。
     monster.sprite.setActive(true).setVisible(true);
@@ -1222,6 +1298,9 @@ export class GrassCuttingScene extends Phaser.Scene {
 
   /** 玩家受伤处理 */
   private applyDamageToPlayer(amount: number): void {
+    // T-027：零伤害接触（考神召唤的迷你 Boss damage=0）不触发任何受伤表现，
+    // 也不消耗无敌帧/接触冷却，更不破坏 noDamage 结算口径
+    if (amount <= 0) return;
     // T-026：躺平 BUFF 激活期间无敌（接触伤害与 DoomZone 都从这里走），不消耗无敌帧
     if (this.lazy?.active) return;
     this.hp -= amount;
@@ -1277,6 +1356,8 @@ export class GrassCuttingScene extends Phaser.Scene {
 
   /** Boss 血条：未生成时显示倒计时文案，生成后按血量比例填充 */
   private updateBossBar(): void {
+    // T-027：死亡序列期间血条正在淡出，停止重绘（重绘不会复位 alpha，但会改 label 文本/几何）
+    if (this.bossBarFading) return;
     const fill = this.bossBarFill;
     const label = this.bossBarLabel;
     const box = this.bossBarBox;
@@ -1380,6 +1461,8 @@ export class GrassCuttingScene extends Phaser.Scene {
     this.scholar?.destroy();
     this.lazy?.destroy();
     this.danmaku?.destroy();
+    this.examSummon?.destroy();
+    this.examSummon = null;
     this.bossLineBg?.destroy();
     this.bossLineBg = null;
     this.bossLineText?.destroy();
@@ -1391,5 +1474,6 @@ export class GrassCuttingScene extends Phaser.Scene {
     this.bossBarFill = null;
     this.bossBarLabel = null;
     this.bossBarBox = null;
+    this.bossBarFading = false;
   }
 }

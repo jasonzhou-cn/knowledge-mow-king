@@ -30,6 +30,10 @@ export interface Monster {
   alive: boolean;
   /** 是否 Boss：不占小怪同屏名额、免疫击退、有专属血条与通关逻辑 */
   isBoss: boolean;
+  /** T-027 是否迷你 Boss（考神召唤的环绕分身）：不占同屏名额、不追人、0 伤害、不计分 */
+  isMiniboss: boolean;
+  /** T-027 迷你 Boss 的主题底色（0 = 非迷你 Boss，refreshTint 走常规混色） */
+  baseTint: number;
   /** 击退速度（像素/秒） */
   knockbackX: number;
   knockbackY: number;
@@ -97,6 +101,8 @@ export class MonsterSpawner {
   private phaseChangeListeners: Array<(newPhaseIndex: number) => void> = [];
   /** T-022：Boss 死亡回调列表（用于 BossSkillController 停止调度） */
   private bossDeathListeners: Array<() => void> = [];
+  /** T-027：存活迷你 Boss 数量（不占小怪同屏名额，计卡时剔除） */
+  private minibossCount = 0;
 
   /** 由 setProgress 计算出的当前难度值 */
   private spawnInterval = 1;
@@ -291,6 +297,7 @@ export class MonsterSpawner {
     this.bossSpawnedFlag = false;
     this.bossCurrentPhase = 0;
     this.phaseChangeListeners.length = 0;
+    this.minibossCount = 0;
   }
 
   /** 销毁对象池 */
@@ -319,6 +326,8 @@ export class MonsterSpawner {
         radius: this.opts.radius,
         alive: false,
         isBoss: false,
+        isMiniboss: false,
+        baseTint: 0,
         knockbackX: 0,
         knockbackY: 0,
         knockbackTime: 0,
@@ -353,8 +362,8 @@ export class MonsterSpawner {
       guard++;
 
       for (let i = 0; i < perBatch; i++) {
-        // 同屏上限是硬红线：满了就等下一批，绝不超量生成（Boss 不占名额）
-        const minions = this.activeList.length - (this.bossAlive ? 1 : 0);
+        // 同屏上限是硬红线：满了就等下一批，绝不超量生成（Boss 与迷你 Boss 不占名额）
+        const minions = this.activeList.length - (this.bossAlive ? 1 : 0) - this.minibossCount;
         if (minions >= cap) return;
         this.spawnOne();
       }
@@ -393,8 +402,11 @@ export class MonsterSpawner {
     monster.sprite.setRotation(0);
     monster.sprite.setAlpha(1);
     monster.sprite.setDisplaySize(radius * 2, radius * 2);
-    // 槽位可能被 Boss 用过，必须先归零再上色，否则 refreshTint 会按 Boss 配色染普通小怪
+    // 槽位可能被 Boss / 迷你 Boss 用过，必须先归零再上色，否则 refreshTint 会按 Boss 配色染普通小怪
     monster.isBoss = false;
+    monster.isMiniboss = false;
+    monster.baseTint = 0;
+    monster.sprite.setTexture('monster');
     monster.radius = this.opts.radius;
     this.refreshTint(monster);
 
@@ -440,6 +452,8 @@ export class MonsterSpawner {
     monster.sprite.setDisplaySize(b.radius * 2, b.radius * 2);
 
     monster.isBoss = true;
+    monster.isMiniboss = false;
+    monster.baseTint = 0;
     monster.radius = b.radius;
     monster.hp = b.hp;
     monster.maxHp = b.hp;
@@ -459,6 +473,46 @@ export class MonsterSpawner {
     this.bossMonster = monster;
     this.bossSpawnedFlag = true;
     this.bossCurrentPhase = 0;
+  }
+
+  /**
+   * T-027：生成一只迷你 Boss（考神召唤的环绕分身）。
+   * 与普通小怪共用对象池，但不占同屏名额、不追人（speed=0，位置由召唤系统驱动）、
+   * 零伤害、零得分；贴图用白色灰度迷你圆底，运行期按主题色 tint。
+   * @returns 生成的 Monster；池满时返回 null（调用方跳过即可）
+   */
+  spawnMiniboss(opts: { hp: number; radius: number; tint: number; texture?: string }): Monster | null {
+    const monster = this.pool.find((m) => !m.alive && m.corpseTime <= 0);
+    if (!monster) return null;
+
+    monster.sprite.setPosition(-100, -100);
+    monster.sprite.setActive(true).setVisible(true);
+    monster.sprite.setRotation(0);
+    monster.sprite.setAlpha(1);
+    monster.sprite.setTexture(opts.texture ?? 'tex-buff-miniboss');
+    monster.sprite.setDisplaySize(opts.radius * 2, opts.radius * 2);
+
+    monster.isBoss = false;
+    monster.isMiniboss = true;
+    monster.baseTint = opts.tint;
+    monster.radius = opts.radius;
+    monster.hp = opts.hp;
+    monster.maxHp = opts.hp;
+    monster.damage = 0;
+    monster.speed = 0;
+    monster.score = 0;
+    monster.alive = true;
+    monster.knockbackTime = 0;
+    monster.knockbackX = 0;
+    monster.knockbackY = 0;
+    monster.flashTime = 0;
+    monster.corpseTime = 0;
+    monster.corpseSpin = 0;
+    this.refreshTint(monster);
+
+    this.minibossCount++;
+    this.activeList.push(monster);
+    return monster;
   }
 
   /** T-022：检查 Boss HP 是否跨过阶段阈值；跨过则切换阶段 + 应用 phase.speedMult/damageMult + 通知监听者。 */
@@ -562,6 +616,8 @@ export class MonsterSpawner {
     if (index >= 0) this.activeList.splice(index, 1);
     monster.alive = false;
     monster.hp = 0;
+    // T-027：迷你 Boss 死亡即不再占用「不占名额」的额度
+    if (monster.isMiniboss && this.minibossCount > 0) this.minibossCount--;
 
     const canCorpse =
       this.opts.corpseLife > 0 &&
@@ -580,8 +636,8 @@ export class MonsterSpawner {
       monster.corpseTime = this.opts.corpseLife;
       monster.corpseSpin = this.opts.corpseSpin;
       monster.flashTime = 0;
-      // 尸体用最亮的颜色，让「被打飞」这一下看得清
-      monster.sprite.setTint(Palette.combat.monsterElite);
+      // 尸体用最亮的颜色，让「被打飞」这一下看得清（迷你 Boss 保留主题底色）
+      monster.sprite.setTint(monster.baseTint !== 0 ? monster.baseTint : Palette.combat.monsterElite);
       this.corpses.push(monster);
       return;
     }
@@ -618,7 +674,9 @@ export class MonsterSpawner {
       monster.sprite.setTint(mixColor(Palette.accent.gold, Palette.status.wrong, 1 - ratio));
       return;
     }
-    monster.sprite.setTint(mixColor(Palette.combat.monster, Palette.combat.monsterElite, 1 - ratio));
+    // T-027：迷你 Boss 按各自主题底色向精英色过渡，普通小怪维持绿→橙
+    const from = monster.baseTint !== 0 ? monster.baseTint : Palette.combat.monster;
+    monster.sprite.setTint(mixColor(from, Palette.combat.monsterElite, 1 - ratio));
   }
 }
 
