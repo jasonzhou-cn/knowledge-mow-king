@@ -1,8 +1,9 @@
 /**
  * 游戏入口（src/main.ts）
  * 职责：创建 Phaser.Game 实例、注册全部场景、配置缩放策略与渲染参数。
- * 约定：逻辑分辨率固定 960×640，使用 Scale.FIT 自适应任意窗口 / 手机屏幕，
- *      保证不同设备上的判定区与选项尺寸比例完全一致（答题公平原则的前提）。
+ * 约定（2026-09-02 锁定）：画布采用方案 C（Scale.RESIZE），canvas CSS 尺寸恒等于
+ *      视口尺寸（如小米设备 2340×1080），铺满无黑边。唯一权威配置见
+ *      src/config/CanvasMode.ts 的 CANVAS_MODE 常量，禁止运行时改写画布尺寸/样式。
  */
 
 import Phaser from 'phaser';
@@ -43,6 +44,21 @@ const config: Phaser.Types.Core.GameConfig = {
 };
 
 const game = new Phaser.Game(config);
+
+// 画布锁定守卫：实际生效的 scale 模式必须与 CanvasMode 配置一致。
+// 不一致说明画布配置被意外覆盖（构建期环境变量残留 / 其他脚本篡改），立即在控制台暴露。
+game.scale.once('ready', () => {
+  const expected = getCanvasMode() === 'c' ? Phaser.Scale.RESIZE : Phaser.Scale.FIT;
+  if (game.scale.scaleMode !== expected) {
+    // eslint-disable-next-line no-console
+    console.error(
+      '[KB Canvas Lock] scale 模式与 CanvasMode 配置不符！实际:',
+      game.scale.scaleMode,
+      '预期:',
+      expected,
+    );
+  }
+});
 
 // 移动端横屏 + 全屏体验（尽力而为）：
 //  ① 竖屏时由 index.html 的 #rotate-overlay 引导用户旋转；

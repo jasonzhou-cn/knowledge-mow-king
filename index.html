@@ -61,7 +61,10 @@
         z-index: 0;
         display: block;
       }
-      /* Phaser canvas（脚本自动创建）：在 #game-root 内 flex 居中，叠在背景之上 */
+      /* Phaser canvas（脚本自动创建）：在 #game-root 内 flex 居中，叠在背景之上。
+         【锁定 2026-09-02】画布为方案 C（Scale.RESIZE）：canvas 的 width/height/margin
+         全部由 Phaser 运行时按视口写入 inline style（如小米设备 2340×1080），
+         此处与任何脚本都不得再注入尺寸样式覆盖它（回归门禁：verify-canvas-lock.mjs）。 */
       #game-root canvas:not(#bg-canvas) {
         position: relative;
         z-index: 1;

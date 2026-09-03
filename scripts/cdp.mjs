@@ -104,6 +104,24 @@ export function sleep(ms) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
+/**
+ * 小米设备视口模拟（2026-09-02 锁定基线）：2340×1080（19.5:9）横屏 + 触屏。
+ * 所有画布相关的 CDP 验证脚本必须走此入口，禁止各自散写视口参数，
+ * 避免「后续操作中画布尺寸被意外改成别的视口」。
+ */
+export async function emulateXiaomi(page, { width = 2340, height = 1080 } = {}) {
+  await page.send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 });
+  await page.send('Emulation.setDeviceMetricsOverride', {
+    width,
+    height,
+    deviceScaleFactor: 1,
+    mobile: true,
+    pointer: 'coarse',
+    screenWidth: width,
+    screenHeight: height,
+  });
+}
+
 /** CDP 会话：连接某个 target 的 websocket 并收发命令 */
 export class Session {
   constructor(ws, id) {
