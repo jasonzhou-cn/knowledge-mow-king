@@ -24,13 +24,18 @@ interface PlaytimeRecord {
   restUntil: number;
 }
 
-class PlaytimeSystem {
+export class PlaytimeSystem {
   private settings: PlaytimeSettings = { enabled: false, sessionLimitMin: 30, restMin: 10 };
   private record: PlaytimeRecord = { sessionStart: Date.now(), restUntil: 0 };
 
   /** 绑定配置（BootScene 在配置校验通过后调用，随后 load()） */
   bind(settings: PlaytimeSettings): void {
     this.settings = settings;
+  }
+
+  /** 当前生效的配置（测试/调试用） */
+  get currentSettings(): PlaytimeSettings {
+    return this.settings;
   }
 
   /** 从 localStorage 恢复记录；损坏时静默重置 */

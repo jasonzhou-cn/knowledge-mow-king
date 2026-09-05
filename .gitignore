@@ -17,5 +17,8 @@ reports/
 # 类型检查临时目录
 .tmp-tsc/
 
+# 本地临时草稿（探针/走查脚本，正式版转正到 scripts/）
+.tmp/
+
 # 工作区私有数据（含 memory 与凭证，切勿提交）
 .workbuddy/
