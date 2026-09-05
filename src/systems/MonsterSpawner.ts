@@ -20,6 +20,8 @@ import { clamp01, lerp } from '../utils/MathUtil';
 
 /** 单只小怪的运行时数据 */
 export interface Monster {
+  /** 稳定唯一 id（本局内自增）：弹丸按它做「一枚弹丸 × 一只怪 = 一次命中」去重 */
+  uid: number;
   sprite: Phaser.GameObjects.Image;
   hp: number;
   maxHp: number;
@@ -77,6 +79,8 @@ export interface MonsterSpawnerOptions {
   /** Boss 数值（仅 isBossLevel 时消费）。
    *  T-022 升级：兼容旧 BossSettings 形态，新接口消费 ResolvedBossTemplate（含阶段 + 技能）。 */
   boss?: BossSettings | ResolvedBossTemplate;
+  /** Boss 生成前的同屏小怪上限比例（相对 maxAlive）；缺省 0.25 */
+  preBossAliveRatio?: number;
 }
 
 export class MonsterSpawner {
@@ -88,6 +92,8 @@ export class MonsterSpawner {
 
   private spawnTimer = 0;
   private running = false;
+  /** 小怪 uid 发号器（reset 时归零；uid 只要求本局内唯一） */
+  private uidCounter = 0;
 
   /** Boss 关：Boss 本体（存活时在 activeList 里，isBoss=true） */
   private bossMonster: Monster | null = null;
@@ -217,7 +223,9 @@ export class MonsterSpawner {
 
   /**
    * 按生存进度刷新难度。
-   * @param t 已用时间 / 本关总时长，自动钳制到 [0, 1]
+   * @param t 有效难度进度（已用时间 / 总时长经 assist 回拉后），自动钳制到 [0, 1]。
+   *          纯插值函数：动态难度下调（assist）由场景侧经 DifficultyAssist 计算后
+   *          直接传入回拉后的 t，本方法只负责四维插值。
    */
   setProgress(t: number): void {
     const d = this.opts.difficulty;
@@ -292,6 +300,7 @@ export class MonsterSpawner {
     this.corpses.length = 0;
     this.running = false;
     this.spawnTimer = 0;
+    this.uidCounter = 0;
     this.bossMonster = null;
     this.bossSpawnTimer = 0;
     this.bossSpawnedFlag = false;
@@ -318,6 +327,7 @@ export class MonsterSpawner {
       sprite.setDisplaySize(size, size);
       this.pool.push({
         sprite,
+        uid: 0,
         hp: 0,
         maxHp: 1,
         damage: 0,
@@ -350,9 +360,9 @@ export class MonsterSpawner {
       ? this.opts.boss!.minionPerWave
       : Math.max(1, Math.round(this.batchSize));
 
-    // 同屏上限（Boss 不占小怪名额）：bossAlive → 满额；boss 未生成 → 1/4 上限；普通关 → 满额
+    // 同屏上限（Boss 不占小怪名额）：bossAlive → 满额；boss 未生成 → preBossAliveRatio 比例上限；普通关 → 满额
     const cap = this.opts.isBossLevel && !this.bossSpawnedFlag
-      ? Math.max(2, Math.round(this.opts.maxAlive * 0.25))
+      ? Math.max(2, Math.round(this.opts.maxAlive * (this.opts.preBossAliveRatio ?? 0.25)))
       : this.opts.maxAlive;
 
     // 上限保护：单帧最多补 8 批，避免长卡顿后一次性涌入造成掉帧
@@ -402,6 +412,8 @@ export class MonsterSpawner {
     monster.sprite.setRotation(0);
     monster.sprite.setAlpha(1);
     monster.sprite.setDisplaySize(radius * 2, radius * 2);
+    // 本局内稳定唯一 id：弹丸命中去重的键（对象池复用槽位也不冲突）
+    monster.uid = ++this.uidCounter;
     // 槽位可能被 Boss / 迷你 Boss 用过，必须先归零再上色，否则 refreshTint 会按 Boss 配色染普通小怪
     monster.isBoss = false;
     monster.isMiniboss = false;
@@ -454,6 +466,7 @@ export class MonsterSpawner {
     monster.isBoss = true;
     monster.isMiniboss = false;
     monster.baseTint = 0;
+    monster.uid = ++this.uidCounter;
     monster.radius = b.radius;
     monster.hp = b.hp;
     monster.maxHp = b.hp;
@@ -495,6 +508,7 @@ export class MonsterSpawner {
     monster.isBoss = false;
     monster.isMiniboss = true;
     monster.baseTint = opts.tint;
+    monster.uid = ++this.uidCounter;
     monster.radius = opts.radius;
     monster.hp = opts.hp;
     monster.maxHp = opts.hp;

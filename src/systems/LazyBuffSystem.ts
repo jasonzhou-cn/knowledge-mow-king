@@ -29,6 +29,8 @@ export interface LazyBuffOptions {
   pickupRadius: number;
   /** 玩家半径（BUFF 圆环按玩家体型换算显示尺寸） */
   playerRadius: number;
+  /** 拾取成功回调（成就统计用；可选） */
+  onPickup?: () => void;
 }
 
 export class LazyBuffSystem {
@@ -36,6 +38,7 @@ export class LazyBuffSystem {
   private readonly settings: LazyBuffSettings;
   private readonly pickupRadius: number;
   private readonly playerRadius: number;
+  private readonly onPickup: (() => void) | null;
 
   /** 场上待拾取的躺平胶囊 */
   private readonly drops: Phaser.GameObjects.Image[] = [];
@@ -54,6 +57,7 @@ export class LazyBuffSystem {
     this.settings = opts.settings;
     this.pickupRadius = opts.pickupRadius;
     this.playerRadius = opts.playerRadius;
+    this.onPickup = opts.onPickup ?? null;
   }
 
   /** BUFF 是否激活（激活期间玩家无敌，但移速 × moveSpeedMultiplier；被压制时视为未激活） */
@@ -130,6 +134,7 @@ export class LazyBuffSystem {
         this.drops.splice(i, 1);
         this.scene.tweens.killTweensOf(drop);
         drop.destroy();
+        this.onPickup?.();
         this.activate(playerX, playerY);
       }
     }

@@ -1,0 +1,20 @@
+{
+  "version": "1.0.0",
+  "description": "本地成就清单（沙雕学渣逆袭风）：condition.type 决定判定字段，value 为阈值",
+  "achievements": [
+    { "id": "first_clear", "name": "初出茅庐", "desc": "第一次通过任意关卡", "condition": { "type": "clears", "value": 1 } },
+    { "id": "clear_5", "name": "小有所成", "desc": "累计通过 5 个关卡", "condition": { "type": "clears", "value": 5 } },
+    { "id": "reach_10", "name": "中学霸", "desc": "解锁到第 10 关", "condition": { "type": "level_reach", "value": 10 } },
+    { "id": "reach_20", "name": "学海无涯", "desc": "解锁到第 20 关", "condition": { "type": "level_reach", "value": 20 } },
+    { "id": "perfect_round", "name": "卷王本王", "desc": "一轮答题全部答对", "condition": { "type": "perfect_rounds", "value": 1 } },
+    { "id": "accuracy_100", "name": "你的卷子是参考答案吧", "desc": "单轮正确率达到 100%", "condition": { "type": "accuracy", "value": 1 } },
+    { "id": "combo_20", "name": "连击大师", "desc": "单局割草连击达到 20", "condition": { "type": "combo", "value": 20 } },
+    { "id": "kills_500", "name": "割草机成精", "desc": "累计击杀 500 只小怪", "condition": { "type": "kills_total", "value": 500 } },
+    { "id": "no_damage", "name": "毫发无伤", "desc": "全程未受伤通关任意关卡", "condition": { "type": "no_damage_clear", "value": 1 } },
+    { "id": "boss_first", "name": "Boss 讨伐者", "desc": "击败第一个 Boss", "condition": { "type": "boss_kills", "value": 1 } },
+    { "id": "boss_all", "name": "Boss 全图鉴", "desc": "击败全部 5 个 Boss", "condition": { "type": "boss_kills", "value": 5 } },
+    { "id": "scholar_10", "name": "学霸附体", "desc": "累计捡到 10 本学霸之书", "condition": { "type": "scholar_pickups", "value": 10 } },
+    { "id": "lazy_5", "name": "躺平也是一种策略", "desc": "累计吃到 5 颗躺平胶囊", "condition": { "type": "lazy_pickups", "value": 5 } },
+    { "id": "score_10000", "name": "万分段选手", "desc": "累计得分达到 10000", "condition": { "type": "score_total", "value": 10000 } }
+  ]
+}

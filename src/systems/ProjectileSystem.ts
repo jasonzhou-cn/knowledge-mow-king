@@ -67,6 +67,13 @@ interface Projectile {
   range: number;
   radius: number;
   weaponId: string;
+  /**
+   * 本枚弹丸已命中的小怪 uid 集合。
+   * 子步进循环里 reach（弹丸半径 + 怪半径）可达步长的数倍，
+   * 同一只怪会在连续多个子步里持续落在判定圈内——没有这个集合，
+   * 一次穿越会被反复结算（穿透额度被单只怪烧光 + 单怪吃多次伤害，P0-0D）。
+   */
+  hitUids: Set<number>;
 }
 
 export interface ProjectileSystemOptions {
@@ -123,6 +130,7 @@ export class ProjectileSystem {
     slot.range = p.range;
     slot.radius = p.radius;
     slot.weaponId = p.weaponId;
+    slot.hitUids.clear();
 
     slot.sprite.setTexture(p.texture);
     slot.sprite.setTint(p.tint);
@@ -139,7 +147,7 @@ export class ProjectileSystem {
    * 推进全部弹丸。
    * @param dt 帧间隔（秒），由场景按顿帧缩放后传入
    * @param monsters 当前存活小怪列表
-   * @param onHit 命中回调，同一只小怪在一次子步进内只会被同一枚弹丸命中一次
+   * @param onHit 命中回调；同一枚弹丸对同一只小怪整个生命周期内只命中一次（hitUids 去重）
    */
   update(dt: number, monsters: readonly Monster[], onHit: (payload: ProjectileHitPayload) => void): void {
     if (this.activeCount === 0) return;
@@ -161,11 +169,14 @@ export class ProjectileSystem {
 
         for (const monster of monsters) {
           if (!monster.alive) continue;
+          // 一枚弹丸 × 一只怪 = 一次判定：跨子步去重，穿透额度只消耗在「下一只」怪身上
+          if (proj.hitUids.has(monster.uid)) continue;
           const reach = proj.radius + monster.radius;
           if (distanceSquared(proj.x, proj.y, monster.sprite.x, monster.sprite.y) > reach * reach) {
             continue;
           }
 
+          proj.hitUids.add(monster.uid);
           onHit({
             monster,
             damage: proj.damage,
@@ -241,6 +252,7 @@ export class ProjectileSystem {
         range: 0,
         radius: 4,
         weaponId: '',
+        hitUids: new Set<number>(),
       });
     }
   }
@@ -256,6 +268,8 @@ export class ProjectileSystem {
   private release(proj: Projectile): void {
     proj.active = false;
     proj.pierceLeft = 0;
+    // 复用插槽必须清空命中集合，否则下一次发射会「记得」上一发打过的怪
+    proj.hitUids.clear();
     proj.sprite.setActive(false).setVisible(false);
     this.activeCount = Math.max(0, this.activeCount - 1);
   }

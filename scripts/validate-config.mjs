@@ -31,6 +31,9 @@ const MODULES = [
   'weaponConfig',
   'bossDialogue',
   'resultFlavor',
+  'sfxConfig',
+  'bgmConfig',
+  'achievementConfig',
 ];
 
 async function main() {

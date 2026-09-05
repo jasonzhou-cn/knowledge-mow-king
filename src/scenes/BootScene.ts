@@ -13,6 +13,10 @@ import Phaser from 'phaser';
 import { ConfigLoader } from '../config/ConfigLoader';
 import { questionBank } from '../data/QuestionBank';
 import { progression } from '../systems/ProgressionSystem';
+import { playtime } from '../systems/PlaytimeSystem';
+import { achievements } from '../systems/AchievementSystem';
+import { sfx } from '../systems/SfxController';
+import { bgm } from '../systems/BgmController';
 import { Palette, css, textStyle } from '../ui/Palette';
 import { showFatalError } from '../utils/FatalError';
 
@@ -85,6 +89,13 @@ export class BootScene extends Phaser.Scene {
 
     progression.bind(loader.getConfig('gameSettings'));
     progression.load();
+
+    // 音效 / BGM / 防沉迷 / 成就统一在配置校验通过后绑定（数值全部来自配置 JSON）
+    sfx.bind(loader.getConfig('sfxConfig'));
+    bgm.bind(loader.getConfig('bgmConfig'));
+    playtime.bind(loader.getConfig('gameSettings').playtimeSettings);
+    playtime.load();
+    achievements.bind(loader.getConfig('achievementConfig'));
 
     this.scene.start('MenuScene');
   }

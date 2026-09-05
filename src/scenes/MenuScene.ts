@@ -10,8 +10,12 @@ import { ConfigLoader } from '../config/ConfigLoader';
 import type { LevelConfig } from '../config/types';
 import { describeBank } from '../data/QuestionBank';
 import { progression } from '../systems/ProgressionSystem';
+import { playtime } from '../systems/PlaytimeSystem';
+import { bgm } from '../systems/BgmController';
 import { isTutorialDone, TutorialOverlay } from '../ui/TutorialOverlay';
 import { LevelSelectPanel } from '../ui/LevelSelectPanel';
+import { AchievementsPanel } from '../ui/AchievementsPanel';
+import { RestOverlay } from '../ui/RestOverlay';
 import { Palette, css, textStyle } from '../ui/Palette';
 import { popScale, ripple } from '../ui/Feedback';
 
@@ -29,6 +33,10 @@ export class MenuScene extends Phaser.Scene {
   private levelPanel!: LevelSelectPanel;
   private statsText!: Phaser.GameObjects.Text;
   private startHint!: Phaser.GameObjects.Text;
+  /** 防沉迷休息遮罩（存续期间阻断一切入口） */
+  private restOverlay: RestOverlay | null = null;
+  /** 成就面板（存续期间阻断开始/切关入口） */
+  private achievementsPanel: AchievementsPanel | null = null;
 
   constructor() {
     super({ key: 'MenuScene' });
@@ -137,6 +145,31 @@ export class MenuScene extends Phaser.Scene {
       .text(cx, h - 26 * s, `题库：${describeBank()}`, textStyle(Math.round(14 * s), css(Palette.text.hint)))
       .setOrigin(0.5);
 
+    // 成就 / 图鉴 / 记录入口（开始按钮左下，尺寸随 vpScale）
+    const achX = cx - btnW / 2;
+    const achY = btnY + btnH + 34 * s;
+    const achW = 150 * s;
+    const achH = 40 * s;
+    const achBg = this.add.graphics();
+    achBg.fillStyle(Palette.background.panelSoft, 1);
+    achBg.fillRoundedRect(achX - achW / 2, achY - achH / 2, achW, achH, 10);
+    achBg.lineStyle(2, Palette.accent.gold, 0.6);
+    achBg.strokeRoundedRect(achX - achW / 2, achY - achH / 2, achW, achH, 10);
+    const achText = this.add
+      .text(achX, achY, '成就 · 图鉴', textStyle(Math.round(18 * s), css(Palette.accent.gold)))
+      .setOrigin(0.5);
+    const achZone = this.add
+      .zone(achX, achY, achW + 16, achH + 12)
+      .setOrigin(0.5)
+      .setInteractive({ useHandCursor: true });
+    achZone.on('pointerdown', () => {
+      if (this.isBlocked()) return;
+      popScale(this, achText, 1.12, 160);
+      this.achievementsPanel = new AchievementsPanel(this, () => {
+        this.achievementsPanel = null;
+      });
+    });
+
     this.selectedLevel = progression.unlockedLevel;
     this.refreshStats();
 
@@ -153,6 +186,36 @@ export class MenuScene extends Phaser.Scene {
     this.input.keyboard?.on('keydown-D', () => this.shiftLevel(1));
     this.input.keyboard?.on('keydown-SPACE', () => this.startLevel());
     this.input.keyboard?.on('keydown-ENTER', () => this.startLevel());
+
+    // BGM：主菜单轨道（AudioContext 受自动播放策略约束，首次交互后自动出声）
+    bgm.play('menu');
+
+    // 防沉迷：进入主菜单时若已达连续游玩上限（或刷新页面绕不过的持久化记录），
+    // 直接弹全屏休息遮罩，倒计时结束前一切入口被阻断
+    if (playtime.shouldRest) {
+      this.showRestOverlay();
+    }
+  }
+
+  /** 遮罩/面板存续期间阻断全部游戏入口 */
+  private isBlocked(): boolean {
+    return this.restOverlay !== null || this.achievementsPanel !== null;
+  }
+
+  /** 展示强制休息遮罩（关闭前 isBlocked 恒真） */
+  private showRestOverlay(): void {
+    if (this.restOverlay) return;
+    this.restOverlay = new RestOverlay(this, () => {
+      this.restOverlay = null;
+    });
+  }
+
+  /** 场景销毁时清理浮层，避免下一局复用实例时残留 */
+  shutdown(): void {
+    this.restOverlay?.destroy();
+    this.restOverlay = null;
+    this.achievementsPanel?.destroy();
+    this.achievementsPanel = null;
   }
 
   /** 绘制背景：草地 + 网格，纯图形生成 */
@@ -178,6 +241,7 @@ export class MenuScene extends Phaser.Scene {
 
   /** 切换选中的关卡（转发给关卡地图面板，处理页内跳转） */
   private shiftLevel(delta: number): void {
+    if (this.isBlocked()) return;
     this.levelPanel?.shiftSelected(delta);
   }
 
@@ -194,8 +258,14 @@ export class MenuScene extends Phaser.Scene {
     this.startHint.setY(this.scale.height - 26 * Math.min(this.scale.width / 960, this.scale.height / 640));
   }
 
-  /** 进入答题场景（首次游玩先展示新手引导 T-017） */
+  /** 进入答题场景（首次游玩先展示新手引导 T-017；防沉迷倒计时期间阻断） */
   private startLevel(): void {
+    if (this.isBlocked()) return;
+    // 连玩时长在主菜单停留期间到期 → 现场弹休息遮罩
+    if (playtime.shouldRest) {
+      this.showRestOverlay();
+      return;
+    }
     const data: LevelStartData = { level: this.selectedLevel, bonusTime: 0 };
     if (isTutorialDone()) {
       this.scene.start('QuestionScene', data);

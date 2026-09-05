@@ -41,7 +41,8 @@
     "arrowLayout": "row",
     "cursorCycleDuration": 1.8,
     "cursorHitZoneWidth": 110,
-    "cursorHitZoneHeight": 50
+    "cursorHitZoneHeight": 50,
+    "bonusPanelAutoAdvanceMs": 2600
   },
   "subjectDifficulty": {
     "math": {

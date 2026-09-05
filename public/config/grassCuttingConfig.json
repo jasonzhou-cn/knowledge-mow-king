@@ -1,5 +1,5 @@
 {
-  "version": "1.3.0",
+  "version": "1.4.0",
   "touchSettings": {
     "joystickCenterX": 160,
     "joystickCenterY": 510,
@@ -33,9 +33,9 @@
   },
   "comboSettings": {
     "comboTimeWindow": 2,
-    "comboDamageGrowth": 0.1,
-    "comboSkillDurationGrowth": 0.2,
-    "comboMaxDamageMultiplier": 3
+    "comboDamageGrowth": 0,
+    "comboSkillDurationGrowth": 0,
+    "comboMaxDamageMultiplier": 1
   },
   "difficultySettings": {
     "interpolation": "linear",
@@ -88,7 +88,12 @@
     "resultPopMs": 360,
     "playerBobAmplitude": 0.02,
     "playerBobPeriodMs": 1100,
-    "comboMilestones": [5, 10, 20, 35],
+    "comboMilestones": [
+      5,
+      10,
+      20,
+      35
+    ],
     "comboZoomPulse": 0.012,
     "comboZoomPulseMs": 200,
     "bossLineDurationMs": 2000,
@@ -98,7 +103,12 @@
     "killShardBonusPerTier": 3,
     "themeDeco": {
       "tuftCount": 90,
-      "symbolCount": 10
+      "symbolCount": 10,
+      "tuftHeightMin": 8,
+      "tuftHeightMax": 22,
+      "tuftAlpha": 0.22,
+      "decoCount": 6,
+      "bossDim": 0.45
     },
     "scholarBuff": {
       "dropChance": 0.05,
@@ -136,13 +146,28 @@
       "popStaggerMs": 150,
       "popInMs": 300,
       "fadeOutMs": 300
+    },
+    "playerSpriteScale": 2.6,
+    "timeWarningThresholdSec": 10,
+    "shake": {
+      "meleeHitMs": 130,
+      "fireMs": 80,
+      "killMs": 140,
+      "hurtMs": 160,
+      "bossDeathMs": 160
+    },
+    "floatingText": {
+      "fontNormal": 20,
+      "fontBig": 27,
+      "fontHuge": 34
     }
   },
   "bossRoster": {
     "common": {
       "maxPhases": 4,
       "skillVisualTtl": 1.2,
-      "skillCastWarnDuration": 0.5
+      "skillCastWarnDuration": 0.5,
+      "preBossAliveRatio": 0.25
     },
     "roster": [
       {
@@ -159,9 +184,37 @@
         "minionSpawnInterval": 3.6,
         "minionPerWave": 2,
         "phases": [
-          { "phaseIndex": 0, "hpThreshold": 1.0,  "speedMult": 1.0, "damageMult": 1.0, "spawnDelay": 6,    "skills": ["charge_basic"] },
-          { "phaseIndex": 1, "hpThreshold": 0.6,  "speedMult": 1.15, "damageMult": 1.1, "spawnDelay": 5,    "skills": ["kpi_throw"] },
-          { "phaseIndex": 2, "hpThreshold": 0.3,  "speedMult": 1.35, "damageMult": 1.25, "spawnDelay": 4,   "skills": ["kpi_throw", "keyboard_smash"] }
+          {
+            "phaseIndex": 0,
+            "hpThreshold": 1.0,
+            "speedMult": 1.0,
+            "damageMult": 1.0,
+            "spawnDelay": 6,
+            "skills": [
+              "charge_basic"
+            ]
+          },
+          {
+            "phaseIndex": 1,
+            "hpThreshold": 0.6,
+            "speedMult": 1.15,
+            "damageMult": 1.1,
+            "spawnDelay": 5,
+            "skills": [
+              "kpi_throw"
+            ]
+          },
+          {
+            "phaseIndex": 2,
+            "hpThreshold": 0.3,
+            "speedMult": 1.35,
+            "damageMult": 1.25,
+            "spawnDelay": 4,
+            "skills": [
+              "kpi_throw",
+              "keyboard_smash"
+            ]
+          }
         ],
         "skills": {
           "charge_basic": {
@@ -206,9 +259,37 @@
         "minionSpawnInterval": 4.2,
         "minionPerWave": 3,
         "phases": [
-          { "phaseIndex": 0, "hpThreshold": 1.0,  "speedMult": 0.85, "damageMult": 1.0,  "spawnDelay": 7,   "skills": ["charge_basic"] },
-          { "phaseIndex": 1, "hpThreshold": 0.6,  "speedMult": 0.7,  "damageMult": 1.1,  "spawnDelay": 6,   "skills": ["lazy_breath"] },
-          { "phaseIndex": 2, "hpThreshold": 0.3,  "speedMult": 0.55, "damageMult": 1.3,  "spawnDelay": 5,   "skills": ["lazy_breath", "dream_charge"] }
+          {
+            "phaseIndex": 0,
+            "hpThreshold": 1.0,
+            "speedMult": 0.85,
+            "damageMult": 1.0,
+            "spawnDelay": 7,
+            "skills": [
+              "charge_basic"
+            ]
+          },
+          {
+            "phaseIndex": 1,
+            "hpThreshold": 0.6,
+            "speedMult": 0.7,
+            "damageMult": 1.1,
+            "spawnDelay": 6,
+            "skills": [
+              "lazy_breath"
+            ]
+          },
+          {
+            "phaseIndex": 2,
+            "hpThreshold": 0.3,
+            "speedMult": 0.55,
+            "damageMult": 1.3,
+            "spawnDelay": 5,
+            "skills": [
+              "lazy_breath",
+              "dream_charge"
+            ]
+          }
         ],
         "skills": {
           "charge_basic": {
@@ -257,9 +338,39 @@
         "minionSpawnInterval": 4,
         "minionPerWave": 3,
         "phases": [
-          { "phaseIndex": 0, "hpThreshold": 1.0,  "speedMult": 1.0,  "damageMult": 1.0,  "spawnDelay": 8,   "skills": ["rune_bolt"] },
-          { "phaseIndex": 1, "hpThreshold": 0.6,  "speedMult": 1.05, "damageMult": 1.15, "spawnDelay": 7,   "skills": ["rune_bolt", "spell_shake"] },
-          { "phaseIndex": 2, "hpThreshold": 0.3,  "speedMult": 1.15, "damageMult": 1.3,  "spawnDelay": 5,   "skills": ["rune_bolt", "spell_shake", "wrong_barrage"] }
+          {
+            "phaseIndex": 0,
+            "hpThreshold": 1.0,
+            "speedMult": 1.0,
+            "damageMult": 1.0,
+            "spawnDelay": 8,
+            "skills": [
+              "rune_bolt"
+            ]
+          },
+          {
+            "phaseIndex": 1,
+            "hpThreshold": 0.6,
+            "speedMult": 1.05,
+            "damageMult": 1.15,
+            "spawnDelay": 7,
+            "skills": [
+              "rune_bolt",
+              "spell_shake"
+            ]
+          },
+          {
+            "phaseIndex": 2,
+            "hpThreshold": 0.3,
+            "speedMult": 1.15,
+            "damageMult": 1.3,
+            "spawnDelay": 5,
+            "skills": [
+              "rune_bolt",
+              "spell_shake",
+              "wrong_barrage"
+            ]
+          }
         ],
         "skills": {
           "rune_bolt": {
@@ -306,9 +417,39 @@
         "minionSpawnInterval": 3.5,
         "minionPerWave": 4,
         "phases": [
-          { "phaseIndex": 0, "hpThreshold": 1.0,  "speedMult": 1.0,  "damageMult": 1.0,  "spawnDelay": 8,   "skills": ["acid_mist"] },
-          { "phaseIndex": 1, "hpThreshold": 0.6,  "speedMult": 1.05, "damageMult": 1.2,  "spawnDelay": 6,   "skills": ["acid_mist", "elemental_summon"] },
-          { "phaseIndex": 2, "hpThreshold": 0.3,  "speedMult": 1.1,  "damageMult": 1.35, "spawnDelay": 5,   "skills": ["acid_mist", "elemental_summon", "acid_mist_burst"] }
+          {
+            "phaseIndex": 0,
+            "hpThreshold": 1.0,
+            "speedMult": 1.0,
+            "damageMult": 1.0,
+            "spawnDelay": 8,
+            "skills": [
+              "acid_mist"
+            ]
+          },
+          {
+            "phaseIndex": 1,
+            "hpThreshold": 0.6,
+            "speedMult": 1.05,
+            "damageMult": 1.2,
+            "spawnDelay": 6,
+            "skills": [
+              "acid_mist",
+              "elemental_summon"
+            ]
+          },
+          {
+            "phaseIndex": 2,
+            "hpThreshold": 0.3,
+            "speedMult": 1.1,
+            "damageMult": 1.35,
+            "spawnDelay": 5,
+            "skills": [
+              "acid_mist",
+              "elemental_summon",
+              "acid_mist_burst"
+            ]
+          }
         ],
         "skills": {
           "acid_mist": {
@@ -356,10 +497,50 @@
         "minionSpawnInterval": 3.0,
         "minionPerWave": 4,
         "phases": [
-          { "phaseIndex": 0, "hpThreshold": 1.0,  "speedMult": 1.0,  "damageMult": 1.0,  "spawnDelay": 9,   "skills": ["rune_bolt", "acid_mist"] },
-          { "phaseIndex": 1, "hpThreshold": 0.5,  "speedMult": 1.1,  "damageMult": 1.2,  "spawnDelay": 6,   "skills": ["past_boss_summon", "rune_bolt"] },
-          { "phaseIndex": 2, "hpThreshold": 0.25, "speedMult": 1.2,  "damageMult": 1.4,  "spawnDelay": 5,   "skills": ["time_freeze_trap", "wrong_barrage"] },
-          { "phaseIndex": 3, "hpThreshold": 0.1,  "speedMult": 1.4,  "damageMult": 1.7,  "spawnDelay": 4,   "skills": ["explosive_dash", "rune_bolt"] }
+          {
+            "phaseIndex": 0,
+            "hpThreshold": 1.0,
+            "speedMult": 1.0,
+            "damageMult": 1.0,
+            "spawnDelay": 9,
+            "skills": [
+              "rune_bolt",
+              "acid_mist"
+            ]
+          },
+          {
+            "phaseIndex": 1,
+            "hpThreshold": 0.5,
+            "speedMult": 1.1,
+            "damageMult": 1.2,
+            "spawnDelay": 6,
+            "skills": [
+              "past_boss_summon",
+              "rune_bolt"
+            ]
+          },
+          {
+            "phaseIndex": 2,
+            "hpThreshold": 0.25,
+            "speedMult": 1.2,
+            "damageMult": 1.4,
+            "spawnDelay": 5,
+            "skills": [
+              "time_freeze_trap",
+              "wrong_barrage"
+            ]
+          },
+          {
+            "phaseIndex": 3,
+            "hpThreshold": 0.1,
+            "speedMult": 1.4,
+            "damageMult": 1.7,
+            "spawnDelay": 4,
+            "skills": [
+              "explosive_dash",
+              "rune_bolt"
+            ]
+          }
         ],
         "skills": {
           "rune_bolt": {
@@ -434,11 +615,32 @@
       "boss_exam_god_ultimate": ""
     },
     "phase": {
-      "boss_overwork_math": ["", "", ""],
-      "boss_slacker_math": ["", "", ""],
-      "boss_grammar_king_english": ["", "", ""],
-      "boss_element_science": ["", "", ""],
-      "boss_exam_god_ultimate": ["", "", "", ""]
+      "boss_overwork_math": [
+        "",
+        "",
+        ""
+      ],
+      "boss_slacker_math": [
+        "",
+        "",
+        ""
+      ],
+      "boss_grammar_king_english": [
+        "",
+        "",
+        ""
+      ],
+      "boss_element_science": [
+        "",
+        "",
+        ""
+      ],
+      "boss_exam_god_ultimate": [
+        "",
+        "",
+        "",
+        ""
+      ]
     },
     "death": {
       "boss_overwork_math": "",
@@ -447,5 +649,15 @@
       "boss_element_science": "",
       "boss_exam_god_ultimate": ""
     }
+  },
+  "assistSettings": {
+    "enabled": true,
+    "accuracyWeight": 0.4,
+    "hpWeight": 0.35,
+    "lossWeight": 0.25,
+    "lossRefHpPerSec": 4,
+    "lossWindowSec": 5,
+    "pullMin": 0.55,
+    "smoothingSec": 1.5
   }
 }

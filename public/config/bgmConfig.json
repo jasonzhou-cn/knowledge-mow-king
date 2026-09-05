@@ -1,0 +1,47 @@
+{
+  "version": "1.0.0",
+  "enabled": true,
+  "masterGain": 0.16,
+  "tracks": {
+    "menu": {
+      "stepSec": 0.3,
+      "bass": [0, -1, -5, -1, -3, -1, -5, -1],
+      "lead": [12, -1, 16, -1, 19, -1, 16, -1, 14, -1, 17, -1, 12, -1, -1, -1],
+      "rootNote": 45,
+      "bassWave": "triangle",
+      "leadWave": "sine",
+      "bassGain": 0.4,
+      "leadGain": 0.3
+    },
+    "question": {
+      "stepSec": 0.28,
+      "bass": [0, -1, -1, -1, -5, -1, -1, -1],
+      "lead": [12, -1, -1, 16, -1, -1, 14, -1],
+      "rootNote": 43,
+      "bassWave": "triangle",
+      "leadWave": "sine",
+      "bassGain": 0.3,
+      "leadGain": 0.22
+    },
+    "grass": {
+      "stepSec": 0.22,
+      "bass": [0, 0, -5, 0, -3, -3, -5, -1],
+      "lead": [12, 16, 19, 16, 14, 17, 21, 17, 15, 19, 22, 19, 17, 14, 10, 14],
+      "rootNote": 45,
+      "bassWave": "square",
+      "leadWave": "square",
+      "bassGain": 0.32,
+      "leadGain": 0.2
+    },
+    "boss": {
+      "stepSec": 0.18,
+      "bass": [0, 0, 0, -1, 0, 0, 1, -1],
+      "lead": [12, -1, 13, -1, 15, -1, 13, -1, 12, -1, 10, -1, 8, -1, 10, -1],
+      "rootNote": 41,
+      "bassWave": "sawtooth",
+      "leadWave": "sawtooth",
+      "bassGain": 0.36,
+      "leadGain": 0.22
+    }
+  }
+}

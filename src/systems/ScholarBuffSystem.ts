@@ -21,6 +21,8 @@ export interface ScholarBuffOptions {
   pickupRadius: number;
   /** 玩家半径（BUFF 圆环按玩家体型换算显示尺寸） */
   playerRadius: number;
+  /** 拾取成功回调（成就统计用；可选） */
+  onPickup?: () => void;
 }
 
 export class ScholarBuffSystem {
@@ -28,6 +30,7 @@ export class ScholarBuffSystem {
   private readonly settings: ScholarBuffSettings;
   private readonly pickupRadius: number;
   private readonly playerRadius: number;
+  private readonly onPickup: (() => void) | null;
 
   /** 场上待拾取的书本图标 */
   private readonly drops: Phaser.GameObjects.Image[] = [];
@@ -44,6 +47,7 @@ export class ScholarBuffSystem {
     this.settings = opts.settings;
     this.pickupRadius = opts.pickupRadius;
     this.playerRadius = opts.playerRadius;
+    this.onPickup = opts.onPickup ?? null;
   }
 
   /** BUFF 是否激活 */
@@ -107,6 +111,7 @@ export class ScholarBuffSystem {
         this.drops.splice(i, 1);
         this.scene.tweens.killTweensOf(drop);
         drop.destroy();
+        this.onPickup?.();
         this.activate(playerX, playerY);
       }
     }

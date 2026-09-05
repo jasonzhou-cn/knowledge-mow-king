@@ -11,7 +11,7 @@ import { resolveExpToNextLevel } from '../config/resolve';
 import type { GameSettings } from '../config/types';
 
 /** 存档结构版本，结构变更时递增以便做兼容迁移 */
-const SAVE_VERSION = 1;
+const SAVE_VERSION = 2;
 const STORAGE_KEY = 'knowledge-mow-king.save.v1';
 
 /** 当日奖励记录：日期变化时自动归零 */
@@ -22,6 +22,28 @@ export interface DailyRewardRecord {
   rewardTime: number;
 }
 
+/** 成就/图鉴/关卡记录共用的本地统计（AchievementSystem 读写） */
+export interface MetaTotals {
+  kills: number;
+  clears: number;
+  bossKills: number;
+  perfectRounds: number;
+  noDamageClears: number;
+  scholarPickups: number;
+  lazyPickups: number;
+  bestCombo: number;
+  bestAccuracy: number;
+}
+
+/** 存档 v2 新增的元数据块：成就 + Boss 图鉴 + 每关最佳得分（本地排行榜） */
+export interface MetaSave {
+  achievements: string[];
+  bossesDefeated: string[];
+  /** key = 关卡号字符串 */
+  bestScores: Record<string, number>;
+  totals: MetaTotals;
+}
+
 /** 存档数据 */
 export interface ProgressSave {
   version: number;
@@ -30,6 +52,7 @@ export interface ProgressSave {
   totalScore: number;
   unlockedLevel: number;
   daily: DailyRewardRecord;
+  meta: MetaSave;
   updatedAt: number;
 }
 
@@ -58,7 +81,7 @@ export class ProgressionSystem {
     this.settings = gameSettings;
   }
 
-  /** 从 localStorage 读取存档；无存档或损坏时回退到默认值 */
+  /** 从 localStorage 读取存档；无存档或损坏时回退到默认值（v1 存档自动迁移：进度保留、meta 清空） */
   load(): void {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -68,6 +91,19 @@ export class ProgressionSystem {
       }
       const parsed = JSON.parse(raw) as Partial<ProgressSave>;
       if (parsed.version !== SAVE_VERSION) {
+        if (parsed.version === 1) {
+          // v1 → v2 迁移：老玩家的等级/经验/得分/解锁全部保留，成就与记录从零开始
+          this.data = {
+            ...ProgressionSystem.createDefault(),
+            level: Math.max(1, Math.floor(parsed.level ?? 1)),
+            exp: Math.max(0, parsed.exp ?? 0),
+            totalScore: Math.max(0, parsed.totalScore ?? 0),
+            unlockedLevel: Math.max(1, Math.floor(parsed.unlockedLevel ?? 1)),
+            daily: this.normalizeDaily(parsed.daily),
+          };
+          this.save();
+          return;
+        }
         this.data = ProgressionSystem.createDefault();
         return;
       }
@@ -78,6 +114,7 @@ export class ProgressionSystem {
         totalScore: Math.max(0, parsed.totalScore ?? 0),
         unlockedLevel: Math.max(1, Math.floor(parsed.unlockedLevel ?? 1)),
         daily: this.normalizeDaily(parsed.daily),
+        meta: this.normalizeMeta(parsed.meta),
         updatedAt: parsed.updatedAt ?? Date.now(),
       };
     } catch {
@@ -111,6 +148,19 @@ export class ProgressionSystem {
   /** 已解锁的最高关卡号 */
   get unlockedLevel(): number {
     return this.data.unlockedLevel;
+  }
+
+  /** 成就/图鉴/记录元数据（AchievementSystem 与面板读写的唯一入口） */
+  get meta(): MetaSave {
+    return this.data.meta;
+  }
+
+  /** 解锁一个成就；已解锁返回 false（幂等） */
+  unlockAchievement(id: string): boolean {
+    if (this.data.meta.achievements.includes(id)) return false;
+    this.data.meta.achievements.push(id);
+    this.save();
+    return true;
   }
 
   /** 升到下一级所需经验；已满级返回 Infinity */
@@ -214,7 +264,46 @@ export class ProgressionSystem {
       totalScore: 0,
       unlockedLevel: 1,
       daily: { date: todayKey(), rewardTime: 0 },
+      meta: {
+        achievements: [],
+        bossesDefeated: [],
+        bestScores: {},
+        totals: {
+          kills: 0,
+          clears: 0,
+          bossKills: 0,
+          perfectRounds: 0,
+          noDamageClears: 0,
+          scholarPickups: 0,
+          lazyPickups: 0,
+          bestCombo: 0,
+          bestAccuracy: 0,
+        },
+      },
       updatedAt: Date.now(),
+    };
+  }
+
+  /** 补全 meta 缺失字段（兼容手改存档 / 老结构片段） */
+  private normalizeMeta(meta: Partial<MetaSave> | undefined): MetaSave {
+    const base = ProgressionSystem.createDefault().meta;
+    if (!meta) return base;
+    const t: Partial<MetaTotals> = meta.totals ?? {};
+    return {
+      achievements: Array.isArray(meta.achievements) ? meta.achievements.filter((s) => typeof s === 'string') : base.achievements,
+      bossesDefeated: Array.isArray(meta.bossesDefeated) ? meta.bossesDefeated.filter((s) => typeof s === 'string') : base.bossesDefeated,
+      bestScores: meta.bestScores && typeof meta.bestScores === 'object' ? meta.bestScores : base.bestScores,
+      totals: {
+        kills: Math.max(0, t.kills ?? 0),
+        clears: Math.max(0, t.clears ?? 0),
+        bossKills: Math.max(0, t.bossKills ?? 0),
+        perfectRounds: Math.max(0, t.perfectRounds ?? 0),
+        noDamageClears: Math.max(0, t.noDamageClears ?? 0),
+        scholarPickups: Math.max(0, t.scholarPickups ?? 0),
+        lazyPickups: Math.max(0, t.lazyPickups ?? 0),
+        bestCombo: Math.max(0, t.bestCombo ?? 0),
+        bestAccuracy: Math.max(0, Math.min(1, t.bestAccuracy ?? 0)),
+      },
     };
   }
 

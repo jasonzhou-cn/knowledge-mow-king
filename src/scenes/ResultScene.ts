@@ -12,6 +12,8 @@ import { ConfigLoader } from '../config/ConfigLoader';
 import { resolveNextLevel } from '../config/resolve';
 import type { LevelConfig, RewardConfig } from '../config/types';
 import { progression } from '../systems/ProgressionSystem';
+import { achievements } from '../systems/AchievementSystem';
+import { bgm } from '../systems/BgmController';
 import { applyDailyCap, calculateRewards, calculateScore, formatRewardItems } from '../systems/RewardSystem';
 import { sfx } from '../systems/SfxController';
 import { Palette, css, textStyle } from '../ui/Palette';
@@ -95,6 +97,17 @@ export class ResultScene extends Phaser.Scene {
     const levelUp = progression.addExp(expGain);
     if (levelUp) sfx.play('levelUp');
     progression.addScore(score);
+
+    // 成就 / 图鉴 / 本地排行榜：回合统计 + 全量达成判定（解锁的成就弹 toast）
+    achievements.recordLevelScore(payload.level, score);
+    if (payload.cleared) progression.meta.totals.clears++;
+    const newlyUnlocked = achievements.notifyRoundResult({
+      cleared: payload.cleared,
+      noDamage: payload.noDamage,
+      accuracy: payload.quiz.accuracy,
+      perfect: payload.quiz.totalQuestions > 0 && payload.quiz.correctCount === payload.quiz.totalQuestions,
+      maxCombo: payload.maxCombo,
+    });
     progression.save();
 
     const rewardInput = { quiz: payload.quiz, kills: payload.kills, noDamage: payload.noDamage };
@@ -145,6 +158,19 @@ export class ResultScene extends Phaser.Scene {
         .text(w / 2, 116 * s, flavorLine, textStyle(Math.round(17 * s), css(Palette.accent.gold)))
         .setOrigin(0.5, 0);
       pushStagger(flavorText, true);
+    }
+
+    // 成就解锁 toast：紧贴趣味文案下方（金色横条，逐条展示本次新解锁）
+    if (newlyUnlocked.length > 0) {
+      const toast = this.add
+        .text(
+          w / 2,
+          116 * s + 30 * s,
+          `🏆 成就解锁：${newlyUnlocked.map((a) => a.name).join('　')}`,
+          textStyle(Math.round(17 * s), css(Palette.accent.gold), { fontStyle: 'bold' }),
+        )
+        .setOrigin(0.5, 0);
+      pushStagger(toast, true);
     }
 
     // 左栏：答题表现
@@ -224,6 +250,9 @@ export class ResultScene extends Phaser.Scene {
 
     // T-025：场景切换 fade 过渡
     this.cameras.main.fadeIn(polish.sceneFadeInMs, 0, 0, 0);
+
+    // BGM：结算回到主菜单轨道（轻快收尾）
+    bgm.play('menu');
   }
 
   /**
@@ -255,12 +284,15 @@ export class ResultScene extends Phaser.Scene {
     }
   }
 
-  /** 计算本关经验：击杀 + 答对 + 通关奖励 */
+  /**
+   * 计算本关经验：答对 + 通关奖励。
+   * 红线 2-B 收口：击杀不再产出经验（expPerKill 已从配置与公式中摘除）——
+   * 等级成长只由答题表现驱动，杜绝「刷怪 → 等级 → 伤害基数」的旁路。
+   */
   private calculateExp(config: RewardConfig, payload: ResultSceneData): number {
     const s = config.scoreSettings;
     return Math.round(
-      payload.kills * s.expPerKill +
-        payload.quiz.correctCount * s.expPerCorrectAnswer +
+      payload.quiz.correctCount * s.expPerCorrectAnswer +
         (payload.cleared ? s.expLevelClearBonus : 0),
     );
   }

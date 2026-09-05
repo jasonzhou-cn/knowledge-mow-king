@@ -21,6 +21,8 @@ import { ArrowSelector } from '../systems/ArrowSelector';
 import { CursorSelector } from '../systems/CursorSelector';
 import { QuizEngine } from '../systems/QuizEngine';
 import { progression } from '../systems/ProgressionSystem';
+import { playtime } from '../systems/PlaytimeSystem';
+import { bgm } from '../systems/BgmController';
 import { resolveComboTier } from '../systems/RewardSystem';
 import { sfx } from '../systems/SfxController';
 import { Palette, css, textStyle } from '../ui/Palette';
@@ -82,6 +84,12 @@ export class QuestionScene extends Phaser.Scene {
   }
 
   create(): void {
+    // 防沉迷：连玩时长达到上限（含刷新页面后恢复的持久化记录）→ 送回主菜单弹休息遮罩
+    if (playtime.shouldRest) {
+      this.scene.start('MenuScene');
+      return;
+    }
+
     // 供 CDP 无头验证直接访问答题场景状态（T-016）；仅开发模式暴露，生产 tree-shake 剔除
     if (import.meta.env.DEV) {
       (window as unknown as { __QS__?: QuestionScene }).__QS__ = this;
@@ -178,6 +186,9 @@ export class QuestionScene extends Phaser.Scene {
 
     this.registerInput();
     this.presentQuestion();
+
+    // BGM：答题轨道（比主菜单更轻，不抢解题注意力）
+    bgm.play('question');
   }
 
   override update(_time: number, delta: number): void {
@@ -517,8 +528,11 @@ export class QuestionScene extends Phaser.Scene {
       this.scene.start('GrassCuttingScene', data);
     };
 
-    // 点击立即开始，否则 2.6 秒后自动进入
-    this.time.delayedCall(2600, go);
+    // 点击立即开始，否则按配置时长自动进入（红线 1 收口：自动推进时长外置）
+    this.time.delayedCall(
+      Math.max(0, this.questionConfig.answerSettings.bonusPanelAutoAdvanceMs),
+      go,
+    );
     this.input.once('pointerdown', go);
     this.input.keyboard?.once('keydown-SPACE', go);
   }

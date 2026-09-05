@@ -27,7 +27,6 @@
     "scorePerKill": 10,
     "scorePerCorrectAnswer": 50,
     "scoreComboBonusPerCombo": 5,
-    "expPerKill": 2,
     "expPerCorrectAnswer": 5,
     "expLevelClearBonus": 20
   },

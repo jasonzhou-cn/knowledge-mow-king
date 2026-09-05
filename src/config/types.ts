@@ -16,7 +16,10 @@ export type ConfigModuleName =
   | 'questionBank'
   | 'weaponConfig'
   | 'bossDialogue'
-  | 'resultFlavor';
+  | 'resultFlavor'
+  | 'sfxConfig'
+  | 'bgmConfig'
+  | 'achievementConfig';
 
 /** 学科 key：刻意使用 string 而非字面量联合，保证新增学科只改 JSON 不改代码 */
 export type SubjectKey = string;
@@ -68,12 +71,27 @@ export interface GrassCuttingBonusSettings {
   multiplierCeiling: MultiplierTriplet;
 }
 
+/**
+ * 防沉迷设置（GDD 2.6：严格游戏时长限制 + 到时间强制下线）。
+ * 纯前端实现：localStorage 记录连续游玩起点，达到上限弹全屏休息提示并阻断继续游戏。
+ */
+export interface PlaytimeSettings {
+  /** 总开关（false 时全部检查短路） */
+  enabled: boolean;
+  /** 连续游玩时长上限（分钟），达到后必须休息 */
+  sessionLimitMin: number;
+  /** 强制休息时长（分钟），倒计时结束前无法进入任何关卡 */
+  restMin: number;
+}
+
 export interface GameSettings {
   version: string;
   levelSettings: LevelSettings;
   rewardSettings: RewardSettings;
   otherSettings: OtherSettings;
   grassCuttingBonusSettings: GrassCuttingBonusSettings;
+  /** 防沉迷：连续游玩时长强制休息 */
+  playtimeSettings: PlaytimeSettings;
 }
 
 // ──────────────────────────── questionConfig.json ────────────────────────────
@@ -146,6 +164,8 @@ export interface AnswerSettings {
   cursorHitZoneWidth: number;
   /** 游标模式：判定框高度（每张卡片中央的小框，px） */
   cursorHitZoneHeight: number;
+  /** 加成结算面板的自动推进时长（毫秒），0 = 只允许点击推进 */
+  bonusPanelAutoAdvanceMs: number;
 }
 
 export interface SubjectDifficultyEntry {
@@ -212,6 +232,31 @@ export interface ComboSettings {
 
 /** 难度曲线插值方式：linear=线性，smoothstep=两端缓入缓出 */
 export type DifficultyInterpolation = 'linear' | 'smoothstep';
+
+/**
+ * 动态难度下调（GDD 1.3 软失败保护 / 红线 3）：
+ * 由玩家实时表现算出 assistFactor ∈ [0,1]（越高 = 表现越好），
+ * 难度进度按 effectiveT = t × (pullMin + (1 - pullMin) × assist) 回拉——**只降不升**，
+ * 表现越好 assist 越接近 1，effectiveT 越接近原曲线；表现差时向 Start 端回拉，堵死亡螺旋。
+ */
+export interface AssistSettings {
+  /** 总开关（false 时 assist 恒为 1，行为与旧版纯时间驱动一致） */
+  enabled: boolean;
+  /** 答题正确率的权重（本关答题已结束，正确率全程恒定） */
+  accuracyWeight: number;
+  /** 当前 HP 占比的权重 */
+  hpWeight: number;
+  /** 近期掉血速率表现的权重 */
+  lossWeight: number;
+  /** 掉血速率归一化参考（HP/秒）：达到该值视为「最差表现」，0 以下不做归一化 */
+  lossRefHpPerSec: number;
+  /** 统计近期掉血的时间窗（秒） */
+  lossWindowSec: number;
+  /** 表现最差时保留的难度进度比例（0~1）：越小保护越强 */
+  pullMin: number;
+  /** assist 向目标值平滑的时间常数（秒），避免难度跳变 */
+  smoothingSec: number;
+}
 
 /**
  * 生存关的时间驱动难度曲线。
@@ -376,6 +421,8 @@ export interface BossCommonConfig {
   skillVisualTtl: number;
   /** 技能施法警告持续（秒，预留） */
   skillCastWarnDuration: number;
+  /** Boss 生成前的同屏小怪上限比例（相对 maxAlive），防止开局被怪海淹没 */
+  preBossAliveRatio: number;
 }
 
 /** Boss 全集：common 公共配置 + roster 模板列表 */
@@ -393,12 +440,43 @@ export interface BossDialogueEntry {
 
 // ───────────────────── T-025 美术表现与趣味性打磨 ─────────────────────
 
-/** 场景主题装饰数量（控制同屏静态装饰与漂浮符号的规模） */
+/** 场景主题装饰数量（控制同屏静态装饰与漂浮符号的规模与观感） */
 export interface ThemeDecoSettings {
   /** 草丛/装饰三角数量 */
   tuftCount: number;
   /** 漂浮学科符号数量 */
   symbolCount: number;
+  /** 草丛最小高度（px） */
+  tuftHeightMin: number;
+  /** 草丛最大高度（px） */
+  tuftHeightMax: number;
+  /** 普通关草丛透明度 */
+  tuftAlpha: number;
+  /** 学科专属静态装饰数量 */
+  decoCount: number;
+  /** Boss 关地面压暗强度（0~1，向背景深色混合的比例） */
+  bossDim: number;
+}
+
+/** 震屏时长组（红线 1 收口：时长与强度分离，全部可配） */
+export interface ShakeFxSettings {
+  /** 近战命中震屏时长（毫秒） */
+  meleeHitMs: number;
+  /** 远程出手震屏时长（毫秒） */
+  fireMs: number;
+  /** 击杀确认震屏时长（毫秒） */
+  killMs: number;
+  /** 玩家受伤震屏时长（毫秒） */
+  hurtMs: number;
+  /** Boss 死亡收场震屏时长（毫秒，强度固定走 GDD 上限 0.006） */
+  bossDeathMs: number;
+}
+
+/** 伤害/击杀飘字的字号分档（红线 1 收口：字号不再散落硬编码） */
+export interface FloatingTextSettings {
+  fontNormal: number;
+  fontBig: number;
+  fontHuge: number;
 }
 
 /** 学霸 BUFF（随机击杀掉落书本，拾取后短暂提升攻速/移速） */
@@ -506,7 +584,15 @@ export interface PolishSettings {
   bossPhaseFlashMs: number;
   /** 每级连击档位额外增加的击杀碎片数 */
   killShardBonusPerTier: number;
-  /** 场景主题装饰数量 */
+  /** 玩家精灵显示尺寸系数（displaySize = player.radius × 该值） */
+  playerSpriteScale: number;
+  /** 倒计时告警阈值（秒）：剩余时间 ≤ 该值时 HUD 进入告警态 */
+  timeWarningThresholdSec: number;
+  /** 震屏时长组 */
+  shake: ShakeFxSettings;
+  /** 飘字字号分档 */
+  floatingText: FloatingTextSettings;
+  /** 场景主题装饰参数 */
   themeDeco: ThemeDecoSettings;
   /** 学霸 BUFF 参数 */
   scholarBuff: ScholarBuffSettings;
@@ -598,6 +684,8 @@ export interface GrassCuttingConfig {
   subjectCoefficientSettings: Record<SubjectKey, SubjectCoefficientEntry>;
   /** T-025 打磨期视觉/趣味参数 */
   polishSettings: PolishSettings;
+  /** 动态难度下调（红线 3 软失败保护） */
+  assistSettings: AssistSettings;
 }
 
 // ──────────────────────────── weaponConfig.json ────────────────────────────
@@ -759,7 +847,11 @@ export interface ScoreSettings {
   scorePerKill: number;
   scorePerCorrectAnswer: number;
   scoreComboBonusPerCombo: number;
-  expPerKill: number;
+  /**
+   * 每次答对获得的经验。
+   * 红线 2-B 收口：经验只由答题表现（答对数 + 通关奖励）驱动，
+   * 击杀不再产出经验——「击杀 → 等级 → 伤害基数」旁路已从公式中摘除。
+   */
   expPerCorrectAnswer: number;
   expLevelClearBonus: number;
 }
@@ -866,6 +958,98 @@ export interface ResultFlavorConfig {
   byResult: Record<string, string[]>;
 }
 
+// ─────────────────────────── sfxConfig.json ───────────────────────────
+
+/** 支持的音效名（与 SfxController 保持一致） */
+export type SfxName =
+  | 'stop'
+  | 'correct'
+  | 'wrong'
+  | 'kill'
+  | 'hurt'
+  | 'levelUp';
+
+/** 单个音效的振荡器参数（WebAudio 实时合成，零素材） */
+export interface SfxToneSpec {
+  /** 起始频率（Hz） */
+  from: number;
+  /** 结束频率（Hz），做滑音 */
+  to: number;
+  /** 时长（秒） */
+  duration: number;
+  /** 波形 */
+  wave: 'sine' | 'square' | 'sawtooth' | 'triangle';
+  /** 音量（0~1） */
+  gain: number;
+}
+
+/** 音效配置（红线 1 收口：节流表与音色参数从源码外置到 JSON） */
+export interface SfxConfig {
+  version: string;
+  /** 同名音效的最小触发间隔（毫秒），0 表示不限制 */
+  minIntervalMs: Record<SfxName, number>;
+  /** 各音色的振荡器参数 */
+  tones: Record<SfxName, SfxToneSpec>;
+}
+
+// ─────────────────────────── bgmConfig.json ───────────────────────────
+
+/** 单条 BGM 轨道的序列参数（WebAudio 程序化合成，零素材） */
+export interface BgmTrackSettings {
+  /** 每步时长（秒），步 = 低音或主旋律的最小音符单位 */
+  stepSec: number;
+  /** 低音序列：半音相对 rootNote 的偏移，-1 = 休止 */
+  bass: number[];
+  /** 主旋律序列：半音相对 rootNote 的偏移，-1 = 休止 */
+  lead: number[];
+  /** 音高基准（MIDI 音符号） */
+  rootNote: number;
+  /** 低音波形 */
+  bassWave: 'sine' | 'square' | 'sawtooth' | 'triangle';
+  /** 主旋律波形 */
+  leadWave: 'sine' | 'square' | 'sawtooth' | 'triangle';
+  /** 低音音量（0~1，最终再乘 masterGain） */
+  bassGain: number;
+  /** 主旋律音量（0~1，最终再乘 masterGain） */
+  leadGain: number;
+}
+
+/** BGM 配置：按场景切换的循环轨道（menu / question / grass / boss） */
+export interface BgmConfig {
+  version: string;
+  /** 总开关 */
+  enabled: boolean;
+  /** 总音量（0~1） */
+  masterGain: number;
+  /** 各场景轨道 */
+  tracks: Record<'menu' | 'question' | 'grass' | 'boss', BgmTrackSettings>;
+}
+
+// ──────────────────────── achievementConfig.json ────────────────────────
+
+/** 成就达成条件（type 决定判定字段，value 为阈值） */
+export interface AchievementCondition {
+  /** 判定类型：level_clear / level_reach / accuracy / combo / kills_total / no_damage_clear / boss_kills / score_total / scholar_pickups / lazy_pickups / perfect_rounds */
+  type: string;
+  /** 阈值（type 含义不同：等级号 / 正确率 / 次数等） */
+  value: number;
+}
+
+/** 单个成就定义 */
+export interface AchievementEntry {
+  id: string;
+  name: string;
+  desc: string;
+  condition: AchievementCondition;
+}
+
+/** 成就配置（本地成就 + 图鉴 + 关卡记录共用的元数据驱动） */
+export interface AchievementConfig {
+  version: string;
+  description: string;
+  achievements: AchievementEntry[];
+}
+
 /** 所有配置模块的联合类型表，ConfigLoader.getConfig<T> 的索引来源 */
 export interface ConfigModuleMap {
   gameSettings: GameSettings;
@@ -878,4 +1062,7 @@ export interface ConfigModuleMap {
   weaponConfig: WeaponConfig;
   bossDialogue: BossDialogueConfig;
   resultFlavor: ResultFlavorConfig;
+  sfxConfig: SfxConfig;
+  bgmConfig: BgmConfig;
+  achievementConfig: AchievementConfig;
 }

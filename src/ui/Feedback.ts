@@ -9,7 +9,11 @@
 
 import Phaser from 'phaser';
 import { CssColor, FONT_FAMILY } from './Palette';
+import type { FloatingTextSettings } from '../config/types';
 import { easeOutBack } from '../utils/MathUtil';
+
+/** 飘字字号分档兜底值（正式来源：polishSettings.floatingText，红线 1 收口） */
+const FALLBACK_FONTS: FloatingTextSettings = { fontNormal: 20, fontBig: 27, fontHuge: 34 };
 
 /** 点击瞬间的扩散圆环反馈 */
 export function ripple(
@@ -197,18 +201,25 @@ function damageColor(tier: number): string {
   return CssColor.primary;
 }
 
-/** 伤害数字的字号分档 */
-function damageFontSize(tier: number): number {
-  if (tier >= 2) return 34;
-  if (tier >= 1) return 27;
-  return 20;
+/** 伤害/击杀飘字的字号分档（配置驱动，未绑定时用兜底值） */
+let floatingFonts: FloatingTextSettings = { ...FALLBACK_FONTS };
+
+/** 绑定飘字字号配置（GrassCuttingScene 构建对象池时传入 polishSettings.floatingText） */
+export function bindFloatingTextFonts(settings: FloatingTextSettings): void {
+  floatingFonts = { ...FALLBACK_FONTS, ...settings };
 }
 
-/** 击杀飘字的字号分档 */
+function damageFontSize(tier: number): number {
+  if (tier >= 2) return floatingFonts.fontHuge;
+  if (tier >= 1) return floatingFonts.fontBig;
+  return floatingFonts.fontNormal;
+}
+
+/** 击杀飘字的字号分档（比伤害数字略大一号的普通档） */
 function killFontSize(tier: number): number {
-  if (tier >= 2) return 34;
-  if (tier >= 1) return 27;
-  return 22;
+  if (tier >= 2) return floatingFonts.fontHuge;
+  if (tier >= 1) return floatingFonts.fontBig;
+  return floatingFonts.fontNormal + 2;
 }
 
 /** 屏幕震动（短促，用于受伤 / 关卡失败） */

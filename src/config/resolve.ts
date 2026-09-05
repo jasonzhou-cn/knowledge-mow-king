@@ -8,6 +8,7 @@
 
 import { ConfigLoader } from './ConfigLoader';
 import type {
+  AssistSettings,
   AutoAimSettings,
   BossRoster,
   BossSettings,
@@ -158,6 +159,8 @@ export interface ResolvedLevelPackage {
   touch: TouchSettings;
   /** 时间驱动难度曲线的起止值（插值在 MonsterSpawner 里按 t 做） */
   difficulty: DifficultySettings;
+  /** 动态难度下调设置（红线 3 软失败保护，插值在 DifficultyAssist 里按表现做） */
+  assist: AssistSettings;
   performance: {
     maxAliveMonsters: number;
     damageCheckFrameInterval: number;
@@ -194,17 +197,8 @@ export interface ResolveInput {
   weaponConfig: WeaponConfig;
 }
 
-/**
- * 把武器原始配置解析为运行期可直接消费的最终数值。
- *
- * 三项答题乘数的落点（GDD 1.3 核心绑定原则：答题质量必须决定割草爽感）：
- *  - damageMultiplier   → 武器伤害
- *  - rangeMultiplier    → 武器射程（近战扇形半径 / 远程弹丸射程）
- *  - durationMultiplier → 攻击节奏（作为冷却的除数，答得越好出手越快）
- *
- * 软失败保护（GDD 2.1）：乘数已在 computeGrassCuttingBonus 中按 multiplierFloor 保底，
- * 正确率 0% 时伤害仍有下限，不会陷入死亡螺旋。
- */
+/** 「持续乘数作冷却除数」时防御除零的下限（数值卫生常量，非游戏手感参数） */
+const MIN_DURATION_DIVISOR = 0.01;
 /** 答题加成中真正参与数值换算的三项乘数（不含结算展示用的 breakdown） */
 export type BonusMultipliers = Pick<
   GrassCuttingBonus,
@@ -218,6 +212,17 @@ const NEUTRAL_MULTIPLIERS: BonusMultipliers = {
   durationMultiplier: 1,
 };
 
+/**
+ * 把武器原始配置解析为运行期可直接消费的最终数值。
+ *
+ * 三项答题乘数的落点（GDD 1.3 核心绑定原则：答题质量必须决定割草爽感）：
+ *  - damageMultiplier   → 武器伤害
+ *  - rangeMultiplier    → 武器射程（近战扇形半径 / 远程弹丸射程）
+ *  - durationMultiplier → 攻击节奏（作为冷却的除数，答得越好出手越快）
+ *
+ * 软失败保护（GDD 2.1）：乘数已在 computeGrassCuttingBonus 中按 multiplierFloor 保底，
+ * 正确率 0% 时伤害仍有下限，不会陷入死亡螺旋。
+ */
 export function resolveWeapons(
   weaponConfig: WeaponConfig,
   level: number,
@@ -233,7 +238,7 @@ export function resolveWeapons(
       growthLinearPercent(w.damage, w.damageGrowthPerLevel, level) *
       subjectDamageCoefficient *
       bonus.damageMultiplier,
-    cooldown: w.cooldown / Math.max(0.01, bonus.durationMultiplier),
+    cooldown: w.cooldown / Math.max(MIN_DURATION_DIVISOR, bonus.durationMultiplier),
     range: w.range * subjectRangeCoefficient * bonus.rangeMultiplier,
     sectorAngle: w.sectorAngle,
     projectileSpeed: w.projectileSpeed,
@@ -524,6 +529,7 @@ export function resolveLevelPackage(
       moveSpeedMultiplierStart: ds.moveSpeedMultiplierStart,
       moveSpeedMultiplierEnd: ds.moveSpeedMultiplierEnd,
     },
+    assist: grassCuttingConfig.assistSettings,
     performance: {
       maxAliveMonsters: maxAlive,
       damageCheckFrameInterval: pf.damageCheckFrameInterval,

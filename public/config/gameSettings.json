@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "levelSettings": {
     "maxLevel": 50,
     "levelUpGradeBase": 100,
@@ -29,7 +29,7 @@
     "accuracyTermMin": 0.4,
     "accuracyTermMax": 1.6,
     "speedFactorBase": 1,
-    "speedFactorWeight": 0.5,
+    "speedFactorWeight": 0.8,
     "speedFactorMin": 0.8,
     "speedFactorMax": 1.5,
     "comboFactorPerCombo": 0.05,
@@ -44,5 +44,10 @@
       "range": 3,
       "duration": 3
     }
+  },
+  "playtimeSettings": {
+    "enabled": true,
+    "sessionLimitMin": 30,
+    "restMin": 10
   }
 }

@@ -26,6 +26,9 @@ const CONFIG_MODULES: ConfigModuleName[] = [
   'weaponConfig',
   'bossDialogue',
   'resultFlavor',
+  'sfxConfig',
+  'bgmConfig',
+  'achievementConfig',
 ];
 
 /** 单个模块的加载结果：成功标记 + 原始数据 */

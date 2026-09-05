@@ -42,11 +42,15 @@ import { LazyBuffSystem } from '../systems/LazyBuffSystem';
 import { ExamSummonSystem } from '../systems/ExamSummonSystem';
 import { WrongDanmakuSystem } from '../systems/WrongDanmakuSystem';
 import { applySceneTheme } from '../systems/SceneTheme';
+import { applyAssistToProgress, computeAssistTarget, smoothAssist } from '../systems/DifficultyAssist';
+import { playtime } from '../systems/PlaytimeSystem';
+import { bgm } from '../systems/BgmController';
+import { achievements } from '../systems/AchievementSystem';
 import { getCanvasMode } from '../config/CanvasMode';
 import { sfx } from '../systems/SfxController';
 import { WeaponSystem, type AttackAction } from '../systems/WeaponSystem';
 import { Palette, css, textStyle, weaponTint } from '../ui/Palette';
-import { FloatingTextPool, cameraShake } from '../ui/Feedback';
+import { FloatingTextPool, cameraShake, bindFloatingTextFonts } from '../ui/Feedback';
 import { CombatHud } from '../ui/Hud';
 import { TouchJoystick } from '../ui/TouchJoystick';
 import { WeaponBar } from '../ui/WeaponBar';
@@ -191,6 +195,14 @@ export class GrassCuttingScene extends Phaser.Scene {
   /** 底部加成文案的左起始 x（触屏时右移以避让虚拟摇杆） */
   private bottomTextX = 16;
 
+  // ───────── 动态难度下调（红线 3 软失败保护，DifficultyAssist） ─────────
+  /** 当前平滑后的 assist ∈ [0,1]：1 = 表现正常，越小难度越向 Start 端回拉 */
+  private assistFactor = 1;
+  /** 近期掉血事件队列（用于按 lossWindowSec 统计掉血速率） */
+  private damageEvents: Array<{ at: number; amount: number }> = [];
+  /** 本关答题正确率（答题已结束，全程恒定；create 时从 data0 取） */
+  private levelAccuracy = 1;
+
   private hp = 1;
   private maxHp = 1;
   private timeLeft = 0;
@@ -224,6 +236,12 @@ export class GrassCuttingScene extends Phaser.Scene {
       return;
     }
 
+    // 防沉迷：连玩时长达到上限 → 送回主菜单弹全屏休息遮罩（倒计时结束才能继续）
+    if (playtime.shouldRest) {
+      this.scene.start('MenuScene');
+      return;
+    }
+
     // 场景单例复用：每次重进关卡必须重置全部运行状态，
     // 否则上一局的 ended/score/kills 等会残留——update() 会被 ended=true 短路，
     // 表现为「完全一动不动、时间静止、但武器还能切」（武器切换走 input 事件不依赖 update）。
@@ -232,6 +250,8 @@ export class GrassCuttingScene extends Phaser.Scene {
     // 答题加成在这里落地到三把武器上（GDD 1.3 核心绑定原则）
     this.packed = resolveLevel(incoming.level, incoming.bonus);
     const bonus = incoming.bonus;
+    // 动态难度下调的输入之一：本关答题正确率
+    this.levelAccuracy = incoming.quiz.accuracy;
 
     // T-025：学科主题（地面/草丛/装饰/漂浮符号随关卡学科切换，Boss 关专属氛围）
     const theme = applySceneTheme(this, this.packed.subject, this.packed.isBossLevel, this.packed.polish.themeDeco);
@@ -241,7 +261,9 @@ export class GrassCuttingScene extends Phaser.Scene {
     const py = this.scale.height / 2 + 40;
 
     this.player = this.add.image(px, py, TextureKeys.player);
-    this.player.setDisplaySize(this.packed.player.radius * 2.6, this.packed.player.radius * 2.6);
+    // 精灵显示尺寸系数来自 polishSettings（红线 1 收口）
+    const spriteScale = this.packed.polish.playerSpriteScale;
+    this.player.setDisplaySize(this.packed.player.radius * spriteScale, this.packed.player.radius * spriteScale);
     this.player.setDepth(200);
     this.player.setTint(Palette.combat.player);
 
@@ -298,6 +320,8 @@ export class GrassCuttingScene extends Phaser.Scene {
       corpseDrag: this.packed.killFx.corpseDrag,
       isBossLevel: this.packed.isBossLevel,
       boss: this.packed.boss,
+      // Boss 生成前的同屏上限比例（红线 1 收口：从源码常量外置到 bossRoster.common）
+      preBossAliveRatio: ConfigLoader.getInstance().getConfig('grassCuttingConfig').bossRoster?.common.preBossAliveRatio,
     });
 
     this.projectiles = new ProjectileSystem(this, {
@@ -327,12 +351,19 @@ export class GrassCuttingScene extends Phaser.Scene {
     });
 
     this.floaters = new FloatingTextPool(this, this.packed.performance.maxHitTextAlive);
+    // 飘字字号分档走配置（红线 1 收口）
+    bindFloatingTextFonts(this.packed.polish.floatingText);
 
     // T-025：学霸 BUFF（击杀概率掉书，拾取后短暂提升攻速/移速）
     this.scholar = new ScholarBuffSystem(this, {
       settings: this.packed.polish.scholarBuff,
       pickupRadius: this.packed.player.radius + 20,
       playerRadius: this.packed.player.radius,
+      // 拾取即计入成就统计（低频事件，直接判定 + 需要时落盘）
+      onPickup: () => {
+        const newly = achievements.notifyBuffPickup('scholar');
+        for (const a of newly) this.toastAchievement(a.name);
+      },
     });
 
     // T-026：躺平 BUFF（击杀概率掉胶囊，拾取后短暂无敌但移速小幅下降）
@@ -340,6 +371,10 @@ export class GrassCuttingScene extends Phaser.Scene {
       settings: this.packed.polish.lazyBuff,
       pickupRadius: this.packed.player.radius + 20,
       playerRadius: this.packed.player.radius,
+      onPickup: () => {
+        const newly = achievements.notifyBuffPickup('lazy');
+        for (const a of newly) this.toastAchievement(a.name);
+      },
     });
 
     // T-026：错题弹幕（无错题时零弹幕，不打扰）
@@ -428,6 +463,9 @@ export class GrassCuttingScene extends Phaser.Scene {
 
     this.spawner.start();
 
+    // BGM：战斗轨道（Boss 关切换到压迫感更强的 boss 轨）
+    bgm.play(this.packed.isBossLevel ? 'boss' : 'grass');
+
     // 奖励时间到账提示（GDD 2.4：奖励发放必须有明确视觉提示）
     if ((incoming.bonusTime ?? 0) > 0) {
       this.floaters.spawn(
@@ -496,6 +534,15 @@ export class GrassCuttingScene extends Phaser.Scene {
         get examSummonTotal()   { return self.examSummon ? self.examSummon.totalSpawned : null; },
         get examSummonAlive()   { return self.examSummon ? self.examSummon.aliveCount : null; },
         get bossBarFading()     { return self.bossBarFading; },
+        // 动态难度下调（红线 3）走查入口：assist 当前值 + 回拉后的有效难度进度（只读）
+        get assistFactor()      { return self.assistFactor; },
+        get effectiveProgress() {
+          if (!self.packed) return null;
+          const progress = Math.min(1, Math.max(0, self.elapsed / self.totalTime));
+          const s = self.packed.assist;
+          return s.enabled ? progress * (s.pullMin + (1 - s.pullMin) * Math.min(1, Math.max(0, self.assistFactor))) : progress;
+        },
+        get hpRatio()           { return self.maxHp > 0 ? Math.min(1, Math.max(0, self.hp / self.maxHp)) : null; },
       };
     }
   }
@@ -539,6 +586,11 @@ export class GrassCuttingScene extends Phaser.Scene {
     this.bossLineBg = null;
     this.bossLineText?.destroy();
     this.bossLineText = null;
+
+    // 动态难度下调：assist 与掉血队列随新关卡复位
+    this.assistFactor = 1;
+    this.damageEvents.length = 0;
+    this.levelAccuracy = 1;
 
     // T-026：上一局的躺平/弹幕系统与死亡序列状态一并复位（对象在 create 里重建）
     this.lazy?.destroy();
@@ -585,6 +637,9 @@ export class GrassCuttingScene extends Phaser.Scene {
     this.frameCounter++;
     this.elapsed += dt;
 
+    // ── 动态难度下调（红线 3）：按表现计算 assist 并回拉难度进度（只降不升） ──
+    this.updateDifficultyAssist(dt);
+
     this.updateSwitchInput();
     this.updateMovement(dt);
     this.updateFacing(dt);
@@ -595,7 +650,12 @@ export class GrassCuttingScene extends Phaser.Scene {
     this.updateAttack();
 
     const progress = clamp(this.elapsed / this.totalTime, 0, 1);
-    this.spawner.setProgress(progress);
+    // assist 回拉后的有效难度进度：表现差 → effectiveT < progress（怪更少更脆）
+    const assistSettings = this.packed.assist;
+    const effectiveProgress = assistSettings.enabled
+      ? applyAssistToProgress(progress, this.assistFactor, assistSettings.pullMin)
+      : progress;
+    this.spawner.setProgress(effectiveProgress);
     this.spawner.update(dt, this.player.x, this.player.y);
 
     // T-022：Boss 出生后启动技能调度器（懒启动：update 循环里等 Boss 真正出现）
@@ -803,6 +863,51 @@ export class GrassCuttingScene extends Phaser.Scene {
 
   // ───────────────────────── 各子系统更新 ─────────────────────────
 
+  /**
+   * 动态难度下调（红线 3 软失败保护）：
+   *  assist = w1×正确率 + w2×HP 占比 + w3×（1 - 掉血速率归一化），指数平滑后经
+   *  applyAssistToProgress 回拉难度进度。**只降不升**：assist 最高 1（= 原曲线），
+   *  绝不会把难度抬到纯时间曲线之上，避免「打得好 → 更难」的新正反馈。
+   */
+  private updateDifficultyAssist(dt: number): void {
+    const assistSettings = this.packed.assist;
+    if (!assistSettings.enabled) {
+      this.assistFactor = 1;
+      return;
+    }
+
+    // 统计近期掉血速率（窗口来自配置；死亡序列/顿帧期间 elapsed 冻结，自然不累计）
+    const windowSec = Math.max(1, assistSettings.lossWindowSec);
+    const cutoff = this.elapsed - windowSec;
+    while (this.damageEvents.length > 0 && this.damageEvents[0].at < cutoff) {
+      this.damageEvents.shift();
+    }
+    const recentLoss = this.damageEvents.reduce((sum, e) => sum + e.amount, 0);
+
+    const target = computeAssistTarget(
+      {
+        accuracy: this.levelAccuracy,
+        hpRatio: this.maxHp > 0 ? clamp(this.hp / this.maxHp, 0, 1) : 1,
+        recentLossPerSec: recentLoss / windowSec,
+      },
+      assistSettings,
+    );
+    this.assistFactor = smoothAssist(this.assistFactor, target, dt, assistSettings.smoothingSec);
+  }
+
+  /** 成就解锁 toast：金色横幅短提示（复用浮动文本池，不阻塞战斗） */
+  private toastAchievement(name: string): void {
+    this.floaters.spawn(
+      this.scale.width / 2,
+      this.scale.height * 0.24,
+      `成就解锁：${name}`,
+      css(Palette.accent.gold),
+      '🏆',
+      24,
+    );
+    sfx.play('levelUp');
+  }
+
   /** 玩家移动：键盘为主，虚拟摇杆只需替换 getMoveVector() 的实现 */
   private updateMovement(dt: number): void {
     const v = this.getMoveVector();
@@ -929,7 +1034,7 @@ export class GrassCuttingScene extends Phaser.Scene {
         monsters: this.spawner.monsters,
       });
       this.showSwing(action);
-      if (result.hits > 0) this.killFx.shake(w.shakeIntensity, 130);
+      if (result.hits > 0) this.killFx.shake(w.shakeIntensity, this.packed.polish.shake.meleeHitMs);
       return;
     }
 
@@ -964,7 +1069,7 @@ export class GrassCuttingScene extends Phaser.Scene {
     }
 
     this.showMuzzleFlash(mx, my);
-    this.killFx.shake(w.shakeIntensity * 0.5, 80);
+    this.killFx.shake(w.shakeIntensity * 0.5, this.packed.polish.shake.fireMs);
   }
 
   /** 近战挥砍弧光 */
@@ -1069,12 +1174,17 @@ export class GrassCuttingScene extends Phaser.Scene {
       this.score += gained;
       sfx.play('levelUp');
       this.floaters.spawn(x, y - 46, `BOSS 击破 +${gained}`, css(Palette.accent.gold), '★');
+      // 成就：记入 Boss 图鉴 + 达成判定（低频，直接落盘）
+      const bossId = this.packed.boss.bossId;
+      const newly = achievements.notifyBossDefeat(bossId);
+      for (const a of newly) this.toastAchievement(a.name);
       // 双层爆散拉开体量差距：金色主爆 + 精英色次爆
       this.killFx.burst(x, y, Palette.accent.gold, dirX, dirY, this.packed.polish.killShardBonusPerTier * 2);
       this.killFx.burst(x, y, Palette.combat.monsterElite, -dirY, dirX, this.packed.polish.killShardBonusPerTier * 2);
       // T-026：死亡瞬间的全屏 hitstop（时长来自 polishSettings.bossDeath）
       this.killFx.requestHitstop(this.packed.polish.bossDeath.hitstopMs);
-      this.killFx.shake(0.006, 160); // GDD 上限：0.006 / 160ms
+      // Boss 死亡震屏 = GDD 上限强度（0.006），时长来自配置
+      this.killFx.shake(0.006, this.packed.polish.shake.bossDeathMs);
       this.startBossDeathSequence(x, y, monster);
       return;
     }
@@ -1082,6 +1192,8 @@ export class GrassCuttingScene extends Phaser.Scene {
     this.kills++;
     sfx.play('kill');
     this.score += gained;
+    // 成就：累计击杀统计（只动内存，随结算统一落盘）
+    achievements.notifyKill();
 
     const nextCombo = this.combo.current + 1;
     const tier = this.comboTier(nextCombo);
@@ -1098,7 +1210,8 @@ export class GrassCuttingScene extends Phaser.Scene {
       this.killFx.burst(x, y, Palette.accent.gold, -dirY, dirX, this.packed.polish.killShardBonusPerTier);
     }
     this.killFx.requestHitstop(this.weaponSystem.current.hitstopDuration);
-    this.killFx.shake(this.weaponSystem.current.shakeIntensity, 140);
+    // 击杀确认震屏时长来自 polishSettings.shake（红线 1 收口）
+    this.killFx.shake(this.weaponSystem.current.shakeIntensity, this.packed.polish.shake.killMs);
 
     // T-025：连击里程碑——屏幕中央弹字 + 相机 zoom pulse（阈值来自配置）
     if (this.packed.polish.comboMilestones.includes(nextCombo)) {
@@ -1304,12 +1417,15 @@ export class GrassCuttingScene extends Phaser.Scene {
     // T-026：躺平 BUFF 激活期间无敌（接触伤害与 DoomZone 都从这里走），不消耗无敌帧
     if (this.lazy?.active) return;
     this.hp -= amount;
-    sfx.play('hurt');
     this.tookDamage = true;
+    // 动态难度下调：记录掉血事件（窗口统计用）
+    this.damageEvents.push({ at: this.elapsed, amount });
+    sfx.play('hurt');
     this.invulnerableTimer = this.packed.player.invulnerableDuration;
     this.contactCooldown = this.packed.player.contactDamageCooldown;
 
-    cameraShake(this, 0.006, 160);
+    // 震屏时长来自 polishSettings.shake（红线 1 收口）
+    cameraShake(this, 0.006, this.packed.polish.shake.hurtMs);
     this.floaters.spawn(this.player.x, this.player.y - 34, `-${Math.round(amount)}`, css(Palette.status.wrong), '♥');
 
     // 无敌帧闪烁提示
@@ -1349,7 +1465,8 @@ export class GrassCuttingScene extends Phaser.Scene {
     this.hud.setTimeLeft(this.timeLeft);
     this.hud.updateScore(this.score);
     this.hud.updateCombo(this.combo.current);
-    this.hud.setTimeWarning(this.timeLeft <= 10);
+    // 倒计时告警阈值来自 polishSettings（红线 1 收口）
+    this.hud.setTimeWarning(this.timeLeft <= this.packed.polish.timeWarningThresholdSec);
     this.weaponBar.update(this.cooldownProvider);
     this.updateBossBar();
   }

@@ -7,27 +7,16 @@
  *      后续要接入真实音频素材时，只需替换本文件的实现，调用方无需改动。
  */
 
-/** 支持的音效名 */
-export type SfxName = 'stop' | 'correct' | 'wrong' | 'kill' | 'hurt' | 'levelUp';
+import type { SfxConfig, SfxName } from '../config/types';
+
+export type { SfxName };
 
 /**
- * 音频设置。`minIntervalMs` = 同名音效的最小触发间隔（毫秒），0 表示不限制。
- * 由编排层在配置校验通过后 bind() 进来，未 bind 时用 DEFAULT_MIN_INTERVAL_MS 兜底。
+ * 兜底节流表与音色表（未 bind 配置时生效）。
+ * 正式的唯一数值来源是 public/config/sfxConfig.json（红线 1 数据代码解耦），
+ * 这里的兜底值与 JSON 保持一致，仅用于配置加载前的极端场景。
  */
-export interface AudioSettings {
-  minIntervalMs: Partial<Record<SfxName, number>>;
-}
-
-/**
- * 兜底节流表（未 bind 配置时生效）。
- *
- * TODO(T-013-B)：迁移到 public/config 走「JSON → types → validator → resolve」四段式
- * 管线后删除本常量。本轮按 team-lead 要求暂缓改动 public/config/ 与 src/config/。
- *
- * 取值规则 ≈ 该音效自身时长 + 10~80ms 间隙：
- * 既压得掉同帧叠音，又保留连杀时的节奏颗粒感，不会把一串连杀压成一声。
- */
-const DEFAULT_MIN_INTERVAL_MS: Record<SfxName, number> = {
+const FALLBACK_MIN_INTERVAL_MS: Record<SfxName, number> = {
   stop: 120, // 时长 0.08s
   correct: 200, // 时长 0.16s
   wrong: 240, // 时长 0.20s
@@ -50,8 +39,8 @@ interface ToneSpec {
   gain: number;
 }
 
-/** 音效参数表：改这里就能调整听感，不需要动任何业务代码 */
-const TONES: Record<SfxName, ToneSpec> = {
+/** 兜底音色表（与 sfxConfig.json 保持一致） */
+const FALLBACK_TONES: Record<SfxName, ToneSpec> = {
   stop: { from: 520, to: 320, duration: 0.08, type: 'triangle', gain: 0.14 },
   correct: { from: 660, to: 990, duration: 0.16, type: 'sine', gain: 0.2 },
   wrong: { from: 300, to: 180, duration: 0.2, type: 'sawtooth', gain: 0.14 },
@@ -60,11 +49,20 @@ const TONES: Record<SfxName, ToneSpec> = {
   levelUp: { from: 520, to: 1040, duration: 0.42, type: 'sine', gain: 0.22 },
 };
 
+const WAVE_TYPES: Record<string, OscillatorType> = {
+  sine: 'sine',
+  square: 'square',
+  sawtooth: 'sawtooth',
+  triangle: 'triangle',
+};
+
 class SfxController {
   private ctx: AudioContext | null = null;
   private enabled = true;
-  /** 同名音效的最小触发间隔（毫秒）；未 bind 时为兜底表 */
-  private minIntervalMs: Record<SfxName, number> = { ...DEFAULT_MIN_INTERVAL_MS };
+  /** 同名音效的最小触发间隔（毫秒）；bind 后来自 sfxConfig.json */
+  private minIntervalMs: Record<SfxName, number> = { ...FALLBACK_MIN_INTERVAL_MS };
+  /** 音色参数；bind 后来自 sfxConfig.json */
+  private tones: Record<SfxName, ToneSpec> = { ...FALLBACK_TONES };
   /** 每个音效上一次真正发声的墙钟时刻（ms），用于节流 */
   private lastPlayedAt = new Map<SfxName, number>();
 
@@ -74,11 +72,25 @@ class SfxController {
   }
 
   /**
-   * 绑定音频设置。配置里没写到的音效沿用兜底值，保证任何情况下都有节流保护。
-   * 调用点：编排层在配置校验通过之后（参考 BootScene.bootstrap 里 progression.bind 的位置）。
+   * 绑定音效配置（public/config/sfxConfig.json）。
+   * 配置里没写到的音效沿用兜底值，保证任何情况下都有节流保护与可用音色。
+   * 调用点：BootScene 在配置校验通过之后 bind。
    */
-  bind(settings: AudioSettings): void {
-    this.minIntervalMs = { ...DEFAULT_MIN_INTERVAL_MS, ...settings.minIntervalMs };
+  bind(settings: SfxConfig): void {
+    this.minIntervalMs = { ...FALLBACK_MIN_INTERVAL_MS, ...settings.minIntervalMs };
+    const merged = { ...FALLBACK_TONES };
+    for (const name of Object.keys(FALLBACK_TONES) as SfxName[]) {
+      const spec = settings.tones?.[name];
+      if (!spec) continue;
+      merged[name] = {
+        from: spec.from,
+        to: spec.to,
+        duration: spec.duration,
+        type: WAVE_TYPES[spec.wave] ?? 'sine',
+        gain: spec.gain,
+      };
+    }
+    this.tones = merged;
   }
 
   /** 是否处于开启状态 */
@@ -99,7 +111,7 @@ class SfxController {
       if (!ctx) return;
       if (ctx.state === 'suspended') void ctx.resume();
 
-      const spec = TONES[name];
+      const spec = this.tones[name];
       const now = ctx.currentTime;
 
       const osc = ctx.createOscillator();

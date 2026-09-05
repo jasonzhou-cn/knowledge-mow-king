@@ -83,7 +83,7 @@ export function applySceneTheme(
   const symbolPeriod = SUBJECT_SYMBOL_PERIOD[subject] ?? 3600;
 
   // Boss 关：地面更深 + 装饰更暗（终极战氛围）；普通关轻微主题染色
-  const bossDim = 0.45;
+  const bossDim = deco.bossDim;
   let fieldBase = blendColor(Palette.background.grassField, themeColor, 0.16);
   let fieldAlt = blendColor(Palette.background.grassFieldAlt, themeColor, 0.16);
   if (isBossLevel) {
@@ -114,24 +114,26 @@ export function applySceneTheme(
     return dx * dx + dy * dy > 80 * 80;
   };
 
-  // 草丛（三角）与学科小装饰，同一层静态绘制
+  // 草丛（三角）与学科小装饰，同一层静态绘制（几何/透明度全部来自 themeDeco 配置）
   const tufts = scene.add.graphics();
   tufts.setDepth(-10);
   const tuftColor = blendColor(Palette.combat.monster, themeColor, 0.3);
-  const tuftAlpha = isBossLevel ? 0.14 : 0.22;
+  const tuftAlpha = isBossLevel ? deco.tuftAlpha * 0.64 : deco.tuftAlpha;
+  const tuftHMin = Math.min(deco.tuftHeightMin, deco.tuftHeightMax);
+  const tuftHSpan = Math.max(0, deco.tuftHeightMax - deco.tuftHeightMin);
   for (let i = 0; i < deco.tuftCount; i++) {
     const x = spawnX();
     const y = spawnY();
-    const height = 8 + next() * 14;
+    const height = tuftHMin + next() * tuftHSpan;
     tufts.fillStyle(tuftColor, tuftAlpha);
     tufts.fillTriangle(x - 5, y, x + 5, y, x, y - height);
   }
 
-  // 学科专属静态装饰：6 个，避开玩家出生点
+  // 学科专属静态装饰，避开玩家出生点
   const decoAlpha = isBossLevel ? 0.3 : 0.8;
   const shapes = scene.add.graphics();
   shapes.setDepth(-9);
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < deco.decoCount; i++) {
     let x = spawnX();
     let y = spawnY();
     for (let tries = 0; tries < 8 && !awayFromCenter(x, y); tries++) {

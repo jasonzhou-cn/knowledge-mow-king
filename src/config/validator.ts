@@ -213,6 +213,9 @@ export function validateAllConfigs(raw: Record<ConfigModuleName, unknown>): void
     'weaponConfig',
     'bossDialogue',
     'resultFlavor',
+    'sfxConfig',
+    'bgmConfig',
+    'achievementConfig',
   ];
   for (const name of modules) {
     if (raw[name] === undefined || raw[name] === null) {
@@ -231,6 +234,9 @@ export function validateAllConfigs(raw: Record<ConfigModuleName, unknown>): void
   const weapon = validateWeaponConfig(raw.weaponConfig);
   const dialogue = validateBossDialogue(raw.bossDialogue);
   const flavor = validateResultFlavor(raw.resultFlavor);
+  const sfx = validateSfxConfig(raw.sfxConfig);
+  const bgm = validateBgmConfig(raw.bgmConfig);
+  const achievement = validateAchievementConfig(raw.achievementConfig);
 
   issues.push(
     ...game.issues,
@@ -243,6 +249,9 @@ export function validateAllConfigs(raw: Record<ConfigModuleName, unknown>): void
     ...weapon.issues,
     ...dialogue.issues,
     ...flavor.issues,
+    ...sfx.issues,
+    ...bgm.issues,
+    ...achievement.issues,
   );
 
   // ───────────── 跨表关联校验（GDD 1.4 多表关联原则） ─────────────
@@ -479,6 +488,18 @@ function validateGameSettings(raw: unknown): Validator {
     }
   }
 
+  // 防沉迷：连续游玩时长强制休息（GDD 2.6）
+  const pt = v.object(root, 'playtimeSettings', 'gameSettings.playtimeSettings');
+  v.boolean(pt, 'enabled', 'gameSettings.playtimeSettings.enabled');
+  v.number(pt, 'sessionLimitMin', 'gameSettings.playtimeSettings.sessionLimitMin', { min: 1, max: 240 });
+  v.number(pt, 'restMin', 'gameSettings.playtimeSettings.restMin', { min: 1, max: 120 });
+  if (Number(pt.restMin) >= Number(pt.sessionLimitMin)) {
+    v.custom(
+      'gameSettings.playtimeSettings',
+      `休息时长（${pt.restMin} 分钟）不应大于等于连续游玩上限（${pt.sessionLimitMin} 分钟），否则永远在休息`,
+    );
+  }
+
   const bs = v.object(root, 'grassCuttingBonusSettings', 'gameSettings.grassCuttingBonusSettings');
   v.number(bs, 'baseBonusGrowthPerLevel', 'gameSettings.grassCuttingBonusSettings.baseBonusGrowthPerLevel', { min: 0, max: 1 });
   v.number(bs, 'accuracyBaseline', 'gameSettings.grassCuttingBonusSettings.accuracyBaseline', { min: 0, max: 1 });
@@ -573,6 +594,7 @@ function validateQuestionConfig(raw: unknown): Validator {
   v.number(as, 'cursorCycleDuration', 'questionConfig.answerSettings.cursorCycleDuration', { min: 0.8, max: 6 });
   v.number(as, 'cursorHitZoneWidth', 'questionConfig.answerSettings.cursorHitZoneWidth', { min: 40, max: 300 });
   v.number(as, 'cursorHitZoneHeight', 'questionConfig.answerSettings.cursorHitZoneHeight', { min: 30, max: 200 });
+  v.integer(as, 'bonusPanelAutoAdvanceMs', 'questionConfig.answerSettings.bonusPanelAutoAdvanceMs', { min: 0, max: 15000 });
 
   // 判定区必须至少和选项卡片一样大，否则永远无法达到 100% 重叠
   if (
@@ -667,9 +689,30 @@ function validateGrassCuttingConfig(raw: unknown): Validator {
 
   const cs = v.object(root, 'comboSettings', 'grassCuttingConfig.comboSettings');
   v.number(cs, 'comboTimeWindow', 'grassCuttingConfig.comboSettings.comboTimeWindow', { min: 0.1 });
+  // 红线 2-A：comboDamageGrowth=0 表示「击杀连击不参与伤害结算」（答题是唯一战力来源），
+  // 校验允许 0；若调大数值等于重新打开旁路，需要同步重算难度曲线与核心绑定验证。
   v.number(cs, 'comboDamageGrowth', 'grassCuttingConfig.comboSettings.comboDamageGrowth', { min: 0 });
   v.number(cs, 'comboSkillDurationGrowth', 'grassCuttingConfig.comboSettings.comboSkillDurationGrowth', { min: 0 });
   v.number(cs, 'comboMaxDamageMultiplier', 'grassCuttingConfig.comboSettings.comboMaxDamageMultiplier', { min: 1 });
+
+  // ─────────────── 动态难度下调（红线 3 软失败保护） ───────────────
+  const ast = v.object(root, 'assistSettings', 'grassCuttingConfig.assistSettings');
+  v.boolean(ast, 'enabled', 'grassCuttingConfig.assistSettings.enabled');
+  v.number(ast, 'accuracyWeight', 'grassCuttingConfig.assistSettings.accuracyWeight', { min: 0 });
+  v.number(ast, 'hpWeight', 'grassCuttingConfig.assistSettings.hpWeight', { min: 0 });
+  v.number(ast, 'lossWeight', 'grassCuttingConfig.assistSettings.lossWeight', { min: 0 });
+  v.number(ast, 'lossRefHpPerSec', 'grassCuttingConfig.assistSettings.lossRefHpPerSec', { min: 0.1 });
+  v.number(ast, 'lossWindowSec', 'grassCuttingConfig.assistSettings.lossWindowSec', { min: 1, max: 30 });
+  v.number(ast, 'pullMin', 'grassCuttingConfig.assistSettings.pullMin', { min: 0.1, max: 1 });
+  v.number(ast, 'smoothingSec', 'grassCuttingConfig.assistSettings.smoothingSec', { min: 0.1, max: 10 });
+  const assistWeightSum =
+    Number(ast.accuracyWeight ?? 0) + Number(ast.hpWeight ?? 0) + Number(ast.lossWeight ?? 0);
+  if (assistWeightSum <= 0) {
+    v.custom(
+      'grassCuttingConfig.assistSettings',
+      'accuracyWeight / hpWeight / lossWeight 之和必须大于 0，否则 assist 恒为 0、难度永远压在最低档',
+    );
+  }
 
   const ds = v.object(root, 'difficultySettings', 'grassCuttingConfig.difficultySettings');
   v.string(ds, 'interpolation', 'grassCuttingConfig.difficultySettings.interpolation', ['linear', 'smoothstep']);
@@ -720,6 +763,7 @@ function validateGrassCuttingConfig(raw: unknown): Validator {
     v.integer(common, 'maxPhases', `${base}.common.maxPhases`, { min: 1, max: 8 });
     v.number(common, 'skillVisualTtl', `${base}.common.skillVisualTtl`, { min: 0 });
     v.number(common, 'skillCastWarnDuration', `${base}.common.skillCastWarnDuration`, { min: 0 });
+    v.number(common, 'preBossAliveRatio', `${base}.common.preBossAliveRatio`, { min: 0.05, max: 1 });
 
     const rosterList = v.array(br as Record<string, unknown>, 'roster', `${base}.roster`, 1);
     const idSet = new Set<string>();
@@ -876,9 +920,30 @@ function validateGrassCuttingConfig(raw: unknown): Validator {
   v.number(pl, 'bossPhaseFlashAlpha', `${pBase}.bossPhaseFlashAlpha`, { min: 0, max: 0.6 });
   v.integer(pl, 'bossPhaseFlashMs', `${pBase}.bossPhaseFlashMs`, { min: 50, max: 1500 });
   v.integer(pl, 'killShardBonusPerTier', `${pBase}.killShardBonusPerTier`, { min: 0, max: 16 });
+  // 红线 1 收口：玩家精灵尺寸系数 / 倒计时告警阈值 / 震屏时长 / 飘字字号
+  v.number(pl, 'playerSpriteScale', `${pBase}.playerSpriteScale`, { min: 1, max: 6 });
+  v.number(pl, 'timeWarningThresholdSec', `${pBase}.timeWarningThresholdSec`, { min: 1, max: 60 });
+  const shakeFx = v.object(pl, 'shake', `${pBase}.shake`);
+  v.integer(shakeFx, 'meleeHitMs', `${pBase}.shake.meleeHitMs`, { min: 0, max: 500 });
+  v.integer(shakeFx, 'fireMs', `${pBase}.shake.fireMs`, { min: 0, max: 500 });
+  v.integer(shakeFx, 'killMs', `${pBase}.shake.killMs`, { min: 0, max: 500 });
+  v.integer(shakeFx, 'hurtMs', `${pBase}.shake.hurtMs`, { min: 0, max: 500 });
+  v.integer(shakeFx, 'bossDeathMs', `${pBase}.shake.bossDeathMs`, { min: 0, max: 500 });
+  const floatText = v.object(pl, 'floatingText', `${pBase}.floatingText`);
+  v.integer(floatText, 'fontNormal', `${pBase}.floatingText.fontNormal`, { min: 8, max: 60 });
+  v.integer(floatText, 'fontBig', `${pBase}.floatingText.fontBig`, { min: 8, max: 80 });
+  v.integer(floatText, 'fontHuge', `${pBase}.floatingText.fontHuge`, { min: 8, max: 96 });
   const deco = v.object(pl, 'themeDeco', `${pBase}.themeDeco`);
   v.integer(deco, 'tuftCount', `${pBase}.themeDeco.tuftCount`, { min: 0, max: 200 });
   v.integer(deco, 'symbolCount', `${pBase}.themeDeco.symbolCount`, { min: 0, max: 30 });
+  v.number(deco, 'tuftHeightMin', `${pBase}.themeDeco.tuftHeightMin`, { min: 2, max: 60 });
+  v.number(deco, 'tuftHeightMax', `${pBase}.themeDeco.tuftHeightMax`, { min: 3, max: 80 });
+  if (Number(deco.tuftHeightMin) >= Number(deco.tuftHeightMax)) {
+    v.custom(`${pBase}.themeDeco.tuftHeightMax`, `草丛最大高度（${deco.tuftHeightMax}）必须大于最小高度（${deco.tuftHeightMin}）`);
+  }
+  v.number(deco, 'tuftAlpha', `${pBase}.themeDeco.tuftAlpha`, { min: 0.02, max: 1 });
+  v.integer(deco, 'decoCount', `${pBase}.themeDeco.decoCount`, { min: 0, max: 30 });
+  v.number(deco, 'bossDim', `${pBase}.themeDeco.bossDim`, { min: 0, max: 1 });
   const buff = v.object(pl, 'scholarBuff', `${pBase}.scholarBuff`);
   v.number(buff, 'dropChance', `${pBase}.scholarBuff.dropChance`, { min: 0, max: 1 });
   v.integer(buff, 'maxDropsPerLevel', `${pBase}.scholarBuff.maxDropsPerLevel`, { min: 0, max: 50 });
@@ -1104,7 +1169,7 @@ function validateRewardConfig(raw: unknown): Validator {
   v.number(sc, 'scorePerKill', 'rewardConfig.scoreSettings.scorePerKill', { min: 0 });
   v.number(sc, 'scorePerCorrectAnswer', 'rewardConfig.scoreSettings.scorePerCorrectAnswer', { min: 0 });
   v.number(sc, 'scoreComboBonusPerCombo', 'rewardConfig.scoreSettings.scoreComboBonusPerCombo', { min: 0 });
-  v.number(sc, 'expPerKill', 'rewardConfig.scoreSettings.expPerKill', { min: 0 });
+  // 红线 2-B：expPerKill 已从配置与等级公式中摘除——击杀不再产出经验，等级只由答题表现驱动
   v.number(sc, 'expPerCorrectAnswer', 'rewardConfig.scoreSettings.expPerCorrectAnswer', { min: 0 });
   v.number(sc, 'expLevelClearBonus', 'rewardConfig.scoreSettings.expLevelClearBonus', { min: 0 });
 
@@ -1253,6 +1318,100 @@ function validateResultFlavor(raw: unknown): Validator {
       v.custom(`resultFlavor.tierRules.${tier}`, `档位 "${tier}" 在 byResult 里没有文案池`);
     }
   }
+  return v;
+}
+
+/** sfxConfig.json：音效节流表 + 音色参数（红线 1 收口，从 SfxController 源码外置） */
+function validateSfxConfig(raw: unknown): Validator {
+  const v = new Validator('sfxConfig');
+  const root = v.isRecord(raw) ? raw : {};
+  v.string(root, 'version', 'sfxConfig.version');
+
+  const names = ['stop', 'correct', 'wrong', 'kill', 'hurt', 'levelUp'] as const;
+  const waves = ['sine', 'square', 'sawtooth', 'triangle'] as const;
+
+  const throttles = v.object(root, 'minIntervalMs', 'sfxConfig.minIntervalMs');
+  for (const name of names) {
+    v.number(throttles, name, `sfxConfig.minIntervalMs.${name}`, { min: 0, max: 5000 });
+  }
+
+  const tones = v.object(root, 'tones', 'sfxConfig.tones');
+  for (const name of names) {
+    const tone = v.object(tones, name, `sfxConfig.tones.${name}`);
+    const p = `sfxConfig.tones.${name}`;
+    v.number(tone, 'from', `${p}.from`, { min: 20, max: 8000 });
+    v.number(tone, 'to', `${p}.to`, { min: 20, max: 8000 });
+    v.number(tone, 'duration', `${p}.duration`, { min: 0.01, max: 3 });
+    v.string(tone, 'wave', `${p}.wave`, waves);
+    v.number(tone, 'gain', `${p}.gain`, { min: 0.01, max: 1 });
+  }
+  return v;
+}
+
+/** bgmConfig.json：程序化 BGM 轨道参数（零素材红线内的 WebAudio 合成） */
+function validateBgmConfig(raw: unknown): Validator {
+  const v = new Validator('bgmConfig');
+  const root = v.isRecord(raw) ? raw : {};
+  v.string(root, 'version', 'bgmConfig.version');
+  v.boolean(root, 'enabled', 'bgmConfig.enabled');
+  v.number(root, 'masterGain', 'bgmConfig.masterGain', { min: 0, max: 1 });
+
+  const waves = ['sine', 'square', 'sawtooth', 'triangle'] as const;
+  const tracks = v.object(root, 'tracks', 'bgmConfig.tracks');
+  for (const key of ['menu', 'question', 'grass', 'boss'] as const) {
+    const p = `bgmConfig.tracks.${key}`;
+    const track = v.object(tracks, key, p);
+    v.number(track, 'stepSec', `${p}.stepSec`, { min: 0.05, max: 2 });
+    v.array(track, 'bass', `${p}.bass`, 1);
+    v.array(track, 'lead', `${p}.lead`, 1);
+    v.number(track, 'rootNote', `${p}.rootNote`, { min: 21, max: 96, integer: true });
+    v.string(track, 'bassWave', `${p}.bassWave`, waves);
+    v.string(track, 'leadWave', `${p}.leadWave`, waves);
+    v.number(track, 'bassGain', `${p}.bassGain`, { min: 0, max: 1 });
+    v.number(track, 'leadGain', `${p}.leadGain`, { min: 0, max: 1 });
+  }
+  return v;
+}
+
+/** achievementConfig.json：本地成就清单（成就/图鉴/关卡记录共用） */
+function validateAchievementConfig(raw: unknown): Validator {
+  const v = new Validator('achievementConfig');
+  const root = v.isRecord(raw) ? raw : {};
+  v.string(root, 'version', 'achievementConfig.version');
+  v.string(root, 'description', 'achievementConfig.description');
+
+  const allowedTypes = [
+    'clears',
+    'level_reach',
+    'perfect_rounds',
+    'accuracy',
+    'combo',
+    'kills_total',
+    'no_damage_clear',
+    'boss_kills',
+    'scholar_pickups',
+    'lazy_pickups',
+    'score_total',
+  ];
+  const list = v.array(root, 'achievements', 'achievementConfig.achievements', 1);
+  const ids = new Set<string>();
+  list.forEach((item, idx) => {
+    if (!v.isRecord(item)) {
+      v.custom(`achievementConfig.achievements[${idx}]`, '成就条目应为对象');
+      return;
+    }
+    const p = `achievementConfig.achievements[${idx}]`;
+    const id = v.string(item, 'id', `${p}.id`);
+    v.string(item, 'name', `${p}.name`);
+    v.string(item, 'desc', `${p}.desc`);
+    const cond = v.object(item, 'condition', `${p}.condition`);
+    v.string(cond, 'type', `${p}.condition.type`, allowedTypes);
+    v.number(cond, 'value', `${p}.condition.value`, { min: 0 });
+    if (id) {
+      if (ids.has(id)) v.custom(`${p}.id`, `成就 id "${id}" 重复`);
+      ids.add(id);
+    }
+  });
   return v;
 }
 
