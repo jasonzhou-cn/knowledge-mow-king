@@ -162,46 +162,144 @@ export class BootScene extends Phaser.Scene {
     g.destroy();
   }
 
-  /** 玩家：圆形主体 + 高光核心 + 朝向缺口 */
+  /**
+   * 玩家「热血小勇士」——粗墨线卡通造型（T-030 美术升级）。
+   * 朝 +X 为面向（精灵按朝向旋转，脸跟着转向敌人）：头带 + 飘带在后、斗鸡眼大眼 + 呐喊嘴在前。
+   * 白灰度贴图运行期 tint：墨线乘任意 tint 仍近似墨色，白色吃满 tint，灰色为暗部——赛璐璐双色调。
+   */
   private makePlayer(): void {
-    const size = 48;
-    const r = size / 2;
+    const size = 64;
+    const c = size / 2;
+    const { ink, inkSoft, shadeGray } = Palette.art;
     const g = this.make.graphics({ x: 0, y: 0 }, false);
+
+    // 墨色外轮廓（粗描边）+ 暗部基调
+    g.fillStyle(ink, 1);
+    g.fillCircle(c, c, 29);
+    g.fillStyle(shadeGray, 1);
+    g.fillCircle(c, c, 25);
+    // 主体亮部向前上方偏移，留出底部/后侧的暗部月牙（赛璐璐硬阴影）
+    g.fillStyle(0xdfe7ee, 1);
+    g.fillCircle(c + 4, c - 4, 23);
+    g.fillStyle(0xffffff, 0.45);
+    g.fillCircle(c + 9, c - 10, 9);
+
+    // 头带（后脑白色亮带 + 墨线包边）与两条乱飞的飘带（无厘头担当）
     g.fillStyle(0xffffff, 1);
-    g.fillCircle(r, r, r - 2);
+    g.fillRect(c - 17, c - 17, 8, 34);
+    g.lineStyle(2, ink, 1);
+    g.strokeRect(c - 17, c - 17, 8, 34);
     g.fillStyle(0xffffff, 1);
-    g.fillCircle(r, r, r - 12);
-    // 朝向缺口：一个不对称的小三角，让玩家能看出面朝方向
-    g.fillStyle(0x000000, 0.35);
-    g.fillTriangle(r + 4, r - 9, r + 4, r + 9, r - 14, r);
+    g.fillTriangle(c - 16, c - 8, c - 27, c - 13, c - 15, c - 1);
+    g.fillTriangle(c - 16, c + 2, c - 26, c + 12, c - 14, c + 9);
+    g.lineStyle(1.5, ink, 1);
+    g.strokeTriangle(c - 16, c - 8, c - 27, c - 13, c - 15, c - 1);
+    g.strokeTriangle(c - 16, c + 2, c - 26, c + 12, c - 14, c + 9);
+
+    // 斗鸡眼大眼（眼白吃满 tint 提亮，瞳孔齐刷刷望向鼻尖——呆）
+    for (const eyeY of [c - 9, c + 9]) {
+      g.fillStyle(0xffffff, 1);
+      g.fillEllipse(c + 10, eyeY, 9, 11);
+      g.lineStyle(2, ink, 1);
+      g.strokeEllipse(c + 10, eyeY, 9, 11);
+    }
+    g.fillStyle(ink, 1);
+    g.fillCircle(c + 12, c - 8, 2.4);
+    g.fillCircle(c + 12, c + 8, 2.4);
+    // 怒眉（一高一低，气势拉满）
+    g.lineStyle(2.5, ink, 1);
+    g.lineBetween(c + 4, c - 17, c + 15, c - 14);
+    g.lineBetween(c + 4, c + 15, c + 15, c + 13);
+    // 呐喊嘴（张口大招脸）
+    g.fillStyle(ink, 1);
+    g.fillEllipse(c + 18, c + 1, 10, 8);
+    g.fillStyle(0xdfe7ee, 0.9);
+    g.fillEllipse(c + 19, c + 2, 4, 2.5);
+    // 脸颊腮红点（次级墨线弱化，避免太凶）
+    g.lineStyle(1.2, inkSoft, 0.7);
+    g.strokeEllipse(c + 22, c - 6, 4, 2);
+    g.strokeEllipse(c + 21, c + 9, 4, 2);
+
     g.generateTexture(TextureKeys.player, size, size);
     g.destroy();
   }
 
-  /** 小怪：带尖角的草团轮廓 */
+  /** 小怪「呆萌草团怪」：粗墨线钝刺团子 + 一大一小不对称眼 + 龅牙 + 头顶发芽（无厘头三件套） */
   private makeMonster(): void {
-    const size = 36;
-    const r = size / 2;
+    const size = 48;
+    const c = size / 2;
+    const { ink, inkSoft, shadeGray } = Palette.art;
     const g = this.make.graphics({ x: 0, y: 0 }, false);
+
+    // 墨色底团（含钝刺）→ 白灰本体（乘 tint 后 = 鲜绿/橙主体 + 墨色粗轮廓）
+    this.drawBlooby(g, c, c, 22.5, 23.5, ink, 1);
+    this.drawBlooby(g, c, c, 19, 20.5, 0xe9f3e2, 1);
+    // 底部赛璐璐暗部（下半弦月）
+    g.fillStyle(shadeGray, 0.35);
+    g.slice(c, c + 1, 17.5, Math.PI * 0.15, Math.PI * 0.85, false);
+    g.fillPath();
+
+    // 不对称呆眼：左眼大（望向左上），右眼小（望向右下）——呆感的核心
     g.fillStyle(0xffffff, 1);
-    // 主体
-    g.fillCircle(r, r, r - 3);
-    // 四周尖角，营造「草丛怪」的锯齿感
-    const spikes = 8;
-    for (let i = 0; i < spikes; i++) {
-      const angle = (i / spikes) * Math.PI * 2;
-      const inner = r - 5;
-      const outer = r - 0.5;
-      const ax = r + Math.cos(angle) * inner;
-      const ay = r + Math.sin(angle) * inner;
-      const bx = r + Math.cos(angle + Math.PI / spikes) * outer;
-      const by = r + Math.sin(angle + Math.PI / spikes) * outer;
-      const cx = r + Math.cos(angle - Math.PI / spikes) * outer;
-      const cy = r + Math.sin(angle - Math.PI / spikes) * outer;
-      g.fillTriangle(ax, ay, bx, by, cx, cy);
-    }
+    g.fillCircle(c - 5, c - 4, 6);
+    g.fillCircle(c + 7, c - 2, 3.8);
+    g.lineStyle(2, ink, 1);
+    g.strokeCircle(c - 5, c - 4, 6);
+    g.strokeCircle(c + 7, c - 2, 3.8);
+    g.fillStyle(ink, 1);
+    g.fillCircle(c - 6.5, c - 5.5, 2.6);
+    g.fillCircle(c + 8, c - 0.5, 1.7);
+    // 眉毛：左眉挑高、右眉压平（「？」脸）
+    g.lineStyle(2.2, ink, 1);
+    g.lineBetween(c - 11, c - 13, c - 2, c - 11);
+    g.lineBetween(c + 4, c - 8, c + 11, c - 9);
+
+    // 龅牙：两颗大白牙挂在嘴线下方
+    g.lineStyle(1.8, ink, 1);
+    g.lineBetween(c - 6, c + 6, c + 6, c + 7);
+    g.fillStyle(0xffffff, 1);
+    g.fillRect(c - 4, c + 6, 3.2, 4.6);
+    g.fillRect(c + 0.5, c + 6.5, 3.2, 4.6);
+    g.lineStyle(1.2, ink, 1);
+    g.strokeRect(c - 4, c + 6, 3.2, 4.6);
+    g.strokeRect(c + 0.5, c + 6.5, 3.2, 4.6);
+
+    // 头顶发芽：两片小叶（草团怪的尊严）
+    g.lineStyle(1.8, ink, 1);
+    g.lineBetween(c, c - 20, c, c - 25);
+    g.fillStyle(0xffffff, 1);
+    g.fillEllipse(c - 4.5, c - 25, 8, 4.5);
+    g.fillEllipse(c + 4.5, c - 26, 8, 4.5);
+    g.lineStyle(1.2, inkSoft, 1);
+    g.strokeEllipse(c - 4.5, c - 25, 8, 4.5);
+    g.strokeEllipse(c + 4.5, c - 26, 8, 4.5);
+
     g.generateTexture(TextureKeys.monster, size, size);
     g.destroy();
+  }
+
+  /** 呆萌团子底型：圆身 + n 个钝刺（共享给墨色底与白色本体两层） */
+  private drawBlooby(
+    g: Phaser.GameObjects.Graphics,
+    cx: number,
+    cy: number,
+    inner: number,
+    outer: number,
+    color: number,
+    alpha: number,
+  ): void {
+    g.fillStyle(color, alpha);
+    g.fillCircle(cx, cy, inner);
+    const spikes = 7;
+    for (let i = 0; i < spikes; i++) {
+      const angle = (i / spikes) * Math.PI * 2;
+      const a1 = angle + Math.PI / spikes;
+      g.fillTriangle(
+        cx + Math.cos(angle) * inner * 0.92, cy + Math.sin(angle) * inner * 0.92,
+        cx + Math.cos(a1) * inner * 0.82, cy + Math.sin(a1) * inner * 0.82,
+        cx + Math.cos(angle) * outer, cy + Math.sin(angle) * outer,
+      );
+    }
   }
 
   /** 技能区域填充：柔和实心圆（用于范围提示） */
@@ -309,52 +407,67 @@ export class BootScene extends Phaser.Scene {
   }
 
   /**
-   * 三把武器的显示贴图：全部为纯 Graphics 生成的白色剪影，运行期靠 tint 上色。
-   * 统一以「朝右」为 0 度基准，方便直接 setRotation(facing)。
-   * 贴图 key 固定为「weapon-」+ 配置里的武器 id，新增武器无需改动业务代码。
+   * 三把武器的显示贴图（T-030 卡通粗墨线）：墨色底形包住白色剪影，
+   * 统一以「朝右」为 0 度基准，运行期靠 tint 上色；贴图 key 固定为「weapon-」+ 武器 id。
    */
   private makeWeapons(): void {
-    // 大刀 blade：长条刀身 + 短握柄
+    const { ink } = Palette.art;
+
+    // 大刀 blade：长条刀身 + 短握柄（墨线包边 + 刃口高光）
     const bl = this.make.graphics({ x: 0, y: 0 }, false);
+    bl.fillStyle(ink, 1);
+    bl.fillRect(0, 5, 10, 12);
+    bl.fillTriangle(7, 1, 55, 7, 7, 17);
     bl.fillStyle(0xffffff, 1);
-    bl.fillRect(0, 6, 8, 8); // 握柄
-    bl.fillTriangle(8, 2, 54, 8, 8, 16); // 刀身
+    bl.fillRect(2, 7, 7, 8);
+    bl.fillTriangle(9, 3, 53, 8, 9, 15);
     bl.fillStyle(0xffffff, 0.55);
-    bl.fillTriangle(8, 6, 44, 9, 8, 13); // 刃口高光
+    bl.fillTriangle(9, 7, 44, 9, 9, 12);
     bl.generateTexture(`${WEAPON_TEXTURE_PREFIX}blade`, 58, 22);
     bl.destroy();
 
     // 机关枪 smg：紧凑机匣 + 细长枪管 + 弹匣
     const sm = this.make.graphics({ x: 0, y: 0 }, false);
+    sm.fillStyle(ink, 1);
+    sm.fillRect(1, 4, 18, 12);
+    sm.fillRect(17, 6, 21, 7);
+    sm.fillRect(5, 14, 8, 10);
     sm.fillStyle(0xffffff, 1);
-    sm.fillRect(2, 5, 16, 10); // 机匣
-    sm.fillRect(18, 7, 20, 5); // 枪管
-    sm.fillRect(6, 15, 6, 8); // 弹匣
+    sm.fillRect(3, 6, 15, 8);
+    sm.fillRect(18, 7, 19, 5);
+    sm.fillRect(6, 15, 6, 8);
     sm.generateTexture(`${WEAPON_TEXTURE_PREFIX}smg`, 40, 24);
     sm.destroy();
 
     // 霰弹枪 scatter：粗短双管 + 枪托
     const sc = this.make.graphics({ x: 0, y: 0 }, false);
+    sc.fillStyle(ink, 1);
+    sc.fillRect(0, 5, 11, 11);
+    sc.fillRect(9, 4, 26, 7);
+    sc.fillRect(9, 10, 26, 7);
     sc.fillStyle(0xffffff, 1);
-    sc.fillRect(0, 6, 10, 9); // 枪托
-    sc.fillRect(10, 5, 24, 5); // 上管
-    sc.fillRect(10, 11, 24, 5); // 下管
+    sc.fillRect(1, 7, 8, 7);
+    sc.fillRect(10, 5, 24, 5);
+    sc.fillRect(10, 11, 24, 5);
     sc.generateTexture(`${WEAPON_TEXTURE_PREFIX}scatter`, 36, 21);
     sc.destroy();
   }
 
   /**
-   * T-025 学霸 BUFF 掉落图标：摊开的书本（白色灰度图，运行期 tint 成金色）。
-   * 两个对开书页 + 中缝阴影，9 岁玩家一眼能认出「书」。
+   * T-025 学霸 BUFF 掉落图标：摊开的书本（墨线包边 + 双开书页 + 中缝与页线）。
    */
   private makeBook(): void {
+    const { ink, inkSoft } = Palette.art;
     const w = 26;
     const h = 20;
     const g = this.make.graphics({ x: 0, y: 0 }, false);
+    g.fillStyle(ink, 1);
+    g.fillRoundedRect(1, 2, 12, 16, 3);
+    g.fillRoundedRect(13, 2, 12, 16, 3);
     g.fillStyle(0xffffff, 1);
     g.fillRoundedRect(2, 3, 10, 14, 2);
     g.fillRoundedRect(14, 3, 10, 14, 2);
-    // 中缝阴影 + 页面横线，纯深色细节（与 makePlayer 的做法一致）
+    // 中缝阴影 + 页面横线
     g.fillStyle(0x000000, 0.3);
     g.fillRect(12, 3, 2, 14);
     g.fillStyle(0x000000, 0.18);
@@ -362,18 +475,23 @@ export class BootScene extends Phaser.Scene {
       g.fillRect(4, 6 + i * 4, 6, 1);
       g.fillRect(16, 6 + i * 4, 6, 1);
     }
+    g.lineStyle(1, inkSoft, 0.6);
+    g.strokeRoundedRect(2, 3, 10, 14, 2);
+    g.strokeRoundedRect(14, 3, 10, 14, 2);
     g.generateTexture(TextureKeys.book, w, h);
     g.destroy();
   }
 
   /**
-   * T-026 躺平 BUFF 掉落图标：横躺胶囊（白色灰度图，运行期 tint 成躺平蓝）。
-   * 两瓣胶囊体 + 中间分割线 + 左上高光，一眼能认出「药丸/胶囊 = 躺平解药」。
+   * T-026 躺平 BUFF 掉落图标：横躺胶囊（墨线包边 + 两瓣胶囊 + 分割线 + 高光）。
    */
   private makeLazyCapsule(): void {
+    const { ink } = Palette.art;
     const w = 28;
     const h = 16;
     const g = this.make.graphics({ x: 0, y: 0 }, false);
+    g.fillStyle(ink, 1);
+    g.fillRoundedRect(0, 1, 28, 14, 7);
     g.fillStyle(0xffffff, 1);
     g.fillRoundedRect(2, 3, 24, 10, 5);
     // 中间分割线：两瓣胶囊
@@ -387,70 +505,99 @@ export class BootScene extends Phaser.Scene {
   }
 
   /**
-   * T-027 考神召唤的迷你 Boss 底型（fun-event-visual.md §4/§9.1 tex_buff_miniboss）：
-   * 28×28 白色正圆 + 内圈弱描边，白色灰度图，运行期由 ExamSummonSystem 按原 Boss 主题色 tint。
+   * T-027 迷你 Boss 底型（fun-event-visual.md §9.1）：白色正圆 + 墨色粗描边 + 底部暗部，
+   * 运行期由 ExamSummonSystem 按原 Boss 主题色 tint（表情亦由其运行期绘制）。
    */
   private makeMiniBossBody(): void {
+    const { ink, shadeGray } = Palette.art;
     const g = this.make.graphics({ x: 0, y: 0 }, false);
-    g.fillStyle(0xffffff, 1);
+    g.fillStyle(ink, 1);
     g.fillCircle(14, 14, 13);
-    g.lineStyle(1.5, 0x000000, 0.16);
-    g.strokeCircle(14, 14, 10);
+    g.fillStyle(0xf2f6fa, 1);
+    g.fillCircle(14, 14, 10.5);
+    g.fillStyle(shadeGray, 0.25);
+    g.slice(14, 14, 10, Math.PI * 0.15, Math.PI * 0.85, false);
+    g.fillPath();
     g.generateTexture(TextureKeys.miniBoss, 28, 28);
     g.destroy();
   }
 
   /**
-   * T-025 五个 Boss 的专属底型贴图（boss-visual-spec.md §1）：
+   * T-025 五个 Boss 的专属底型 + T-030 卡通粗墨线升级：
    * 内卷怪=圆角方（格子间工位） / 躺平怪=横躺椭圆 / 语法之王=正圆 /
    * 化合狂魔=六边形（分子感） / 考神=正圆+内环（神性加强）。
-   * 全部为白色灰度图：MonsterSpawner.refreshTint 的 Boss 金→红血量 tint 照常生效，
-   * Boss 之间的辨识度由形状 + BossVisual 的配件与表情补足。
+   * 全部为白灰度图：墨色粗描边乘 tint 保持墨色，refreshTint 的金→红血量染色照常生效；
+   * 每个底型补一道底部赛璐璐暗部，体量感更强（BossVisual 的表情/配件照常叠在其上）。
    */
   private makeBossBodies(): void {
-    const dark = 0x000000;
+    const { ink, inkSoft, shadeGray } = Palette.art;
 
-    // 内卷怪：圆角方形（92×92，圆角 14），内部一圈弱描边传达「格子间」
+    // 内卷怪：圆角方形（格子间工位）
     const sq = this.make.graphics({ x: 0, y: 0 }, false);
-    sq.fillStyle(0xffffff, 1);
+    sq.fillStyle(ink, 1);
     sq.fillRoundedRect(2, 2, 88, 88, 14);
-    sq.lineStyle(2, dark, 0.18);
-    sq.strokeRoundedRect(10, 10, 72, 72, 10);
+    sq.fillStyle(0xf2f6fa, 1);
+    sq.fillRoundedRect(7, 7, 78, 78, 11);
+    sq.fillStyle(shadeGray, 0.22);
+    sq.fillRoundedRect(7, 48, 78, 37, { tl: 0, tr: 0, bl: 11, br: 11 });
+    sq.lineStyle(2, inkSoft, 0.35);
+    sq.strokeRoundedRect(12, 12, 68, 68, 9);
     sq.generateTexture('tex-boss-square', 92, 92);
     sq.destroy();
 
-    // 躺平怪：横躺椭圆（110×70，圆角 35）
+    // 躺平怪：横躺椭圆（摊成一团）
     const ov = this.make.graphics({ x: 0, y: 0 }, false);
-    ov.fillStyle(0xffffff, 1);
+    ov.fillStyle(ink, 1);
     ov.fillRoundedRect(2, 10, 106, 50, 25);
+    ov.fillStyle(0xf2f6fa, 1);
+    ov.fillRoundedRect(7, 15, 96, 40, 20);
+    ov.fillStyle(shadeGray, 0.22);
+    ov.fillRoundedRect(7, 36, 96, 19, { tl: 0, tr: 0, bl: 19, br: 19 });
     ov.generateTexture('tex-boss-oval', 110, 70);
     ov.destroy();
 
-    // 语法之王：正圆（92×92）
+    // 语法之王：正圆（博士头玩家）
     const ci = this.make.graphics({ x: 0, y: 0 }, false);
-    ci.fillStyle(0xffffff, 1);
+    ci.fillStyle(ink, 1);
     ci.fillCircle(46, 46, 44);
+    ci.fillStyle(0xf2f6fa, 1);
+    ci.fillCircle(46, 46, 39);
+    ci.fillStyle(shadeGray, 0.22);
+    ci.slice(46, 46, 38, Math.PI * 0.12, Math.PI * 0.88, false);
+    ci.fillPath();
     ci.generateTexture('tex-boss-circle', 92, 92);
     ci.destroy();
 
-    // 化合狂魔：六边形（外接半径 44）
+    // 化合狂魔：六边形（分子感）+ 内圈缝线
     const he = this.make.graphics({ x: 0, y: 0 }, false);
-    he.fillStyle(0xffffff, 1);
-    const hexPoints: Phaser.Geom.Point[] = [];
-    for (let i = 0; i < 6; i++) {
-      const a = (i / 6) * Math.PI * 2 - Math.PI / 2;
-      hexPoints.push(new Phaser.Geom.Point(46 + Math.cos(a) * 44, 46 + Math.sin(a) * 44));
-    }
-    he.fillPoints(hexPoints, true);
+    const hexAt = (radius: number): Phaser.Geom.Point[] => {
+      const pts: Phaser.Geom.Point[] = [];
+      for (let i = 0; i < 6; i++) {
+        const a = (i / 6) * Math.PI * 2 - Math.PI / 2;
+        pts.push(new Phaser.Geom.Point(46 + Math.cos(a) * radius, 46 + Math.sin(a) * radius));
+      }
+      return pts;
+    };
+    he.fillStyle(ink, 1);
+    he.fillPoints(hexAt(45), true);
+    he.fillStyle(0xf2f6fa, 1);
+    he.fillPoints(hexAt(40), true);
+    he.lineStyle(2, inkSoft, 0.35);
+    he.strokePoints(hexAt(34), true);
     he.generateTexture('tex-boss-hexagon', 92, 92);
     he.destroy();
 
-    // 考神：正圆 + 内环（「神」的层次感）
+    // 考神：正圆 + 内环（神性的层次感）
     const go = this.make.graphics({ x: 0, y: 0 }, false);
-    go.fillStyle(0xffffff, 1);
+    go.fillStyle(ink, 1);
     go.fillCircle(46, 46, 44);
-    go.lineStyle(2, dark, 0.22);
-    go.strokeCircle(46, 46, 34);
+    go.fillStyle(0xf2f6fa, 1);
+    go.fillCircle(46, 46, 39);
+    go.fillStyle(shadeGray, 0.22);
+    go.slice(46, 46, 38, Math.PI * 0.12, Math.PI * 0.88, false);
+    go.fillPath();
+    go.lineStyle(2, ink, 0.3);
+    go.strokeCircle(46, 46, 33);
     go.generateTexture('tex-boss-god', 92, 92);
     go.destroy();
   }

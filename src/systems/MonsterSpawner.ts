@@ -420,7 +420,6 @@ export class MonsterSpawner {
     monster.baseTint = 0;
     monster.sprite.setTexture('monster');
     monster.radius = this.opts.radius;
-    this.refreshTint(monster);
 
     // 难度曲线的即时产物：新生成的小怪直接吃到当前的血量与移速倍率
     monster.hp = this.opts.hp * this.hpMultiplier;
@@ -435,6 +434,8 @@ export class MonsterSpawner {
     monster.flashTime = 0;
     monster.corpseTime = 0;
     monster.corpseSpin = 0;
+    // 血量比例必须在 hp/maxHp 就绪后再染色，否则按池默认值 0/1 染成「残血橙」（T-030 修复的存量 bug）
+    this.refreshTint(monster);
 
     this.activeList.push(monster);
   }

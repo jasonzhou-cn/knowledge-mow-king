@@ -82,10 +82,10 @@ export function applySceneTheme(
   const symbols = SUBJECT_SYMBOLS[subject] ?? SUBJECT_SYMBOLS.math;
   const symbolPeriod = SUBJECT_SYMBOL_PERIOD[subject] ?? 3600;
 
-  // Boss 关：地面更深 + 装饰更暗（终极战氛围）；普通关轻微主题染色
+  // Boss 关：地面更深 + 装饰更暗（终极战氛围）；普通关轻微主题染色 + 提亮（卡通明快）
   const bossDim = deco.bossDim;
-  let fieldBase = blendColor(Palette.background.grassField, themeColor, 0.16);
-  let fieldAlt = blendColor(Palette.background.grassFieldAlt, themeColor, 0.16);
+  let fieldBase = blendColor(blendColor(Palette.background.grassField, themeColor, 0.16), 0xffffff, 0.07);
+  let fieldAlt = blendColor(blendColor(Palette.background.grassFieldAlt, themeColor, 0.16), 0xffffff, 0.1);
   if (isBossLevel) {
     fieldBase = blendColor(fieldBase, Palette.background.deep, bossDim);
     fieldAlt = blendColor(fieldAlt, Palette.background.deep, bossDim);
@@ -115,6 +115,7 @@ export function applySceneTheme(
   };
 
   // 草丛（三角）与学科小装饰，同一层静态绘制（几何/透明度全部来自 themeDeco 配置）
+  // T-030：每株草丛补一道墨线描边——粗线条卡通的「上墨」一步
   const tufts = scene.add.graphics();
   tufts.setDepth(-10);
   const tuftColor = blendColor(Palette.combat.monster, themeColor, 0.3);
@@ -127,9 +128,11 @@ export function applySceneTheme(
     const height = tuftHMin + next() * tuftHSpan;
     tufts.fillStyle(tuftColor, tuftAlpha);
     tufts.fillTriangle(x - 5, y, x + 5, y, x, y - height);
+    tufts.lineStyle(1.5, Palette.art.ink, Math.min(1, tuftAlpha * 2.2));
+    tufts.strokeTriangle(x - 5, y, x + 5, y, x, y - height);
   }
 
-  // 学科专属静态装饰，避开玩家出生点
+  // 学科专属静态装饰（墨线描边统一卡通质感），避开玩家出生点
   const decoAlpha = isBossLevel ? 0.3 : 0.8;
   const shapes = scene.add.graphics();
   shapes.setDepth(-9);
@@ -143,22 +146,27 @@ export function applySceneTheme(
     if (subject === 'english') {
       // 椭圆树叶（随机旋转）
       shapes.fillStyle(Palette.accent.primary, decoAlpha * 0.75);
-      shapes.fillEllipse(x, y, 16, 8);
-      shapes.lineStyle(2, Palette.accent.primaryDark, decoAlpha * 0.6);
-      shapes.strokeEllipse(x, y, 16, 8);
+      shapes.fillEllipse(x, y, 18, 9);
+      shapes.lineStyle(2, Palette.art.ink, decoAlpha * 0.85);
+      shapes.strokeEllipse(x, y, 18, 9);
     } else if (subject === 'science') {
       // 锥形瓶（三角瓶身 + 瓶口）
       shapes.fillStyle(Palette.accent.primary, decoAlpha * 0.4);
       shapes.fillTriangle(x - 10, y, x + 10, y, x, y - 18);
-      shapes.lineStyle(2, Palette.accent.primary, decoAlpha * 0.9);
+      shapes.lineStyle(2, Palette.art.ink, decoAlpha * 0.9);
       shapes.strokeTriangle(x - 10, y, x + 10, y, x, y - 18);
+      shapes.fillStyle(Palette.accent.primary, decoAlpha * 0.5);
       shapes.fillRect(x - 3, y - 22, 6, 5);
+      shapes.lineStyle(1.5, Palette.art.ink, decoAlpha * 0.9);
+      shapes.strokeRect(x - 3, y - 22, 6, 5);
     } else {
       // 数学：金色小圆点（几何感）
       shapes.fillStyle(Palette.accent.gold, decoAlpha * 0.6);
       shapes.fillCircle(x, y, 4);
-      shapes.lineStyle(1.5, Palette.accent.gold, decoAlpha * 0.4);
-      shapes.strokeCircle(x, y, 7);
+      shapes.lineStyle(2, Palette.art.ink, decoAlpha * 0.9);
+      shapes.strokeCircle(x, y, 4);
+      shapes.lineStyle(1.5, Palette.accent.gold, decoAlpha * 0.5);
+      shapes.strokeCircle(x, y, 8);
     }
   }
 

@@ -55,12 +55,19 @@ export class MenuScene extends Phaser.Scene {
     const cx = w / 2;
     const cy = h / 2;
 
-    // 标题
+    // 标题（墨色粗描边 → 卡通海报字）
     this.add
-      .text(cx, cy - 200 * s, '知识割草王', textStyle(Math.round(64 * s), css(Palette.accent.primary), { fontStyle: 'bold' }))
+      .text(cx, cy - 200 * s, '知识割草王', textStyle(Math.round(64 * s), css(Palette.accent.primary), {
+        fontStyle: 'bold',
+        stroke: css(Palette.art.ink),
+        strokeThickness: Math.round(9 * s),
+      }))
       .setOrigin(0.5);
     this.add
-      .text(cx, cy - 148 * s, '答得越准越快，割得越狠越爽', textStyle(Math.round(22 * s), css(Palette.text.secondary)))
+      .text(cx, cy - 148 * s, '答得越准越快，割得越狠越爽', textStyle(Math.round(22 * s), css(Palette.text.secondary), {
+        stroke: css(Palette.art.ink),
+        strokeThickness: Math.round(4 * s),
+      }))
       .setOrigin(0.5);
 
     // 成长面板
@@ -218,8 +225,9 @@ export class MenuScene extends Phaser.Scene {
     this.achievementsPanel = null;
   }
 
-  /** 绘制背景：草地 + 网格，纯图形生成 */
+  /** 绘制背景：草地 + 网格 + T-030 卡通布景（戴墨镜的太阳 / 糖果云 / 描边草丛小花），纯图形生成 */
   private drawBackdrop(w: number, h: number): void {
+    const { ink, inkSoft } = Palette.art;
     const g = this.add.graphics();
     g.fillStyle(Palette.background.deep, 1);
     g.fillRect(0, 0, w, h);
@@ -237,6 +245,75 @@ export class MenuScene extends Phaser.Scene {
     g.lineStyle(1, Palette.background.panelSoft, 0.25);
     for (let x = 0; x <= w; x += 60) g.lineBetween(x, 0, x, h - 150);
     for (let y = 0; y <= h - 150; y += 60) g.lineBetween(0, y, w, y);
+
+    // ── T-030 卡通布景 ──
+    // 糖果云三朵（两白一粉，圆团簇 + 墨线弱描边；无厘头担当之一）
+    const clouds: Array<{ x: number; y: number; s: number; pink: boolean }> = [
+      { x: w * 0.16, y: 96, s: 1, pink: false },
+      { x: w * 0.42, y: 62, s: 0.78, pink: true },
+      { x: w * 0.8, y: 210, s: 0.9, pink: false },
+    ];
+    for (const c of clouds) {
+      const puffs: Array<[number, number, number]> = [
+        [0, 0, 26], [24, 6, 19], [-24, 7, 18], [8, -12, 18],
+      ];
+      const fill = c.pink ? Palette.status.wrong : 0xffffff;
+      g.fillStyle(fill, c.pink ? 0.2 : 0.24);
+      for (const [dx, dy, r] of puffs) g.fillCircle(c.x + dx * c.s, c.y + dy * c.s, r * c.s);
+      g.fillStyle(fill, c.pink ? 0.3 : 0.36);
+      g.fillRoundedRect(c.x - 34 * c.s, c.y + 2 * c.s, 68 * c.s, 14 * c.s, 7 * c.s);
+      g.lineStyle(1.5, inkSoft, 0.75);
+      g.strokeRoundedRect(c.x - 34 * c.s, c.y + 2 * c.s, 68 * c.s, 14 * c.s, 7 * c.s);
+    }
+
+    // 戴墨镜的太阳（右上角，无厘头担当之二：没通知任何人就自带了墨镜）
+    const sunX = w - 92;
+    const sunY = 92;
+    for (let i = 0; i < 10; i++) {
+      const a = (i / 10) * Math.PI * 2 + 0.31;
+      const r1 = 30;
+      const r2 = 40;
+      g.fillStyle(Palette.accent.gold, 0.55);
+      g.fillTriangle(
+        sunX + Math.cos(a) * r1, sunY + Math.sin(a) * r1,
+        sunX + Math.cos(a + 0.16) * r1, sunY + Math.sin(a + 0.16) * r1,
+        sunX + Math.cos(a + 0.08) * r2, sunY + Math.sin(a + 0.08) * r2,
+      );
+    }
+    g.fillStyle(Palette.accent.gold, 0.92);
+    g.fillCircle(sunX, sunY, 26);
+    g.lineStyle(2.5, ink, 0.8);
+    g.strokeCircle(sunX, sunY, 26);
+    // 墨镜（两片 + 鼻梁 + 嘴角坏笑）
+    g.fillStyle(ink, 0.85);
+    g.fillRoundedRect(sunX - 17, sunY - 8, 13, 9, 3);
+    g.fillRoundedRect(sunX + 4, sunY - 8, 13, 9, 3);
+    g.fillRect(sunX - 4, sunY - 6, 8, 2.5);
+    g.lineStyle(2, ink, 0.85);
+    g.lineBetween(sunX - 6, sunY + 8, sunX + 7, sunY + 10);
+
+    // 草地条带上的描边草丛与小野花（糖果色，错落）
+    const tuftColors = [Palette.accent.primary, Palette.combat.monster, Palette.accent.secondary];
+    for (let i = 0; i < 14; i++) {
+      const x = 30 + (i / 13) * (w - 60) + (i % 3) * 12;
+      const y = h - 148 + (i % 4) * 22;
+      const th = 16 + (i % 3) * 9;
+      g.fillStyle(tuftColors[i % 3], 0.5);
+      g.fillTriangle(x - 6, y, x + 6, y, x, y - th);
+      g.lineStyle(1.5, ink, 0.65);
+      g.strokeTriangle(x - 6, y, x + 6, y, x, y - th);
+    }
+    const flowerColors = [Palette.accent.gold, Palette.status.wrong, Palette.accent.secondary, Palette.accent.orange];
+    for (let i = 0; i < 8; i++) {
+      const x = 70 + (i / 7) * (w - 140);
+      const y = h - 60 + (i % 3) * 26;
+      g.fillStyle(flowerColors[i % 4], 0.85);
+      g.fillCircle(x, y, 4);
+      g.fillCircle(x - 5, y + 2, 3);
+      g.fillCircle(x + 5, y + 2, 3);
+      g.fillStyle(ink, 0.8);
+      g.fillCircle(x, y, 1.6);
+    }
   }
 
   /** 切换选中的关卡（转发给关卡地图面板，处理页内跳转） */

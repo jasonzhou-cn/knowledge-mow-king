@@ -27,8 +27,8 @@ export const Palette = {
     base: 0x12263a,
     panel: 0x1b3550,
     panelSoft: 0x22425f,
-    grassField: 0x16351f,
-    grassFieldAlt: 0x1a3d24,
+    grassField: 0x1c4a26,
+    grassFieldAlt: 0x276034,
   },
 
   /** 文字 */
@@ -71,10 +71,10 @@ export const Palette = {
 
   /** 割草场景 */
   combat: {
-    player: 0x7fd8ff,
+    player: 0x53e0ff,
     playerCore: 0xffffff,
-    monster: 0x8fdc6a,
-    monsterElite: 0xf2a25c,
+    monster: 0x7df04e,
+    monsterElite: 0xffa53d,
     monsterHurt: 0xffffff,
     zoneRing: 0x35d0a5,
     zoneFill: 0x1f9c78,
@@ -87,6 +87,20 @@ export const Palette = {
       ranged_bolt: 0xa8f5dc,
       ranged_spread: 0xffd9a8,
     },
+  },
+
+  /**
+   * 卡通描边风格（T-030 美术升级）：贴图烘焙用的「墨线」体系。
+   * 原理：贴图统一为白色灰度 + 运行期乘法 tint，深色像素与任意 tint 相乘仍近似墨色，
+   * 因此粗描边 / 卡通表情 / 阴影直接烘进贴图即可，全局换色不受影响。
+   */
+  art: {
+    /** 主墨线（粗描边 / 眼睛 / 嘴） */
+    ink: 0x141f2a,
+    /** 次级墨线（细节缝线 / 弱描边） */
+    inkSoft: 0x2b3c4d,
+    /** 阴影/明暗分界的灰度（乘 tint 后变为「该色的暗部」） */
+    shadeGray: 0xb9c4d2,
   },
 } as const;
 
