@@ -20,6 +20,8 @@ import { css, textStyle } from '../ui/Palette';
 /** 场上单条弹幕 */
 interface DanmakuItem {
   text: Phaser.GameObjects.Text;
+  /** 所属车道下标（同车道同时只允许一条弹幕，杜绝叠字 T-031） */
+  lane: number;
 }
 
 export interface WrongDanmakuOptions {
@@ -41,6 +43,8 @@ export class WrongDanmakuSystem {
   private timer = 0;
   /** 下一条弹幕取用的错题下标（循环轮转） */
   private cursor = 0;
+  /** 车道轮转游标（spawn 从空闲车道起轮询） */
+  private laneCursor = 0;
 
   constructor(scene: Phaser.Scene, opts: WrongDanmakuOptions) {
     this.scene = scene;
@@ -85,19 +89,44 @@ export class WrongDanmakuSystem {
     this.active.length = 0;
   }
 
-  /** 在右缘外、活动带内随机高度生成一条弹幕 */
+  /**
+   * 在右缘外、活动带内的「空闲车道」生成一条弹幕（T-031 叠字修复）：
+   * 活动带按 fontSize×1.8 的车道高度切分，同一条车道同时只允许一条弹幕——
+   * 弹幕速度全部相同，同车道永不相撞；车道全满时本次跳过（稍后重试）。
+   */
   private spawnOne(): void {
     const s = this.settings;
     const h = this.scene.scale.height;
     const bandTop = h * s.bandTopRatio;
     const bandBottom = Math.max(bandTop + s.fontSize + 6, h * s.bandBottomRatio);
+    const bandHeight = bandBottom - bandTop;
+    const laneHeight = Math.max(s.fontSize * 1.8, 34);
+    const laneCount = Math.max(1, Math.floor(bandHeight / laneHeight));
+
+    const occupied = new Set(this.active.map((it) => it.lane));
+    let lane = -1;
+    for (let i = 0; i < laneCount; i++) {
+      const candidate = (this.laneCursor + i) % laneCount;
+      if (!occupied.has(candidate)) {
+        lane = candidate;
+        break;
+      }
+    }
+    if (lane === -1) {
+      // 全部车道被占：跳过本次生成，0.3s 后再试
+      this.timer = Math.max(0, s.spawnIntervalSec - 0.3);
+      return;
+    }
+    this.laneCursor = (lane + 1) % laneCount;
+
     const content = this.items[this.cursor % this.items.length];
     this.cursor = (this.cursor + 1) % Math.max(1, this.items.length);
+    const y = bandTop + (lane + 0.5) * (bandHeight / laneCount);
 
     const text = this.scene.add
-      .text(this.scene.scale.width + 40, Phaser.Math.Between(bandTop, bandBottom), content, textStyle(s.fontSize, this.colorCss))
+      .text(this.scene.scale.width + 40, y, content, textStyle(s.fontSize, this.colorCss))
       .setAlpha(s.alpha)
       .setDepth(115);
-    this.active.push({ text });
+    this.active.push({ text, lane });
   }
 }

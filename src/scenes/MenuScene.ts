@@ -152,9 +152,10 @@ export class MenuScene extends Phaser.Scene {
       .text(cx, h - 26 * s, `题库：${describeBank()}`, textStyle(Math.round(14 * s), css(Palette.text.hint)))
       .setOrigin(0.5);
 
-    // 成就 / 图鉴 / 记录入口（开始按钮左下，尺寸随 vpScale）
-    const achX = cx - btnW / 2;
-    const achY = btnY + btnH + 34 * s;
+    // 成就 / 图鉴 / 记录入口：与「开始答题」同一行放其左侧
+    //（T-031 修复：原「开始按钮下方 34s」与两行操作说明文字重叠）
+    const achX = cx - btnW / 2 - 96 * s;
+    const achY = btnY + btnH / 2;
     const achW = 150 * s;
     const achH = 40 * s;
     const achBg = this.add.graphics();

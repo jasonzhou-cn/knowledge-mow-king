@@ -26,6 +26,7 @@ import { bgm } from '../systems/BgmController';
 import { resolveComboTier } from '../systems/RewardSystem';
 import { sfx } from '../systems/SfxController';
 import { Palette, css, textStyle } from '../ui/Palette';
+import { refitText } from '../ui/FitText';
 import { ripple, shake } from '../ui/Feedback';
 import { QuizHud } from '../ui/Hud';
 import type { LevelStartData } from './MenuScene';
@@ -41,8 +42,8 @@ export interface GrassCuttingData {
   wrongAnswers: string[];
 }
 
-/** 场景内部状态机 */
-type SceneState = 'moving' | 'feedback' | 'wrongPause' | 'summary';
+  /** 场景内部状态机 */
+  type SceneState = 'moving' | 'feedback' | 'wrongPause' | 'summary';
 
 export class QuestionScene extends Phaser.Scene {
   private startData: LevelStartData = { level: 1 };
@@ -70,6 +71,8 @@ export class QuestionScene extends Phaser.Scene {
   private pendingAdvance = false;
   /** T-026 本轮答错的题目文案（答错/超时各记一条，供割草场景错题弹幕使用） */
   private wrongAnswers: string[] = [];
+  /** 题干基准字号（refitText 缩字回退的起点，buildQuestionPanel 里按视口赋值） */
+  private questionBaseFontSize = 28;
 
   constructor() {
     super({ key: 'QuestionScene' });
@@ -233,7 +236,12 @@ export class QuestionScene extends Phaser.Scene {
     if (!engine) return;
     if (!this.track && !this.selector && !this.cursorSel) return;
 
-    this.questionText.setText(engine.current.question);
+    // 题干展示 + 高度自适应缩字（长题干缩小到面板内，绝不裁切）
+    refitText(this.questionText, engine.current.question, {
+      maxHeight: this.panelHeight - 14,
+      baseSize: this.questionBaseFontSize,
+      minSize: 18,
+    });
     this.explanationText.setText('');
     this.resultText.setText('');
     this.hintText.setText(this.modeHint()).setVisible(true);
@@ -590,9 +598,11 @@ export class QuestionScene extends Phaser.Scene {
     this.questionText = this.add
       .text(w / 2, panelY + panelH / 2, '', textStyle(Math.round(28 * s), css(Palette.text.primary), {
         align: 'center',
-        wordWrap: { width: panelW - 30 * s },
+        wordWrap: { width: panelW - 30 * s, useAdvancedWrap: true },
       }))
       .setOrigin(0.5, 0.5);
+    // 题干基准字号（refitText 缩字回退的起点）
+    this.questionBaseFontSize = Math.round(28 * s);
 
     // 反馈条：位于题干下方 HUD 进度条（panelBottom + 36·s 处）之下，互不重叠
     // 布局序列：卡片底 → +6·s 倒计时(≈26·s 高) → +36·s 进度条(10·s) → +64·s 反馈 → +96·s 解析
@@ -603,7 +613,7 @@ export class QuestionScene extends Phaser.Scene {
     this.explanationText = this.add
       .text(w / 2, panelY + panelH + 96 * s, '', textStyle(Math.round(15 * s), css(Palette.text.secondary), {
         align: 'center',
-        wordWrap: { width: panelW + 20 * s },
+        wordWrap: { width: panelW + 20 * s, useAdvancedWrap: true },
         lineSpacing: 3,
       }))
       .setOrigin(0.5, 0);

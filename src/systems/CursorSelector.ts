@@ -15,7 +15,8 @@
  */
 
 import Phaser from 'phaser';
-import { Palette, css, textStyle } from '../ui/Palette';
+import { Palette, css } from '../ui/Palette';
+import { createFittedText } from '../ui/FitText';
 import type { CardState } from './AnswerTrack';
 
 /** 游标选择器的几何 / 节奏参数，来自 questionConfig.answerSettings */
@@ -123,15 +124,12 @@ export class CursorSelector {
       border.setDisplaySize(this.opts.cardWidth, this.opts.cardHeight);
       border.setTint(Palette.quiz.cardBorder);
 
-      const label = this.scene.add.text(
-        0,
-        0,
-        labels[i],
-        textStyle(24, css(Palette.quiz.cardText), {
-          align: 'center',
-          wordWrap: { width: this.opts.cardWidth - 24 },
-        }),
-      );
+      const label = createFittedText(this.scene, labels[i], {
+        color: css(Palette.quiz.cardText),
+        wrapWidth: this.opts.cardWidth - 24,
+        maxHeight: this.opts.cardHeight - 14,
+        baseSize: Math.max(16, Math.round(this.opts.cardHeight * 0.34)),
+      });
       label.setOrigin(0.5, 0.5);
 
       const marker = this.scene.add.graphics();
