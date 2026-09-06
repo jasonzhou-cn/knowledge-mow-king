@@ -41,6 +41,11 @@ import { ScholarBuffSystem } from '../systems/ScholarBuffSystem';
 import { LazyBuffSystem } from '../systems/LazyBuffSystem';
 import { ExamSummonSystem } from '../systems/ExamSummonSystem';
 import { WrongDanmakuSystem } from '../systems/WrongDanmakuSystem';
+import { TreasureChestSystem } from '../systems/TreasureChestSystem';
+import { TrapSystem } from '../systems/TrapSystem';
+import type { TrapTypeSettings } from '../config/types';
+import { TreasureQuizOverlay } from '../ui/TreasureQuizOverlay';
+import { pickDifficultyWeights, questionBank } from '../data/QuestionBank';
 import { applySceneTheme } from '../systems/SceneTheme';
 import { applyAssistToProgress, computeAssistTarget, smoothAssist } from '../systems/DifficultyAssist';
 import { playtime } from '../systems/PlaytimeSystem';
@@ -202,6 +207,31 @@ export class GrassCuttingScene extends Phaser.Scene {
   private damageEvents: Array<{ at: number; amount: number }> = [];
   /** 本关答题正确率（答题已结束，全程恒定；create 时从 data0 取） */
   private levelAccuracy = 1;
+  /** T-032 大地图：战斗世界尺寸（= 视口 × worldSettings 缩放） */
+  private worldW = 0;
+  private worldH = 0;
+  /** T-032 宝物：宝箱系统 / 答题浮层 / 生效中的加成 / 加成倒计时文本 */
+  private treasure!: TreasureChestSystem;
+  private treasureQuiz: TreasureQuizOverlay | null = null;
+  private treasureBuff: {
+    kind: 'damage' | 'cooldown' | 'move' | 'range' | 'heal';
+    label: string;
+    remain: number;
+    damageMult: number;
+    cooldownMult: number;
+    moveSpeedMult: number;
+    rangeMult: number;
+  } | null = null;
+  private treasureBuffText: Phaser.GameObjects.Text | null = null;
+  /** T-032 陷阱系统与各效果运行时状态 */
+  private traps!: TrapSystem;
+  private trapStunTime = 0;
+  private trapSlowFactor = 1;
+  private trapSlowTime = 0;
+  private trapSlip: { dirX: number; dirY: number; speedMult: number; time: number } | null = null;
+  private trapReverseTime = 0;
+  private trapCooldownMult = 1;
+  private trapCooldownTime = 0;
 
   private hp = 1;
   private maxHp = 1;
@@ -253,12 +283,16 @@ export class GrassCuttingScene extends Phaser.Scene {
     // 动态难度下调的输入之一：本关答题正确率
     this.levelAccuracy = incoming.quiz.accuracy;
 
+    // T-032 大地图：世界 = 视口 × worldSettings 缩放，相机跟随玩家滚动
+    this.worldW = Math.round(this.scale.width * this.packed.world.widthScale);
+    this.worldH = Math.round(this.scale.height * this.packed.world.heightScale);
+
     // T-025：学科主题（地面/草丛/装饰/漂浮符号随关卡学科切换，Boss 关专属氛围）
-    const theme = applySceneTheme(this, this.packed.subject, this.packed.isBossLevel, this.packed.polish.themeDeco);
+    const theme = applySceneTheme(this, this.packed.subject, this.packed.isBossLevel, this.packed.polish.themeDeco, this.worldW, this.worldH);
     this.themeAccent = theme.accent;
 
-    const px = this.scale.width / 2;
-    const py = this.scale.height / 2 + 40;
+    const px = this.worldW / 2;
+    const py = this.worldH / 2 + 40;
 
     this.player = this.add.image(px, py, TextureKeys.player);
     // 精灵显示尺寸系数来自 polishSettings（红线 1 收口）
@@ -311,8 +345,8 @@ export class GrassCuttingScene extends Phaser.Scene {
       knockbackDuration: m.knockbackDuration,
       spawnMargin: m.spawnMargin,
       poolSize: this.packed.performance.monsterPoolSize,
-      viewWidth: this.scale.width,
-      viewHeight: this.scale.height,
+      viewWidth: this.worldW,
+      viewHeight: this.worldH,
       difficulty: this.packed.difficulty,
       corpsePoolSize: this.packed.performance.corpsePoolSize,
       corpseLife: this.packed.killFx.corpseLife,
@@ -326,8 +360,8 @@ export class GrassCuttingScene extends Phaser.Scene {
 
     this.projectiles = new ProjectileSystem(this, {
       poolSize: this.packed.performance.projectilePoolSize,
-      viewWidth: this.scale.width,
-      viewHeight: this.scale.height,
+      viewWidth: this.worldW,
+      viewHeight: this.worldH,
       despawnMargin: m.spawnMargin,
     });
 
@@ -427,6 +461,24 @@ export class GrassCuttingScene extends Phaser.Scene {
       bandBottomLimit: Number.isFinite(bottomUiTop) ? bottomUiTop - 24 : undefined,
     });
 
+    // T-032 宝物掉落：击杀小怪概率掉宝箱，拾起弹快问快答
+    this.treasure = new TreasureChestSystem(this, {
+      settings: this.packed.polish.treasureChest,
+      pickupRadius: this.packed.player.radius + 24,
+      onPickup: (x, y) => this.openTreasureQuiz(x, y),
+    });
+
+    // T-032 无厘头陷阱：开局铺设，踩到触发 debuff
+    this.traps = new TrapSystem(this, {
+      settings: this.packed.polish.trapSettings,
+      worldW: this.worldW,
+      worldH: this.worldH,
+      playerRadius: this.packed.player.radius,
+      spawnSafeX: this.worldW / 2,
+      spawnSafeY: this.worldH / 2 + 40,
+      onTrigger: (type) => this.applyTrap(type),
+    });
+
     // Boss 关：顶部 HUD（52px）下方加一条 Boss 血条，目标改为「击杀 Boss 即通关」
     if (this.packed.isBossLevel) {
       const barW = 400;
@@ -434,18 +486,19 @@ export class GrassCuttingScene extends Phaser.Scene {
       const bx = (hudWidth - barW) / 2;
       const by = 60; // 52px 顶栏之下留 8px 间隙，不与现有 HUD 重叠
 
-      this.bossBarBg = this.add.graphics().setDepth(1005);
+      this.bossBarBg = this.add.graphics().setDepth(1005).setScrollFactor(0);
       this.bossBarBg.fillStyle(Palette.background.panel, 0.85);
       this.bossBarBg.fillRoundedRect(bx, by, barW, barH, 8);
       this.bossBarBg.lineStyle(2, Palette.status.wrong, 0.8);
       this.bossBarBg.strokeRoundedRect(bx, by, barW, barH, 8);
 
-      this.bossBarFill = this.add.graphics().setDepth(1006);
+      this.bossBarFill = this.add.graphics().setDepth(1006).setScrollFactor(0);
 
       this.bossBarLabel = this.add
         .text(bx + barW / 2, by + barH / 2, '', textStyle(13, css(Palette.text.primary)))
         .setOrigin(0.5)
-        .setDepth(1007);
+        .setDepth(1007)
+        .setScrollFactor(0);
       this.bossBarBox = { x: bx, y: by, w: barW, h: barH };
 
       // T-022：创建 DoomZoneSystem 与 BossSkillController
@@ -468,6 +521,10 @@ export class GrassCuttingScene extends Phaser.Scene {
     }
 
     this.setupInput();
+
+    // T-032 大地图：相机边界 = 世界，平滑跟随玩家
+    this.cameras.main.setBounds(0, 0, this.worldW, this.worldH);
+    this.cameras.main.startFollow(this.player, true, 0.12, 0.12);
 
     this.spawner.start();
 
@@ -551,6 +608,12 @@ export class GrassCuttingScene extends Phaser.Scene {
           return s.enabled ? progress * (s.pullMin + (1 - s.pullMin) * Math.min(1, Math.max(0, self.assistFactor))) : progress;
         },
         get hpRatio()           { return self.maxHp > 0 ? Math.min(1, Math.max(0, self.hp / self.maxHp)) : null; },
+        // T-032：宝物 / 陷阱 / 大地图走查入口（只读）
+        get treasureDrops()     { return self.treasure ? self.treasure.dropsSpawnedCount : null; },
+        get treasureQuizActive(){ return self.treasureQuiz ? self.treasureQuiz.isActive : false; },
+        get treasureBuffKind()  { return self.treasureBuff ? self.treasureBuff.kind : null; },
+        get trapAliveCount()    { return self.traps ? self.traps.aliveCount : null; },
+        get worldSize()         { return { w: self.worldW, h: self.worldH }; },
       };
     }
   }
@@ -600,6 +663,20 @@ export class GrassCuttingScene extends Phaser.Scene {
     this.damageEvents.length = 0;
     this.levelAccuracy = 1;
 
+    // T-032：宝物/陷阱运行时状态复位
+    this.treasureQuiz?.destroy();
+    this.treasureQuiz = null;
+    this.treasureBuff = null;
+    this.treasureBuffText?.destroy();
+    this.treasureBuffText = null;
+    this.trapStunTime = 0;
+    this.trapSlowFactor = 1;
+    this.trapSlowTime = 0;
+    this.trapSlip = null;
+    this.trapReverseTime = 0;
+    this.trapCooldownMult = 1;
+    this.trapCooldownTime = 0;
+
     // T-026：上一局的躺平/弹幕系统与死亡序列状态一并复位（对象在 create 里重建）
     this.lazy?.destroy();
     this.danmaku?.destroy();
@@ -640,10 +717,50 @@ export class GrassCuttingScene extends Phaser.Scene {
       return;
     }
 
+    // T-032：宝物答题浮层打开期间世界冻结（浮层倒计时走真实时间，自行管理）
+    if (this.treasureQuiz) {
+      this.killFx.updateFx(this.killFx.hitstopActive ? 0 : rawDt);
+      return;
+    }
+
     // 其余系统全部走缩放后的 dt，顿帧期间整个世界一起「卡住」
     const dt = rawDt * this.time.timeScale;
     this.frameCounter++;
     this.elapsed += dt;
+
+    // T-032：陷阱效果计时
+    if (this.trapStunTime > 0) this.trapStunTime -= dt;
+    if (this.trapSlowTime > 0) {
+      this.trapSlowTime -= dt;
+      if (this.trapSlowTime <= 0) this.trapSlowFactor = 1;
+    }
+    if (this.trapReverseTime > 0) this.trapReverseTime -= dt;
+    if (this.trapCooldownTime > 0) {
+      this.trapCooldownTime -= dt;
+      if (this.trapCooldownTime <= 0) this.trapCooldownMult = 1;
+    }
+    if (this.trapSlip) {
+      this.trapSlip.time -= dt;
+      if (this.trapSlip.time <= 0) this.trapSlip = null;
+    }
+
+    // T-032：宝物限时加成倒计时
+    if (this.treasureBuff) {
+      this.treasureBuff.remain -= dt;
+      if (this.treasureBuff.remain <= 0) {
+        this.floaters.spawn(this.player.x, this.player.y - 46, this.treasureBuff.label + ' 结束', css(Palette.text.hint), '', 18);
+        this.treasureBuff = null;
+      }
+    }
+    if (this.treasureBuffText) {
+      if (this.treasureBuff) {
+        this.treasureBuffText.setVisible(true)
+          .setPosition(this.player.x, this.player.y - this.packed.player.radius - 34)
+          .setText(this.treasureBuff.label + ' ' + this.treasureBuff.remain.toFixed(1) + 's');
+      } else {
+        this.treasureBuffText.setVisible(false);
+      }
+    }
 
     // ── 动态难度下调（红线 3）：按表现计算 assist 并回拉难度进度（只降不升） ──
     this.updateDifficultyAssist(dt);
@@ -654,7 +771,10 @@ export class GrassCuttingScene extends Phaser.Scene {
     this.updateWeaponVisual();
 
     // T-025：学霸 BUFF 激活时冷却走得更快（攻速提升）——只改 dt 缩放，不动伤害语义
-    this.weaponSystem.update(dt * this.scholar.cooldownFactor);
+    // T-032：宝物攻速加成与陷阱「断网卡壳」同样按冷却倍率叠加
+    this.weaponSystem.update(
+      dt * this.scholar.cooldownFactor * this.activeTreasureCooldownMult * this.trapCooldownMult,
+    );
     this.updateAttack();
 
     const progress = clamp(this.elapsed / this.totalTime, 0, 1);
@@ -690,6 +810,10 @@ export class GrassCuttingScene extends Phaser.Scene {
 
     // T-026：躺平 BUFF 掉落拾取与计时
     this.lazy.update(dt, this.player.x, this.player.y);
+
+    // T-032：宝箱拾取判定 + 陷阱碰撞
+    this.treasure.update(dt, this.player.x, this.player.y);
+    this.traps.update(dt, this.player.x, this.player.y);
 
     // T-026：错题弹幕推进
     this.danmaku.update(dt);
@@ -903,6 +1027,146 @@ export class GrassCuttingScene extends Phaser.Scene {
     this.assistFactor = smoothAssist(this.assistFactor, target, dt, assistSettings.smoothingSec);
   }
 
+  // ───────────────────────── T-032 宝物 / 陷阱 ─────────────────────────
+
+  /** 当前宝物攻击伤害倍率 */
+  private get activeTreasureDamageMult(): number {
+    return this.treasureBuff && this.treasureBuff.kind === 'damage' ? this.treasureBuff.damageMult : 1;
+  }
+  /** 当前宝物攻速（冷却）倍率 */
+  private get activeTreasureCooldownMult(): number {
+    return this.treasureBuff && this.treasureBuff.kind === 'cooldown' ? this.treasureBuff.cooldownMult : 1;
+  }
+  /** 当前宝物移速倍率 */
+  private get activeTreasureMoveMult(): number {
+    return this.treasureBuff && this.treasureBuff.kind === 'move' ? this.treasureBuff.moveSpeedMult : 1;
+  }
+  /** 当前宝物范围倍率 */
+  private get activeTreasureRangeMult(): number {
+    return this.treasureBuff && this.treasureBuff.kind === 'range' ? this.treasureBuff.rangeMult : 1;
+  }
+
+  /** 拾起宝箱：抽一道题弹快问快答浮层（世界随即冻结） */
+  private openTreasureQuiz(x: number, y: number): void {
+    if (this.treasureQuiz) return;
+    const questionConfig = ConfigLoader.getInstance().getConfig('questionConfig');
+    const mix = questionConfig.subjectMixSettings;
+    const weights = pickDifficultyWeights(this.data0?.level ?? 1, questionConfig.difficultySelection);
+    const subject = mix?.enabled
+      ? questionBank.pickSubjectForRound(this.packed.subject, mix.primaryRatio)
+      : this.packed.subject;
+    const drawn = questionBank.draw({ subject, count: 1, difficultyWeights: weights });
+    const q = drawn[0];
+    const subjectConfig = ConfigLoader.getInstance().getConfig('subjectConfig');
+
+    this.floaters.spawn(x, y - 44, '答对拿神秘加成！', css(Palette.accent.gold), '🎁', 22);
+    sfx.play('stop');
+    this.treasureQuiz = new TreasureQuizOverlay(this, {
+      question: q,
+      subjectName: subjectConfig.subjects[q.subject]?.displayName ?? q.subject,
+      timeSec: this.packed.polish.treasureChest.quizTimeSec,
+      onDone: (correct) => this.finishTreasureQuiz(correct),
+    });
+  }
+
+  /** 宝物答题结算：答对 5 选 1 随机加成；答错宝物失效 */
+  private finishTreasureQuiz(correct: boolean): void {
+    this.treasureQuiz = null; // 世界恢复
+    if (!correct) return;
+    const chest = this.packed.polish.treasureChest;
+    const roll = Math.random();
+    const makeBuff = (
+      kind: 'damage' | 'cooldown' | 'move' | 'range' | 'heal',
+      label: string,
+    ): {
+      kind: 'damage' | 'cooldown' | 'move' | 'range' | 'heal';
+      label: string;
+      remain: number;
+      damageMult: number;
+      cooldownMult: number;
+      moveSpeedMult: number;
+      rangeMult: number;
+    } => ({
+      kind,
+      label,
+      remain: chest.buffDurationSec,
+      damageMult: kind === 'damage' ? chest.damageMult : 1,
+      cooldownMult: kind === 'cooldown' ? chest.cooldownMult : 1,
+      moveSpeedMult: kind === 'move' ? chest.moveSpeedMult : 1,
+      rangeMult: kind === 'range' ? chest.rangeMult : 1,
+    });
+
+    if (roll < 0.2) {
+      this.treasureBuff = makeBuff('damage', '攻击力UP');
+    } else if (roll < 0.4) {
+      this.treasureBuff = makeBuff('cooldown', '攻速UP');
+    } else if (roll < 0.6) {
+      this.treasureBuff = makeBuff('move', '移速UP');
+    } else if (roll < 0.8) {
+      this.treasureBuff = makeBuff('range', '范围UP');
+    } else {
+      // 回血：瞬时生效
+      this.hp = Math.min(this.maxHp, this.hp + chest.healAmount);
+      this.floaters.spawn(
+        this.player.x, this.player.y - 46, '生命回复 +' + chest.healAmount,
+        css(Palette.status.correct), '♥', 24,
+      );
+      sfx.play('levelUp');
+      return;
+    }
+
+    if (!this.treasureBuffText) {
+      this.treasureBuffText = this.add
+        .text(0, 0, '', textStyle(15, css(Palette.accent.gold), { fontStyle: 'bold' }))
+        .setOrigin(0.5)
+        .setDepth(260);
+    }
+    this.floaters.spawn(
+      this.player.x, this.player.y - 46, this.treasureBuff.label + ' ×' + chest.buffDurationSec + 's',
+      css(Palette.accent.gold), '🎁', 24,
+    );
+    sfx.play('levelUp');
+  }
+
+  /** 踩到陷阱：按类型结算无厘头 debuff */
+  private applyTrap(type: TrapTypeSettings): void {
+    this.floaters.spawn(this.player.x, this.player.y - 46, type.label, css(Palette.status.warning), '', 20);
+    switch (type.effect) {
+      case 'stun':
+        this.trapStunTime = type.duration;
+        sfx.play('stop');
+        break;
+      case 'damage':
+        this.applyDamageToPlayer(type.value);
+        break;
+      case 'slow':
+        this.trapSlowFactor = Math.max(0.2, type.value);
+        this.trapSlowTime = type.duration;
+        sfx.play('stop');
+        break;
+      case 'slip': {
+        const dir = Math.random() * Math.PI * 2;
+        this.trapSlip = {
+          dirX: Math.cos(dir),
+          dirY: Math.sin(dir),
+          speedMult: Math.max(1.2, type.value),
+          time: type.duration,
+        };
+        sfx.play('wrong');
+        break;
+      }
+      case 'reverse':
+        this.trapReverseTime = type.duration;
+        sfx.play('wrong');
+        break;
+      case 'cooldownUp':
+        this.trapCooldownMult = Math.max(1, type.value);
+        this.trapCooldownTime = type.duration;
+        sfx.play('wrong');
+        break;
+    }
+  }
+
   /** 成就解锁 toast：金色横幅短提示（复用浮动文本池，不阻塞战斗） */
   private toastAchievement(name: string): void {
     this.floaters.spawn(
@@ -912,6 +1176,7 @@ export class GrassCuttingScene extends Phaser.Scene {
       css(Palette.accent.gold),
       '🏆',
       24,
+      true,
     );
     sfx.play('levelUp');
   }
@@ -920,20 +1185,36 @@ export class GrassCuttingScene extends Phaser.Scene {
   private updateMovement(dt: number): void {
     const v = this.getMoveVector();
     // T-025：学霸 BUFF 激活时移速提升；T-026：躺平 BUFF 激活时移速小幅下降（倍率都来自配置）
-    const speed = this.packed.player.moveSpeed * this.scholar.moveSpeedFactor * this.lazy.moveSpeedFactor;
-    const len = Math.sqrt(v.x * v.x + v.y * v.y);
-    this.moving = len > 0.001;
-    if (this.moving) {
-      const nx = v.x / len;
-      const ny = v.y / len;
-      this.player.x += nx * speed * dt;
-      this.player.y += ny * speed * dt;
-      this.moveFacing = Math.atan2(ny, nx);
+    // T-032：宝物移速加成 / 水洼减速 / 踩屎定身 全部乘在基础移速上
+    const speed = this.packed.player.moveSpeed
+      * this.scholar.moveSpeedFactor
+      * this.lazy.moveSpeedFactor
+      * this.activeTreasureMoveMult
+      * this.trapSlowFactor
+      * (this.trapStunTime > 0 ? 0 : 1);
+    // T-032：香蕉皮打滑——失控朝固定方向冲
+    if (this.trapSlip) {
+      this.player.x += this.trapSlip.dirX * this.packed.player.moveSpeed * this.trapSlip.speedMult * dt;
+      this.player.y += this.trapSlip.dirY * this.packed.player.moveSpeed * this.trapSlip.speedMult * dt;
+      this.moving = true;
+    } else {
+      // T-032：妈妈的怒吼——方向反转
+      const vec = this.trapReverseTime > 0 ? { x: -v.x, y: -v.y } : v;
+      const len = Math.sqrt(vec.x * vec.x + vec.y * vec.y);
+      this.moving = len > 0.001;
+      if (this.moving) {
+        const nx = vec.x / len;
+        const ny = vec.y / len;
+        this.player.x += nx * speed * dt;
+        this.player.y += ny * speed * dt;
+        this.moveFacing = Math.atan2(ny, nx);
+      }
     }
 
+    // T-032 大地图：活动范围钳制到世界边界（顶部 64px 留给 HUD）
     const margin = this.packed.player.radius;
-    this.player.x = clamp(this.player.x, margin, this.scale.width - margin);
-    this.player.y = clamp(this.player.y, margin + 64, this.scale.height - margin);
+    this.player.x = clamp(this.player.x, margin, this.worldW - margin);
+    this.player.y = clamp(this.player.y, margin + 64, this.worldH - margin);
   }
 
   /**
@@ -1034,9 +1315,9 @@ export class GrassCuttingScene extends Phaser.Scene {
         x: action.x,
         y: action.y,
         facing: action.facing,
-        range: w.range,
+        range: w.range * this.activeTreasureRangeMult,
         sectorAngle: w.sectorAngle,
-        damage: w.damage,
+        damage: w.damage * this.activeTreasureDamageMult,
         comboMultiplier: this.combo.damageMultiplier,
         knockback: w.knockback,
         monsters: this.spawner.monsters,
@@ -1065,10 +1346,10 @@ export class GrassCuttingScene extends Phaser.Scene {
         y: my,
         angle: action.facing + offset,
         speed: w.projectileSpeed,
-        damage: w.damage,
+        damage: w.damage * this.activeTreasureDamageMult,
         pierce: w.pierce,
         knockback: w.knockback,
-        range: w.range,
+        range: w.range * this.activeTreasureRangeMult,
         radius: w.projectileRadius,
         texture,
         tint: weaponTint(w.attackType),
@@ -1229,6 +1510,9 @@ export class GrassCuttingScene extends Phaser.Scene {
     // T-025：学霸 BUFF——概率掉落书本，拾取后短暂提升攻速/移速
     this.scholar.maybeDrop(x, y);
 
+    // T-032：宝物——概率掉宝箱（拾起弹快问快答）
+    this.treasure.maybeDrop(x, y);
+
     // T-026：躺平 BUFF——概率掉落胶囊，拾取后短暂无敌但移速小幅下降
     this.lazy.maybeDrop(x, y);
   }
@@ -1298,7 +1582,8 @@ export class GrassCuttingScene extends Phaser.Scene {
       .setOrigin(0.5)
       .setDepth(1300)
       .setScale(0.6)
-      .setAlpha(0);
+      .setAlpha(0)
+      .setScrollFactor(0);
     this.tweens.add({
       targets: label,
       alpha: 1,
@@ -1330,11 +1615,12 @@ export class GrassCuttingScene extends Phaser.Scene {
   private showBossLine(line: string): void {
     const polish = this.packed.polish;
     if (!this.bossLineText || !this.bossLineBg) {
-      this.bossLineBg = this.add.graphics().setDepth(1300);
+      this.bossLineBg = this.add.graphics().setDepth(1300).setScrollFactor(0);
       this.bossLineText = this.add
         .text(0, 0, '', textStyle(polish.bossLineFontSize, css(Palette.accent.gold), { fontStyle: 'bold', align: 'center' }))
         .setOrigin(0.5)
-        .setDepth(1301);
+        .setDepth(1301)
+        .setScrollFactor(0);
     }
     const bg = this.bossLineBg;
     const text = this.bossLineText;
@@ -1371,7 +1657,8 @@ export class GrassCuttingScene extends Phaser.Scene {
       .setDisplaySize(this.scale.width, this.scale.height)
       .setTint(Palette.accent.gold)
       .setDepth(1290)
-      .setAlpha(polish.bossPhaseFlashAlpha);
+      .setAlpha(polish.bossPhaseFlashAlpha)
+      .setScrollFactor(0);
     this.tweens.add({
       targets: flash,
       alpha: 0,
@@ -1514,7 +1801,8 @@ export class GrassCuttingScene extends Phaser.Scene {
         textStyle(24, css(Palette.accent.gold)),
       )
       .setOrigin(0.5)
-      .setDepth(1200);
+      .setDepth(1200)
+      .setScrollFactor(0);
     this.tweens.add({
       targets: tip,
       alpha: 0,
@@ -1585,6 +1873,12 @@ export class GrassCuttingScene extends Phaser.Scene {
     this.bossVisual = null;
     this.scholar?.destroy();
     this.lazy?.destroy();
+    this.treasure?.destroy();
+    this.traps?.destroy();
+    this.treasureQuiz?.destroy();
+    this.treasureQuiz = null;
+    this.treasureBuffText?.destroy();
+    this.treasureBuffText = null;
     this.danmaku?.destroy();
     this.examSummon?.destroy();
     this.examSummon = null;

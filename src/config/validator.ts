@@ -608,6 +608,11 @@ function validateQuestionConfig(raw: unknown): Validator {
     );
   }
 
+  // 学科混排（T-032 试玩反馈：一轮题混入其他学科，增加随机性）
+  const mix = v.object(root, 'subjectMixSettings', 'questionConfig.subjectMixSettings');
+  v.boolean(mix, 'enabled', 'questionConfig.subjectMixSettings.enabled');
+  v.number(mix, 'primaryRatio', 'questionConfig.subjectMixSettings.primaryRatio', { min: 0, max: 1 });
+
   const sd = v.object(root, 'subjectDifficulty', 'questionConfig.subjectDifficulty');
   for (const key of Object.keys(sd)) {
     const entry = v.object(sd, key, `questionConfig.subjectDifficulty.${key}`);
@@ -705,6 +710,11 @@ function validateGrassCuttingConfig(raw: unknown): Validator {
   v.number(ast, 'lossWindowSec', 'grassCuttingConfig.assistSettings.lossWindowSec', { min: 1, max: 30 });
   v.number(ast, 'pullMin', 'grassCuttingConfig.assistSettings.pullMin', { min: 0.1, max: 1 });
   v.number(ast, 'smoothingSec', 'grassCuttingConfig.assistSettings.smoothingSec', { min: 0.1, max: 10 });
+  // 世界尺寸（T-032 大地图）：缩放系数 1.0 = 旧版视口即世界
+  const ws = v.object(root, 'worldSettings', 'grassCuttingConfig.worldSettings');
+  v.number(ws, 'widthScale', 'grassCuttingConfig.worldSettings.widthScale', { min: 1, max: 2.5 });
+  v.number(ws, 'heightScale', 'grassCuttingConfig.worldSettings.heightScale', { min: 1, max: 2.5 });
+
   const assistWeightSum =
     Number(ast.accuracyWeight ?? 0) + Number(ast.hpWeight ?? 0) + Number(ast.lossWeight ?? 0);
   if (assistWeightSum <= 0) {
@@ -991,6 +1001,43 @@ function validateGrassCuttingConfig(raw: unknown): Validator {
   v.integer(summon, 'popStaggerMs', `${pBase}.examSummon.popStaggerMs`, { min: 0, max: 1000 });
   v.integer(summon, 'popInMs', `${pBase}.examSummon.popInMs`, { min: 100, max: 1000 });
   v.integer(summon, 'fadeOutMs', `${pBase}.examSummon.fadeOutMs`, { min: 100, max: 1000 });
+
+  // ─────────────── T-032 宝物掉落 / 无厘头陷阱 ───────────────
+  const chest = v.object(pl, 'treasureChest', `${pBase}.treasureChest`);
+  v.number(chest, 'dropChance', `${pBase}.treasureChest.dropChance`, { min: 0, max: 1 });
+  v.integer(chest, 'maxPerLevel', `${pBase}.treasureChest.maxPerLevel`, { min: 0, max: 20 });
+  v.number(chest, 'despawnSec', `${pBase}.treasureChest.despawnSec`, { min: 3, max: 60 });
+  v.number(chest, 'quizTimeSec', `${pBase}.treasureChest.quizTimeSec`, { min: 3, max: 30 });
+  v.number(chest, 'buffDurationSec', `${pBase}.treasureChest.buffDurationSec`, { min: 1, max: 60 });
+  v.number(chest, 'damageMult', `${pBase}.treasureChest.damageMult`, { min: 1, max: 5 });
+  v.number(chest, 'cooldownMult', `${pBase}.treasureChest.cooldownMult`, { min: 0.2, max: 1 });
+  v.number(chest, 'moveSpeedMult', `${pBase}.treasureChest.moveSpeedMult`, { min: 1, max: 3 });
+  v.number(chest, 'rangeMult', `${pBase}.treasureChest.rangeMult`, { min: 1, max: 3 });
+  v.number(chest, 'healAmount', `${pBase}.treasureChest.healAmount`, { min: 0, max: 200 });
+
+  const traps = v.object(pl, 'trapSettings', `${pBase}.trapSettings`);
+  v.boolean(traps, 'enabled', `${pBase}.trapSettings.enabled`);
+  v.integer(traps, 'spawnCount', `${pBase}.trapSettings.spawnCount`, { min: 0, max: 40 });
+  v.number(traps, 'respawnSec', `${pBase}.trapSettings.respawnSec`, { min: 0, max: 120 });
+  const allowedTraps = ['poop', 'bolt', 'puddle', 'banana', 'megaphone', 'router'];
+  const allowedEffects = ['stun', 'damage', 'slow', 'slip', 'reverse', 'cooldownUp'];
+  const trapTypes = v.array(traps, 'types', `${pBase}.trapSettings.types`, 1);
+  let trapWeightSum = 0;
+  trapTypes.forEach((item, idx) => {
+    if (!v.isRecord(item)) {
+      v.custom(`${pBase}.trapSettings.types[${idx}]`, '陷阱类型应为对象');
+      return;
+    }
+    const tp = `${pBase}.trapSettings.types[${idx}]`;
+    v.string(item, 'id', `${tp}.id`, allowedTraps);
+    v.string(item, 'label', `${tp}.label`);
+    v.string(item, 'effect', `${tp}.effect`, allowedEffects);
+    v.number(item, 'duration', `${tp}.duration`, { min: 0, max: 10 });
+    v.number(item, 'value', `${tp}.value`, { min: 0, max: 50 });
+    const w = v.number(item, 'weight', `${tp}.weight`, { min: 0 });
+    trapWeightSum += typeof w === 'number' ? w : 0;
+  });
+
   return v;
 }
 

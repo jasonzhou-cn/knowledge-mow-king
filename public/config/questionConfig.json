@@ -1,5 +1,5 @@
 {
-  "version": "1.1.0",
+  "version": "1.2.0",
   "speedSettings": {
     "curveType": "hybrid",
     "baseSpeed": 800,
@@ -76,5 +76,9 @@
       "2": 0.4,
       "3": 0.6
     }
+  },
+  "subjectMixSettings": {
+    "enabled": true,
+    "primaryRatio": 0.5
   }
 }

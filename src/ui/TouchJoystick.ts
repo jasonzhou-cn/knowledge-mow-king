@@ -63,8 +63,9 @@ export class TouchJoystick {
     this.activeAlpha = s.joystickActiveAlpha;
     this.maxOffset = Math.max(1, this.baseRadius - this.knobRadius);
 
-    this.base = scene.add.graphics().setDepth(depth);
-    this.knob = scene.add.graphics().setDepth(depth + 1);
+    // 大地图（T-032）：摇杆是屏幕空间层
+    this.base = scene.add.graphics().setDepth(depth).setScrollFactor(0);
+    this.knob = scene.add.graphics().setDepth(depth + 1).setScrollFactor(0);
 
     this.drawBase();
     this.drawKnob();

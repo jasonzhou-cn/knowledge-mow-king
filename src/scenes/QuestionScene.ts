@@ -54,6 +54,10 @@ export class QuestionScene extends Phaser.Scene {
   private selector: ArrowSelector | null = null;
   private cursorSel: CursorSelector | null = null;
   private hud: QuizHud | null = null;
+  /** 学科标签（随每道题的学科混排结果切换，T-032） */
+  private subjectTag: Phaser.GameObjects.Text | null = null;
+  /** 学科 key → 展示名 */
+  private subjectMetaMap: Record<string, { displayName: string }> = {};
 
   private questionText!: Phaser.GameObjects.Text;
   private explanationText!: Phaser.GameObjects.Text;
@@ -114,13 +118,29 @@ export class QuestionScene extends Phaser.Scene {
       0, 0, 0,
     );
 
-    // 抽题：数量与难度权重全部来自配置
+    // 抽题：数量与难度权重全部来自配置。
+    // T-032 学科混排：开启后每题按 primaryRatio 概率取关卡主学科，其余均匀混入
+    // 其他仍有余量的学科（小朋友反馈「一轮全是英语/全是数学」的随机性不足）。
+    this.subjectMetaMap = Object.fromEntries(
+      Object.entries(subjectConfig.subjects).map(([k, v]) => [k, { displayName: v.displayName }]),
+    );
     const weights = pickDifficultyWeights(this.startData.level, this.questionConfig.difficultySelection);
-    const questions: DrawnQuestion[] = questionBank.draw({
-      subject,
-      count: this.packed.questionCount,
-      difficultyWeights: weights,
-    });
+    const mix = this.questionConfig.subjectMixSettings;
+    const usedIds = new Set<string>();
+    const questions: DrawnQuestion[] = [];
+    for (let i = 0; i < this.packed.questionCount; i++) {
+      const pick = mix?.enabled
+        ? questionBank.pickSubjectForRound(subject, mix.primaryRatio, usedIds)
+        : subject;
+      const drawn = questionBank.draw({
+        subject: pick,
+        count: 1,
+        difficultyWeights: weights,
+        excludeIds: usedIds,
+      });
+      for (const q of drawn) usedIds.add(q.id);
+      questions.push(...drawn);
+    }
 
     this.engine = new QuizEngine({ questions, timeLimit: this.packed.questionTimeLimit });
 
@@ -236,7 +256,9 @@ export class QuestionScene extends Phaser.Scene {
     if (!engine) return;
     if (!this.track && !this.selector && !this.cursorSel) return;
 
-    // 题干展示 + 高度自适应缩字（长题干缩小到面板内，绝不裁切）
+    // 学科标签跟随当前题（学科混排后一轮内学科可能不同，T-032）
+    const currentMeta = this.subjectMetaMap[engine.current.subject];
+    this.subjectTag?.setText(currentMeta ? currentMeta.displayName : engine.current.subject);
     refitText(this.questionText, engine.current.question, {
       maxHeight: this.panelHeight - 14,
       baseSize: this.questionBaseFontSize,
@@ -587,10 +609,10 @@ export class QuestionScene extends Phaser.Scene {
     this.panel.lineStyle(2, Palette.accent.primaryDark, 0.8);
     this.panel.strokeRoundedRect(panelX, panelY, panelW, panelH, 14);
 
-    const subjectTag = this.add
+    this.subjectTag = this.add
       .text(panelX + 16 * s, panelY + 6 * s, subjectName, textStyle(Math.round(15 * s), css(Palette.accent.secondary)))
       .setOrigin(0, 0);
-    subjectTag.setDepth(2);
+    this.subjectTag.setDepth(2);
 
     // 场景单例复用：每次重进答题必须清空上一轮的错题记录
     this.wrongAnswers = [];

@@ -69,6 +69,31 @@ export class QuestionBankStore {
     return [...this.bySubject.keys()];
   }
 
+  /** 列出「排除已用题后仍有余量」的学科 key（学科混排 T-032 用） */
+  listAvailableSubjects(excludeIds?: ReadonlySet<string>): string[] {
+    const out: string[] = [];
+    for (const [subject, list] of this.bySubject) {
+      const usedCount = excludeIds ? list.filter((q) => excludeIds.has(q.id)).length : 0;
+      if (list.length - usedCount > 0) out.push(subject);
+    }
+    return out;
+  }
+
+  /**
+   * 为一轮答题挑一道题的学科（学科混排 T-032）：
+   *  - 以 primaryRatio 的概率取关卡主学科（若其还有余量）；
+   *  - 否则从「其他仍有余量」的学科里均匀挑一个；
+   *  - 主学科无余量或其他学科为空时安全回落，绝不抛错。
+   */
+  pickSubjectForRound(primary: string, primaryRatio: number, excludeIds?: ReadonlySet<string>): string {
+    const available = this.listAvailableSubjects(excludeIds);
+    if (available.length === 0) return primary;
+    const others = available.filter((s) => s !== primary);
+    if (others.length === 0) return primary;
+    if (available.includes(primary) && Math.random() < primaryRatio) return primary;
+    return others[Math.floor(Math.random() * others.length)];
+  }
+
   /**
    * 按学科与难度权重抽题。
    * @throws 题库未加载或可用题数为 0 时抛出中文错误

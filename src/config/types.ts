@@ -186,6 +186,14 @@ export interface DifficultySelection {
   weightsHigh: DifficultyWeights;
 }
 
+/** 学科混排（T-032 试玩反馈）：一轮题不再全部来自关卡主学科，按比例混入其他学科 */
+export interface SubjectMixSettings {
+  /** false = 维持旧行为（整轮只出关卡主学科） */
+  enabled: boolean;
+  /** 每题来自关卡主学科的概率（0~1），其余均匀落到其他有题的学科 */
+  primaryRatio: number;
+}
+
 export interface QuestionConfig {
   version: string;
   speedSettings: SpeedSettings;
@@ -193,6 +201,7 @@ export interface QuestionConfig {
   answerSettings: AnswerSettings;
   subjectDifficulty: Record<SubjectKey, SubjectDifficultyEntry>;
   difficultySelection: DifficultySelection;
+  subjectMixSettings: SubjectMixSettings;
 }
 
 // ───────────────────────── grassCuttingConfig.json ─────────────────────────
@@ -556,6 +565,62 @@ export interface ExamSummonSettings {
   fadeOutMs: number;
 }
 
+/**
+ * T-032 宝物掉落：击杀小怪概率掉宝箱，拾起弹出快问快答，
+ * 答对随机获得一种限时加成（攻击/攻速/移速/范围/回血）。
+ */
+export interface TreasureChestSettings {
+  /** 每次击杀的掉落概率 0~1 */
+  dropChance: number;
+  /** 单关掉落上限 */
+  maxPerLevel: number;
+  /** 宝箱停留秒数（超时消失，最后 3s 闪烁） */
+  despawnSec: number;
+  /** 答题限时（秒） */
+  quizTimeSec: number;
+  /** 限时加成持续（秒），heal 为瞬时不受此值影响 */
+  buffDurationSec: number;
+  /** 攻击力加成倍率（乘在武器伤害上） */
+  damageMult: number;
+  /** 攻速加成（冷却倍率，<1 = 更快） */
+  cooldownMult: number;
+  /** 移速加成倍率 */
+  moveSpeedMult: number;
+  /** 攻击范围加成倍率 */
+  rangeMult: number;
+  /** 回血量（ instantaneous HP，钳制到 maxHp） */
+  healAmount: number;
+}
+
+/** 陷阱效果类型（T-032 无厘头陷阱） */
+export type TrapEffectKind = 'stun' | 'damage' | 'slow' | 'slip' | 'reverse' | 'cooldownUp';
+
+/** 单个陷阱类型配置 */
+export interface TrapTypeSettings {
+  /** 陷阱 id（同时是贴图 key 后缀）：poop / bolt / puddle / banana / megaphone / router */
+  id: string;
+  /** 触发时的飘字（无厘头文案） */
+  label: string;
+  /** 效果类型 */
+  effect: TrapEffectKind;
+  /** 效果持续（秒）；damage 为瞬时 */
+  duration: number;
+  /** 效果数值：damage=扣血量；slow=移速倍率；slip=冲刺速度倍率；cooldownUp=冷却倍率；其余忽略 */
+  value: number;
+  /** 生成权重（加权随机） */
+  weight: number;
+}
+
+/** 陷阱总配置 */
+export interface TrapSettings {
+  enabled: boolean;
+  /** 开局铺设数量 */
+  spawnCount: number;
+  /** 触发后多少秒再生（0 = 不再生） */
+  respawnSec: number;
+  types: TrapTypeSettings[];
+}
+
 /** T-025 打磨期全部视觉/趣味参数（数值解耦红线：一律进配置，不硬编码） */
 export interface PolishSettings {
   /** 场景进入时的 fadeIn 时长（毫秒） */
@@ -604,6 +669,10 @@ export interface PolishSettings {
   lazyBuff: LazyBuffSettings;
   /** T-027 考神召唤参数（Boss 关专属氛围事件） */
   examSummon: ExamSummonSettings;
+  /** T-032 宝物掉落（拾起答题 → 随机加成） */
+  treasureChest: TreasureChestSettings;
+  /** T-032 无厘头陷阱 */
+  trapSettings: TrapSettings;
 }
 
 /**
@@ -667,6 +736,17 @@ export interface TouchSettings {
   joystickActiveAlpha: number;
 }
 
+/**
+ * 世界尺寸（T-032 试玩反馈「扩大打怪地图」）：
+ * 战斗世界 = 视口 × 缩放系数，相机跟随玩家滚动；1.0 = 旧版（世界即视口）。
+ */
+export interface WorldSettings {
+  /** 世界宽 = 视口宽 × widthScale */
+  widthScale: number;
+  /** 世界高 = 视口高 × heightScale */
+  heightScale: number;
+}
+
 export interface GrassCuttingConfig {
   version: string;
   touchSettings: TouchSettings;
@@ -686,6 +766,8 @@ export interface GrassCuttingConfig {
   polishSettings: PolishSettings;
   /** 动态难度下调（红线 3 软失败保护） */
   assistSettings: AssistSettings;
+  /** 世界尺寸（相机跟随大地图，T-032） */
+  worldSettings: WorldSettings;
 }
 
 // ──────────────────────────── weaponConfig.json ────────────────────────────

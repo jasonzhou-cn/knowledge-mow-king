@@ -99,6 +99,12 @@ export class CombatHud {
     this.redrawTime();
     this.updateScore(0);
     this.updateCombo(0);
+
+    // 大地图（T-032）：HUD 是屏幕空间层，相机滚动时固定在视口上
+    for (const obj of [
+      this.bg, this.hpBarFill, this.timeBarFill, this.timeText, this.hpText,
+      this.scoreText, this.comboText, this.levelText, this.bonusText,
+    ]) obj.setScrollFactor(0);
   }
 
   /** 更新血量显示 */

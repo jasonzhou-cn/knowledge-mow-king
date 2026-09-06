@@ -75,9 +75,12 @@ export function applySceneTheme(
   subject: string,
   isBossLevel: boolean,
   deco: ThemeDecoSettings,
+  width?: number,
+  height?: number,
 ): SceneThemeResult {
-  const w = scene.scale.width;
-  const h = scene.scale.height;
+  // 大地图（T-032）：地面绘制到整个世界；未传时世界=视口（旧行为）
+  const w = width ?? scene.scale.width;
+  const h = height ?? scene.scale.height;
   const themeColor = SUBJECT_THEME_COLORS[subject] ?? Palette.combat.monsterElite;
   const symbols = SUBJECT_SYMBOLS[subject] ?? SUBJECT_SYMBOLS.math;
   const symbolPeriod = SUBJECT_SYMBOL_PERIOD[subject] ?? 3600;
@@ -169,6 +172,12 @@ export function applySceneTheme(
       shapes.strokeCircle(x, y, 8);
     }
   }
+
+  // 世界边界：墨线描边一圈，让「世界比屏幕大」可感知（T-032）
+  const border = scene.add.graphics();
+  border.setDepth(-7);
+  border.lineStyle(6, Palette.art.ink, 0.55);
+  border.strokeRect(3, 3, w - 6, h - 6);
 
   // 漂浮学科符号：轻量 yoyo tween，数量受配置约束
   const symbolAlpha = isBossLevel ? 0.28 : 0.5;

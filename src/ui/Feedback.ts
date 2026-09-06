@@ -127,7 +127,7 @@ export class FloatingTextPool {
    * @param shape 形状前缀（如 "✓" / "✕"），保证不只靠颜色传达结果
    * @param fontSize 字号，用于高连击时把飘字升档（暴击感）
    */
-  spawn(x: number, y: number, content: string, color: string, shape = '', fontSize = 20): void {
+  spawn(x: number, y: number, content: string, color: string, shape = '', fontSize = 20, screenSpace = false): void {
     let item: Phaser.GameObjects.Text;
     if (this.items.length < this.limit) {
       item = this.scene.add.text(0, 0, '', {
@@ -150,6 +150,8 @@ export class FloatingTextPool {
     item.setColor(color);
     item.setFontSize(fontSize);
     item.setPosition(x, y);
+    // 大地图（T-032）：屏幕空间飘字（如成就 toast）随 scrollFactor(0) 固定在视口上
+    item.setScrollFactor(screenSpace ? 0 : 1);
     item.setAlpha(1);
     item.setScale(0.7);
     item.setActive(true).setVisible(true);

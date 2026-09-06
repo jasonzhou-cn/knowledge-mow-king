@@ -160,6 +160,73 @@
       "fontNormal": 20,
       "fontBig": 27,
       "fontHuge": 34
+    },
+    "treasureChest": {
+      "dropChance": 0.045,
+      "maxPerLevel": 2,
+      "despawnSec": 12,
+      "quizTimeSec": 10,
+      "buffDurationSec": 10,
+      "damageMult": 1.5,
+      "cooldownMult": 0.7,
+      "moveSpeedMult": 1.35,
+      "rangeMult": 1.4,
+      "healAmount": 30
+    },
+    "trapSettings": {
+      "enabled": true,
+      "spawnCount": 8,
+      "respawnSec": 0,
+      "types": [
+        {
+          "id": "poop",
+          "label": "踩屎了！定住 2 秒",
+          "effect": "stun",
+          "duration": 2,
+          "value": 0,
+          "weight": 2
+        },
+        {
+          "id": "bolt",
+          "label": "触电！-8 HP",
+          "effect": "damage",
+          "duration": 0,
+          "value": 8,
+          "weight": 1.5
+        },
+        {
+          "id": "puddle",
+          "label": "踩进水洼，减速…",
+          "effect": "slow",
+          "duration": 3,
+          "value": 0.5,
+          "weight": 2
+        },
+        {
+          "id": "banana",
+          "label": "踩到香蕉皮！滑倒了",
+          "effect": "slip",
+          "duration": 1,
+          "value": 1.8,
+          "weight": 1.5
+        },
+        {
+          "id": "megaphone",
+          "label": "妈妈的怒吼！方向反了",
+          "effect": "reverse",
+          "duration": 2.5,
+          "value": 0,
+          "weight": 1
+        },
+        {
+          "id": "router",
+          "label": "断网了！武器卡壳",
+          "effect": "cooldownUp",
+          "duration": 4,
+          "value": 1.8,
+          "weight": 1
+        }
+      ]
     }
   },
   "bossRoster": {
@@ -659,5 +726,9 @@
     "lossWindowSec": 5,
     "pullMin": 0.55,
     "smoothingSec": 1.5
+  },
+  "worldSettings": {
+    "widthScale": 1.5,
+    "heightScale": 1.5
   }
 }

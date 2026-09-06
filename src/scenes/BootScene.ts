@@ -40,6 +40,17 @@ export const TextureKeys = {
   lazyCapsule: 'tex-lazy-capsule',
   /** T-027 考神召唤迷你 Boss 底型（白色正圆灰度图，运行期按原 Boss 主题色 tint） */
   miniBoss: 'tex-buff-miniboss',
+  /** T-032 宝箱（直接彩色烘焙，运行期不再 tint） */
+  treasureChest: 'tex-treasure-chest',
+  /** T-032 陷阱图标（直接彩色烘焙）：poop / bolt / puddle / banana / megaphone / router */
+  trap: {
+    poop: 'tex-trap-poop',
+    bolt: 'tex-trap-bolt',
+    puddle: 'tex-trap-puddle',
+    banana: 'tex-trap-banana',
+    megaphone: 'tex-trap-megaphone',
+    router: 'tex-trap-router',
+  },
 } as const;
 
 /**
@@ -129,6 +140,152 @@ export class BootScene extends Phaser.Scene {
     this.makeLazyCapsule();
     this.makeMiniBossBody();
     this.makeBossBodies();
+    this.makeTreasureChest();
+    this.makeTrapIcons();
+  }
+
+  /**
+   * T-032 宝箱（彩色直接烘焙 + 墨线描边，运行期不 tint）：
+   * 棕木箱体 + 金色箍带 + 锁扣，卡通粗描边。
+   */
+  private makeTreasureChest(): void {
+    const { ink, inkSoft } = Palette.art;
+    const g = this.make.graphics({ x: 0, y: 0 }, false);
+    // 墨色外轮廓底
+    g.fillStyle(ink, 1);
+    g.fillRoundedRect(1, 6, 34, 23, 5);
+    // 箱体（下半）
+    g.fillStyle(0xa9713b, 1);
+    g.fillRoundedRect(3, 15, 30, 12, 3);
+    // 箱盖（上半，微鼓）
+    g.fillStyle(0xc08a4d, 1);
+    g.fillRoundedRect(3, 8, 30, 9, 4);
+    // 金色箍带 + 锁扣
+    g.fillStyle(Palette.accent.gold, 1);
+    g.fillRect(16, 7, 6, 21);
+    g.fillCircle(19, 19, 3.5);
+    g.fillStyle(ink, 1);
+    g.fillCircle(19, 20, 1.4);
+    // 盖缝
+    g.lineStyle(2, inkSoft, 0.8);
+    g.lineBetween(3, 15, 33, 15);
+    // 外描边
+    g.lineStyle(2, ink, 1);
+    g.strokeRoundedRect(1, 6, 34, 23, 5);
+    g.generateTexture(TextureKeys.treasureChest, 36, 30);
+    g.destroy();
+  }
+
+  /**
+   * T-032 六种无厘头陷阱图标（彩色直接烘焙 + 墨线描边，36×36）。
+   * 便便堆 / 电火花 / 水洼 / 香蕉皮 / 妈妈的怒吼(喇叭) / 断网路由器。
+   */
+  private makeTrapIcons(): void {
+    const { ink, inkSoft } = Palette.art;
+
+    // 💩 便便堆：三截叠起来的棕色陀螺
+    const poop = this.make.graphics({ x: 0, y: 0 }, false);
+    poop.fillStyle(0x8a5a2b, 1);
+    poop.fillEllipse(18, 27, 26, 12);
+    poop.fillEllipse(18, 19, 18, 10);
+    poop.fillEllipse(18, 12, 10, 8);
+    poop.lineStyle(2, ink, 1);
+    poop.strokeEllipse(18, 27, 26, 12);
+    poop.strokeEllipse(18, 19, 18, 10);
+    poop.strokeEllipse(18, 12, 10, 8);
+    poop.lineStyle(2, ink, 1);
+    poop.lineBetween(21, 8, 25, 4); // 顶端小卷
+    poop.generateTexture(TextureKeys.trap.poop, 36, 36);
+    poop.destroy();
+
+    // ⚡ 电火花：黄色闪电
+    const bolt = this.make.graphics({ x: 0, y: 0 }, false);
+    bolt.fillStyle(Palette.accent.gold, 1);
+    bolt.fillPoints([
+      new Phaser.Geom.Point(21, 2),
+      new Phaser.Geom.Point(10, 19),
+      new Phaser.Geom.Point(17, 19),
+      new Phaser.Geom.Point(13, 34),
+      new Phaser.Geom.Point(27, 15),
+      new Phaser.Geom.Point(19, 15),
+    ], true);
+    bolt.lineStyle(2, ink, 1);
+    bolt.strokePoints([
+      new Phaser.Geom.Point(21, 2),
+      new Phaser.Geom.Point(10, 19),
+      new Phaser.Geom.Point(17, 19),
+      new Phaser.Geom.Point(13, 34),
+      new Phaser.Geom.Point(27, 15),
+      new Phaser.Geom.Point(19, 15),
+    ], true);
+    bolt.generateTexture(TextureKeys.trap.bolt, 36, 36);
+    bolt.destroy();
+
+    // 🌊 水洼：蓝椭圆 + 浅色内圈
+    const pud = this.make.graphics({ x: 0, y: 0 }, false);
+    pud.fillStyle(0x4fa8e0, 0.9);
+    pud.fillEllipse(18, 22, 32, 18);
+    pud.lineStyle(2, ink, 1);
+    pud.strokeEllipse(18, 22, 32, 18);
+    pud.fillStyle(0x9fd8f5, 0.9);
+    pud.fillEllipse(14, 20, 12, 6);
+    pud.lineStyle(1.5, inkSoft, 0.8);
+    pud.strokeEllipse(14, 20, 12, 6);
+    pud.generateTexture(TextureKeys.trap.puddle, 36, 36);
+    pud.destroy();
+
+    // 🍌 香蕉皮：两瓣黄皮 + 棕色尖头
+    const ban = this.make.graphics({ x: 0, y: 0 }, false);
+    ban.fillStyle(Palette.accent.gold, 1);
+    ban.fillEllipse(15, 20, 20, 10);
+    ban.fillEllipse(23, 24, 14, 9);
+    ban.lineStyle(2, ink, 1);
+    ban.strokeEllipse(15, 20, 20, 10);
+    ban.strokeEllipse(23, 24, 14, 9);
+    ban.fillStyle(0x8a5a2b, 1);
+    ban.fillCircle(6, 18, 3);
+    ban.fillCircle(30, 27, 3);
+    ban.lineStyle(1.5, ink, 1);
+    ban.strokeCircle(6, 18, 3);
+    ban.strokeCircle(30, 27, 3);
+    ban.generateTexture(TextureKeys.trap.banana, 36, 36);
+    ban.destroy();
+
+    // 📢 妈妈的怒吼：橙色喇叭 + 三条声波
+    const meg = this.make.graphics({ x: 0, y: 0 }, false);
+    meg.fillStyle(Palette.accent.orange, 1);
+    meg.fillPoints([
+      new Phaser.Geom.Point(6, 14),
+      new Phaser.Geom.Point(16, 8),
+      new Phaser.Geom.Point(16, 28),
+      new Phaser.Geom.Point(6, 22),
+    ], true);
+    meg.fillRect(16, 8, 5, 20);
+    meg.lineStyle(2, ink, 1);
+    meg.strokeTriangle(6, 14, 16, 8, 16, 28);
+    meg.strokeRect(16, 8, 5, 20);
+    meg.lineStyle(2.5, ink, 0.9);
+    meg.lineBetween(25, 12, 31, 10);
+    meg.lineBetween(26, 18, 33, 18);
+    meg.lineBetween(25, 24, 31, 26);
+    meg.generateTexture(TextureKeys.trap.megaphone, 36, 36);
+    meg.destroy();
+
+    // 📶 断网路由器：灰盒子 + 双天线 + 红灯
+    const rt = this.make.graphics({ x: 0, y: 0 }, false);
+    rt.fillStyle(0x9aa7b5, 1);
+    rt.fillRoundedRect(4, 20, 28, 12, 4);
+    rt.lineStyle(2, ink, 1);
+    rt.strokeRoundedRect(4, 20, 28, 12, 4);
+    rt.lineStyle(2.5, inkSoft, 1);
+    rt.lineBetween(10, 20, 6, 8);
+    rt.lineBetween(26, 20, 30, 8);
+    rt.fillStyle(Palette.status.wrong, 1);
+    rt.fillCircle(18, 26, 3);
+    rt.lineStyle(1.2, ink, 0.9);
+    rt.strokeCircle(18, 26, 3);
+    rt.generateTexture(TextureKeys.trap.router, 36, 36);
+    rt.destroy();
   }
 
   /** 1x1 白色像素（放大后用于血条、进度条等纯色矩形） */

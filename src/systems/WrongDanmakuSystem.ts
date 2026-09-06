@@ -141,7 +141,9 @@ export class WrongDanmakuSystem {
     const text = this.scene.add
       .text(this.scene.scale.width + 40, y, content, textStyle(s.fontSize, this.colorCss))
       .setAlpha(s.alpha)
-      .setDepth(90);
+      .setDepth(90)
+      // 大地图（T-032）：弹幕是屏幕空间氛围层，不随相机滚动
+      .setScrollFactor(0);
     this.active.push({ text, lane });
   }
 }

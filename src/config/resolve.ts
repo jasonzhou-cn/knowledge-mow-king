@@ -15,6 +15,7 @@ import type {
   BossTemplate,
   GameSettings,
   GrassCuttingBonus,
+  WorldSettings,
   GrassCuttingBonusSettings,
   GrassCuttingConfig,
   DifficultySettings,
@@ -161,6 +162,8 @@ export interface ResolvedLevelPackage {
   difficulty: DifficultySettings;
   /** 动态难度下调设置（红线 3 软失败保护，插值在 DifficultyAssist 里按表现做） */
   assist: AssistSettings;
+  /** 世界尺寸（相机跟随大地图，T-032） */
+  world: WorldSettings;
   performance: {
     maxAliveMonsters: number;
     damageCheckFrameInterval: number;
@@ -530,6 +533,7 @@ export function resolveLevelPackage(
       moveSpeedMultiplierEnd: ds.moveSpeedMultiplierEnd,
     },
     assist: grassCuttingConfig.assistSettings,
+    world: grassCuttingConfig.worldSettings,
     performance: {
       maxAliveMonsters: maxAlive,
       damageCheckFrameInterval: pf.damageCheckFrameInterval,

@@ -74,11 +74,13 @@ export class WeaponBar {
       const x = startX + i * (slotW + slotGap);
       const y = startY;
 
-      const bg = scene.add.graphics().setDepth(this.depth);
+      // 大地图（T-032）：武器栏是屏幕空间层
+      const bg = scene.add.graphics().setDepth(this.depth).setScrollFactor(0);
 
       const icon = scene.add
         .image(x + slotW / 2, y + 16 * s, `${WEAPON_TEXTURE_PREFIX}${opts.weapons[i].id}`)
-        .setDepth(this.depth + 1);
+        .setDepth(this.depth + 1)
+        .setScrollFactor(0);
       // 等比缩放塞进 ICON_BOX：按贴图原始长边取较小比例，避免拉伸变形
       const iconBaseScale = Math.min(
         iconBox / Math.max(1, icon.width),
@@ -89,19 +91,22 @@ export class WeaponBar {
       const name = scene.add
         .text(x + slotW / 2, y + 34 * s, opts.weapons[i].name, textStyle(Math.round(14 * s), css(Palette.text.secondary)))
         .setOrigin(0.5, 0.5)
-        .setDepth(this.depth + 1);
+        .setDepth(this.depth + 1)
+        .setScrollFactor(0);
 
       const hotkey = scene.add
         .text(x + 6 * s, y + 4 * s, `${i + 1}`, textStyle(Math.round(12 * s), css(Palette.text.hint)))
         .setOrigin(0, 0)
-        .setDepth(this.depth + 1);
+        .setDepth(this.depth + 1)
+        .setScrollFactor(0);
 
       // 点击热区：向下外扩 32px 方便手指点，上方不动以免遮挡战斗区
       const zone = scene.add
         .zone(x, y, slotW, slotH + hitExtend)
         .setOrigin(0, 0)
         .setInteractive({ useHandCursor: true })
-        .setDepth(this.depth + 2);
+        .setDepth(this.depth + 2)
+        .setScrollFactor(0);
       zone.on('pointerdown', () => opts.onSelect(i));
 
       this.slots.push({
