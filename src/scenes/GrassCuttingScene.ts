@@ -377,13 +377,6 @@ export class GrassCuttingScene extends Phaser.Scene {
       },
     });
 
-    // T-026：错题弹幕（无错题时零弹幕，不打扰）
-    this.danmaku = new WrongDanmakuSystem(this, {
-      settings: this.packed.polish.wrongDanmaku,
-      items: incoming.wrongAnswers ?? [],
-      color: this.themeAccent,
-    });
-
     // 虚拟摇杆只在触屏设备创建：PC 端 joystick 保持 null，观感与操作完全不变
     if (this.sys.game.device.input.touch) {
       this.joystick = new TouchJoystick(this, { settings: this.packed.touch });
@@ -417,6 +410,21 @@ export class GrassCuttingScene extends Phaser.Scene {
       height: hudHeight,
       weapons: this.weaponSystem.all,
       onSelect: (index) => this.switchWeapon(index),
+    });
+
+    // T-026：错题弹幕（无错题时零弹幕，不打扰）。
+    // T-031：活动带底边动态避开底部 UI（虚拟摇杆 / 武器栏 / 加成文案取最高者再留 24px），
+    // 触屏端弹幕不再压住摇杆叠字；层级 90 在小怪(100)/玩家(200)之后，穿过战斗区时垫底不抢视线。
+    const bottomUiTop = Math.min(
+      this.joystick ? this.joystick.top : Number.POSITIVE_INFINITY,
+      this.weaponBar.topY,
+      this.hud.bonusTopY,
+    );
+    this.danmaku = new WrongDanmakuSystem(this, {
+      settings: this.packed.polish.wrongDanmaku,
+      items: incoming.wrongAnswers ?? [],
+      color: this.themeAccent,
+      bandBottomLimit: Number.isFinite(bottomUiTop) ? bottomUiTop - 24 : undefined,
     });
 
     // Boss 关：顶部 HUD（52px）下方加一条 Boss 血条，目标改为「击杀 Boss 即通关」

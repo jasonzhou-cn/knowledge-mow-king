@@ -138,6 +138,11 @@ export class CombatHud {
     );
   }
 
+  /** 底部加成文案的顶边 y（绝对坐标），供弹幕等活动带避让（T-031） */
+  get bonusTopY(): number {
+    return this.bonusText.y - this.bonusText.height;
+  }
+
   /** 倒计时进入危险区时的视觉告警 */
   setTimeWarning(active: boolean): void {
     this.timeText.setColor(active ? css(Palette.status.wrong) : css(Palette.text.primary));

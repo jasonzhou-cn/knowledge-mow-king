@@ -89,6 +89,11 @@ export class TouchJoystick {
     return this.centerX + this.baseRadius;
   }
 
+  /** 底座上边缘 y：弹幕等活动带据此避让，不压摇杆（T-031） */
+  get top(): number {
+    return this.centerY - this.baseRadius;
+  }
+
   /** 当前移动方向（归一化；死区内或未激活时为 0 向量） */
   get vector(): JoystickVector {
     return { x: this.vecX, y: this.vecY };

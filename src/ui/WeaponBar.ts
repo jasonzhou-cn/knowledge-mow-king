@@ -45,6 +45,8 @@ export class WeaponBar {
   private readonly slots: Slot[] = [];
   private readonly bounds: Phaser.Geom.Rectangle;
   private readonly depth: number;
+  /** 武器栏格子的顶边 y（弹幕等活动带避让用，T-031） */
+  private readonly topEdge: number;
   private index = 0;
 
   constructor(scene: Phaser.Scene, opts: WeaponBarOptions) {
@@ -66,6 +68,7 @@ export class WeaponBar {
     // 热区要向下外扩 hitExtend，格子必须同步上移同样的距离，
     // 否则外扩部分落在屏幕外（格子底边 630 + 外扩 32 > 屏幕高 640），实际可点区域被吃掉大半
     const startY = opts.height - bottomMargin - slotH - hitExtend;
+    this.topEdge = startY;
 
     for (let i = 0; i < count; i++) {
       const x = startX + i * (slotW + slotGap);
@@ -171,6 +174,11 @@ export class WeaponBar {
    * 刷新冷却进度条。
    * @param ratioOf 传入索引返回 0~1 的就绪比例（1 = 可以出手）
    */
+  /** 武器栏顶边 y（绝对坐标），供底部活动带避让 */
+  get topY(): number {
+    return this.topEdge;
+  }
+
   update(ratioOf: (index: number) => number): void {
     for (let i = 0; i < this.slots.length; i++) {
       this.drawSlot(i, clamp01(ratioOf(i)));

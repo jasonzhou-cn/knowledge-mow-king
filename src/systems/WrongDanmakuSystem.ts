@@ -30,6 +30,12 @@ export interface WrongDanmakuOptions {
   items: string[];
   /** 弹幕文字颜色（用本关学科主题强调色） */
   color: number;
+  /**
+   * 弹幕活动带底边的上限（绝对 y，px，可选）。
+   * 场景传入「摇杆 / 武器栏 / 底部文案」三者最高点的上沿 - 24px，
+   * 弹幕车道全部堆在该线之上——触屏端弹幕不再压住虚拟摇杆（T-031 叠字修复）。
+   */
+  bandBottomLimit?: number;
 }
 
 export class WrongDanmakuSystem {
@@ -37,6 +43,8 @@ export class WrongDanmakuSystem {
   private readonly settings: WrongDanmakuSettings;
   private readonly items: string[];
   private readonly colorCss: string;
+  /** 活动带底边上限（绝对 y）；未传时用 bandBottomRatio */
+  private readonly bandBottomLimit: number | null;
   /** 场上存活弹幕 */
   private readonly active: DanmakuItem[] = [];
   /** 生成计时器（秒） */
@@ -51,6 +59,7 @@ export class WrongDanmakuSystem {
     this.settings = opts.settings;
     this.items = opts.items.filter((s) => s.length > 0).slice();
     this.colorCss = css(opts.color);
+    this.bandBottomLimit = opts.bandBottomLimit ?? null;
   }
 
   /** 场上当前弹幕条数（debug/验证用） */
@@ -97,11 +106,17 @@ export class WrongDanmakuSystem {
   private spawnOne(): void {
     const s = this.settings;
     const h = this.scene.scale.height;
-    const bandTop = h * s.bandTopRatio;
-    const bandBottom = Math.max(bandTop + s.fontSize + 6, h * s.bandBottomRatio);
-    const bandHeight = bandBottom - bandTop;
     const laneHeight = Math.max(s.fontSize * 1.8, 34);
-    const laneCount = Math.max(1, Math.floor(bandHeight / laneHeight));
+    // 活动带底边 = 配置比例 与 「底部 UI 上沿 - 24」 中较小者；顶边 = 配置比例。
+    // 车道自底边向上堆叠，同车道同时只允许一条弹幕。
+    const bandBottom = Math.min(
+      h * s.bandBottomRatio,
+      this.bandBottomLimit ?? Number.POSITIVE_INFINITY,
+      h - s.fontSize - 8,
+    );
+    const bandTop = Math.min(h * s.bandTopRatio, bandBottom - laneHeight);
+    const bandHeight = Math.max(laneHeight, bandBottom - bandTop);
+    const laneCount = Math.max(1, Math.min(this.settings.maxOnScreen, Math.floor(bandHeight / laneHeight)));
 
     const occupied = new Set(this.active.map((it) => it.lane));
     let lane = -1;
@@ -121,12 +136,12 @@ export class WrongDanmakuSystem {
 
     const content = this.items[this.cursor % this.items.length];
     this.cursor = (this.cursor + 1) % Math.max(1, this.items.length);
-    const y = bandTop + (lane + 0.5) * (bandHeight / laneCount);
+    const y = bandBottom - (lane + 0.5) * (bandHeight / laneCount);
 
     const text = this.scene.add
       .text(this.scene.scale.width + 40, y, content, textStyle(s.fontSize, this.colorCss))
       .setAlpha(s.alpha)
-      .setDepth(115);
+      .setDepth(90);
     this.active.push({ text, lane });
   }
 }

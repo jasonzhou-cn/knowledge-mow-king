@@ -39,6 +39,21 @@
 | 质量门 | typecheck 0 / validate-config 13 模块 / `npm test` **117/117** / smoke PASS / canvas-lock **6/6** |
 | 发布 | dist-c `index-DzJxQoqf.js`，5173/5180 同步 |
 
+## 二.5、第二轮：触屏端弹幕压摇杆（用户复测反馈「还有一点重叠」）
+
+真实设备（触屏）上的剩余重叠点：**虚拟摇杆随视口缩放后占据左下 y 742~979**，
+而弹幕活动带（bandTopRatio 0.66 = 713 起）的车道正好从摇杆身上穿过。修复：
+
+- `TouchJoystick` 暴露 `top`（底座上沿）、`WeaponBar` 暴露 `topY`、`CombatHud` 暴露
+  `bonusTopY` 三个几何 getter；
+- `WrongDanmakuSystem` 新增 `bandBottomLimit` 入参：活动带底边 =
+  min(配置比例, 底部 UI 三者最高点上沿 − 24, 屏高 − 字号 − 8)，车道自底边向上堆叠；
+- `GrassCuttingScene` 在摇杆/HUD/武器栏就绪后创建弹幕（创建顺序后移）并传入避让上限；
+- 弹幕层级 115 → **90**（小怪 100 / 玩家 200 之后）：即使穿过战斗区也是垫底背景层，不抢视线。
+
+实测（触屏模拟 + 2340×1080）：摇杆上沿 743、加成文案顶 945、武器栏顶 915 → 弹幕车道底缘 711.5 ≤ 上限 719 ✅，
+截图 `reports/t031-layout/danmaku-joystick.png` 三者完全分离。
+
 ## 三、边界
 
 - 卡片加大后轨道模式（track）的轨道半径/跨度同步放大，但该模式为非默认配置，建议后续实测一轮。
