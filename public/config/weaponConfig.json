@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "2.1.0",
   "autoAim": {
     "enabled": true,
     "searchRadius": 460,
@@ -32,16 +32,16 @@
       "id": "blade",
       "name": "大刀",
       "attackType": "melee_sector",
-      "damage": 34,
-      "cooldown": 0.42,
-      "range": 132,
-      "sectorAngle": 130,
+      "damage": 30,
+      "cooldown": 0.46,
+      "range": 150,
+      "sectorAngle": 120,
       "projectileSpeed": 0,
       "projectileRadius": 0,
       "pierce": 0,
       "pelletCount": 1,
       "spread": 0,
-      "knockback": 300,
+      "knockback": 260,
       "damageGrowthPerLevel": 0.2,
       "hitstopDuration": 70,
       "shakeIntensity": 0.006
@@ -50,9 +50,9 @@
       "id": "smg",
       "name": "机关枪",
       "attackType": "ranged_bolt",
-      "damage": 9,
-      "cooldown": 0.09,
-      "range": 620,
+      "damage": 7.5,
+      "cooldown": 0.1,
+      "range": 500,
       "sectorAngle": 0,
       "projectileSpeed": 780,
       "projectileRadius": 5,
@@ -62,15 +62,20 @@
       "knockback": 40,
       "damageGrowthPerLevel": 0.2,
       "hitstopDuration": 18,
-      "shakeIntensity": 0.0015
+      "shakeIntensity": 0.0015,
+      "overheat": {
+        "shotsToOverheat": 18,
+        "coolPerSec": 6,
+        "lockSec": 2
+      }
     },
     {
       "id": "scatter",
       "name": "霰弹枪",
       "attackType": "ranged_spread",
-      "damage": 13,
-      "cooldown": 0.62,
-      "range": 300,
+      "damage": 12,
+      "cooldown": 0.55,
+      "range": 340,
       "sectorAngle": 0,
       "projectileSpeed": 640,
       "projectileRadius": 4,
@@ -81,6 +86,72 @@
       "damageGrowthPerLevel": 0.2,
       "hitstopDuration": 40,
       "shakeIntensity": 0.004
+    },
+    {
+      "id": "boomerang",
+      "name": "公式飞盘",
+      "attackType": "ranged_boomerang",
+      "damage": 16,
+      "cooldown": 0.55,
+      "range": 380,
+      "sectorAngle": 0,
+      "projectileSpeed": 520,
+      "projectileRadius": 9,
+      "pierce": 99,
+      "pelletCount": 1,
+      "spread": 0,
+      "knockback": 60,
+      "damageGrowthPerLevel": 0.2,
+      "hitstopDuration": 24,
+      "shakeIntensity": 0.002,
+      "boomerangReturnRatio": 0.5
+    },
+    {
+      "id": "acid",
+      "name": "酸液试管",
+      "attackType": "lobbed",
+      "damage": 10,
+      "cooldown": 0.9,
+      "range": 320,
+      "sectorAngle": 0,
+      "projectileSpeed": 460,
+      "projectileRadius": 7,
+      "pierce": 0,
+      "pelletCount": 1,
+      "spread": 0,
+      "knockback": 0,
+      "damageGrowthPerLevel": 0.2,
+      "hitstopDuration": 0,
+      "shakeIntensity": 0.002,
+      "impactZone": {
+        "radius": 110,
+        "damage": 5,
+        "tickInterval": 0.5,
+        "duration": 2.4
+      }
+    },
+    {
+      "id": "homing",
+      "name": "单词追踪弹",
+      "attackType": "ranged_homing",
+      "damage": 14,
+      "cooldown": 0.3,
+      "range": 460,
+      "sectorAngle": 0,
+      "projectileSpeed": 520,
+      "projectileRadius": 6,
+      "pierce": 0,
+      "pelletCount": 1,
+      "spread": 0,
+      "knockback": 30,
+      "damageGrowthPerLevel": 0.2,
+      "hitstopDuration": 20,
+      "shakeIntensity": 0.002,
+      "homingTurnRate": 4
     }
-  ]
+  ],
+  "switchBonus": {
+    "windowSec": 1.5,
+    "damageMult": 1.25
+  }
 }

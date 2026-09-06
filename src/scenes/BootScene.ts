@@ -42,6 +42,13 @@ export const TextureKeys = {
   miniBoss: 'tex-buff-miniboss',
   /** T-032 宝箱（直接彩色烘焙，运行期不再 tint） */
   treasureChest: 'tex-treasure-chest',
+  /** T-033 怪物变体贴图（白色灰度 + tint 管线，形状区分变体） */
+  monsterVariants: {
+    rusher: 'tex-monster-rusher',
+    bookworm: 'tex-monster-bookworm',
+    panhead: 'tex-monster-panhead',
+    splitter: 'tex-monster-splitter',
+  },
   /** T-032 陷阱图标（直接彩色烘焙）：poop / bolt / puddle / banana / megaphone / router */
   trap: {
     poop: 'tex-trap-poop',
@@ -142,6 +149,104 @@ export class BootScene extends Phaser.Scene {
     this.makeBossBodies();
     this.makeTreasureChest();
     this.makeTrapIcons();
+    this.makeVariantMonsters();
+  }
+
+  /**
+   * T-033 四种怪物变体贴图（48×48，白色灰度 + 呆萌脸，运行期 tint 照常）。
+   * 形状区分：冲刺怪=流线尖锥体；扔书怪=小眼镜+腋下夹书；
+   * 铁锅头=头顶倒扣铁锅（墨线大锅，看一眼就知道子弹没用）；分裂怪=身体中缝裂纹。
+   */
+  private makeVariantMonsters(): void {
+    const { ink, inkSoft } = Palette.art;
+    const c = 24;
+    const face = (g: Phaser.GameObjects.Graphics): void => {
+      // 共用呆萌脸：一大一小眼 + 龅牙
+      g.fillStyle(0xffffff, 1);
+      g.fillCircle(c - 5, c - 4, 6);
+      g.fillCircle(c + 7, c - 2, 3.8);
+      g.lineStyle(2, ink, 1);
+      g.strokeCircle(c - 5, c - 4, 6);
+      g.strokeCircle(c + 7, c - 2, 3.8);
+      g.fillStyle(ink, 1);
+      g.fillCircle(c - 6.5, c - 5.5, 2.6);
+      g.fillCircle(c + 8, c - 0.5, 1.7);
+      g.lineStyle(1.8, ink, 1);
+      g.lineBetween(c - 6, c + 6, c + 6, c + 7);
+    };
+
+    // 冲刺怪：前倾流线楔形 + 三条速度线（往 +X 冲）
+    const ru = this.make.graphics({ x: 0, y: 0 }, false);
+    ru.fillStyle(ink, 1);
+    ru.fillTriangle(2, 12, 2, 36, 46, 24);
+    ru.fillStyle(0xe9f3e2, 1);
+    ru.fillTriangle(5, 16, 5, 32, 41, 24);
+    ru.lineStyle(1.5, ink, 0.5);
+    ru.lineBetween(0, 8, 8, 14);
+    ru.lineBetween(0, 24, 10, 24);
+    ru.lineBetween(0, 40, 8, 34);
+    face(ru);
+    ru.generateTexture(TextureKeys.monsterVariants.rusher, 48, 48);
+    ru.destroy();
+
+    // 扔书怪：团子 + 圆眼镜 + 腋下夹一本厚书
+    const bw = this.make.graphics({ x: 0, y: 0 }, false);
+    bw.fillStyle(ink, 1);
+    bw.fillCircle(c, c, 22.5);
+    bw.fillStyle(0xe9f3e2, 1);
+    bw.fillCircle(c, c, 19);
+    face(bw);
+    // 眼镜：两个圈 + 鼻梁架在大眼上
+    bw.lineStyle(2, ink, 1);
+    bw.strokeCircle(c - 5, c - 4, 8);
+    bw.strokeCircle(c + 7, c - 2, 5.5);
+    bw.lineBetween(c - 0.5, c - 3.5, c + 2.5, c - 2.8);
+    // 腋下书（右下角一摞）
+    bw.fillStyle(0xffffff, 1);
+    bw.fillRect(c + 2, c + 8, 16, 9);
+    bw.lineStyle(1.5, ink, 1);
+    bw.strokeRect(c + 2, c + 8, 16, 9);
+    bw.lineStyle(1, inkSoft, 0.8);
+    bw.lineBetween(c + 2, c + 11, c + 18, c + 11);
+    bw.lineBetween(c + 2, c + 14, c + 18, c + 14);
+    bw.generateTexture(TextureKeys.monsterVariants.bookworm, 48, 48);
+    bw.destroy();
+
+    // 铁锅头：团子 + 头顶倒扣大铁锅（占半张脸宽，一眼看懂「子弹没用」）
+    const ph = this.make.graphics({ x: 0, y: 0 }, false);
+    ph.fillStyle(ink, 1);
+    ph.fillCircle(c, c, 22.5);
+    ph.fillStyle(0xe9f3e2, 1);
+    ph.fillCircle(c, c, 19);
+    face(ph);
+    // 铁锅：灰色椭圆锅体 + 锅沿 + 锅柄
+    ph.fillStyle(0xb9c4d2, 1);
+    ph.fillEllipse(c, c - 16, 30, 12);
+    ph.lineStyle(2.2, ink, 1);
+    ph.strokeEllipse(c, c - 16, 30, 12);
+    ph.lineStyle(2, ink, 1);
+    ph.lineBetween(c + 14, c - 18, c + 22, c - 21); // 锅柄
+    ph.fillStyle(0x8d99a8, 1);
+    ph.fillEllipse(c, c - 13, 22, 5);
+    ph.generateTexture(TextureKeys.monsterVariants.panhead, 48, 48);
+    ph.destroy();
+
+    // 分裂怪：团子 + 中缝裂纹 + 双瞳（一分为二的既视感）
+    const sp = this.make.graphics({ x: 0, y: 0 }, false);
+    sp.fillStyle(ink, 1);
+    sp.fillCircle(c, c, 22.5);
+    sp.fillStyle(0xe9f3e2, 1);
+    sp.fillCircle(c, c, 19);
+    face(sp);
+    // 中缝裂纹（从头顶锯齿裂到肚子）
+    sp.lineStyle(2.4, ink, 1);
+    sp.lineBetween(c + 1, c - 19, c - 3, c - 12);
+    sp.lineBetween(c - 3, c - 12, c + 2, c - 5);
+    sp.lineBetween(c + 2, c - 5, c - 2, c + 2);
+    sp.lineBetween(c - 2, c + 2, c + 1, c + 9);
+    sp.lineBetween(c + 1, c + 9, c - 1, c + 17);
+    sp.generateTexture(TextureKeys.monsterVariants.splitter, 48, 48);
+    sp.destroy();
   }
 
   /**
@@ -608,6 +713,48 @@ export class BootScene extends Phaser.Scene {
     sc.fillRect(10, 11, 24, 5);
     sc.generateTexture(`${WEAPON_TEXTURE_PREFIX}scatter`, 36, 21);
     sc.destroy();
+
+    // 公式飞盘 boomerang：圆环飞盘（中心镂空 + 两道刻痕），墨线包边
+    const bo = this.make.graphics({ x: 0, y: 0 }, false);
+    bo.fillStyle(ink, 1);
+    bo.fillCircle(18, 18, 16);
+    bo.fillStyle(0xffffff, 1);
+    bo.fillCircle(18, 18, 13);
+    bo.fillStyle(0x000000, 1);
+    bo.fillCircle(18, 18, 6);
+    bo.lineStyle(2, ink, 1);
+    bo.lineBetween(18, 4, 18, 10);
+    bo.lineBetween(29, 24, 24, 21);
+    bo.generateTexture(`${WEAPON_TEXTURE_PREFIX}boomerang`, 36, 36);
+    bo.destroy();
+
+    // 酸液试管 acid：斜试管（管口 + 液面），墨线包边
+    const ac = this.make.graphics({ x: 0, y: 0 }, false);
+    ac.fillStyle(ink, 1);
+    ac.fillTriangle(4, 4, 16, 2, 26, 22);
+    ac.fillTriangle(4, 4, 26, 22, 14, 26);
+    ac.fillStyle(0xffffff, 1);
+    ac.fillTriangle(7, 6, 15, 5, 23, 20);
+    ac.fillTriangle(7, 6, 23, 20, 13, 22);
+    ac.lineStyle(2, ink, 1);
+    ac.lineBetween(3, 3, 15, 1);
+    ac.generateTexture(`${WEAPON_TEXTURE_PREFIX}acid`, 30, 28);
+    ac.destroy();
+
+    // 单词追踪弹 homing：字母 A 剪影 + 双尾翼
+    const hm = this.make.graphics({ x: 0, y: 0 }, false);
+    hm.fillStyle(ink, 1);
+    hm.fillTriangle(2, 24, 12, 2, 22, 24);
+    hm.fillTriangle(8, 24, 12, 12, 16, 24);
+    hm.fillStyle(0xffffff, 1);
+    hm.fillTriangle(5, 22, 12, 4, 19, 22);
+    hm.fillTriangle(9, 22, 12, 14, 15, 22);
+    hm.fillStyle(ink, 1);
+    hm.fillCircle(12, 19, 3);
+    hm.fillTriangle(0, 22, 6, 20, 2, 27);
+    hm.fillTriangle(24, 22, 18, 20, 22, 27);
+    hm.generateTexture(`${WEAPON_TEXTURE_PREFIX}homing`, 26, 28);
+    hm.destroy();
   }
 
   /**

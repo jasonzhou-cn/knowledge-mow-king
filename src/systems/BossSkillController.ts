@@ -236,6 +236,7 @@ export class BossSkillController {
         texture: 'fx-bolt',
         tint: this.parseColor(cfg.color),
         weaponId: `boss_${this.boss.id}`,
+        attackType: '',
       });
     }
   }

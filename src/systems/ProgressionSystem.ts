@@ -33,6 +33,10 @@ export interface MetaTotals {
   lazyPickups: number;
   bestCombo: number;
   bestAccuracy: number;
+  /** T-033：单关内「所有已解锁武器各击杀 ≥5」的次数（十八般武艺） */
+  multiWeaponRounds: number;
+  /** T-033：近战击杀铁锅头的累计数（铁头克星） */
+  panheadMeleeKills: number;
 }
 
 /** 存档 v2 新增的元数据块：成就 + Boss 图鉴 + 每关最佳得分（本地排行榜） */
@@ -42,6 +46,8 @@ export interface MetaSave {
   /** key = 关卡号字符串 */
   bestScores: Record<string, number>;
   totals: MetaTotals;
+  /** T-033 已解锁武器 id（初始 ['blade']，渐进解锁） */
+  weaponUnlocks: string[];
 }
 
 /** 存档数据 */
@@ -117,6 +123,16 @@ export class ProgressionSystem {
         meta: this.normalizeMeta(parsed.meta),
         updatedAt: parsed.updatedAt ?? Date.now(),
       };
+      // T-033 补丁迁移：老 v2 存档没有 weaponUnlocks——按解锁链 + 已达关卡推导
+      if (this.data.meta.weaponUnlocks.length === 0 && this.settings) {
+        this.data.meta.weaponUnlocks = ['blade'];
+        for (const u of this.settings.weaponUnlockSettings ?? []) {
+          if (this.data.unlockedLevel > u.afterLevel && !this.data.meta.weaponUnlocks.includes(u.id)) {
+            this.data.meta.weaponUnlocks.push(u.id);
+          }
+        }
+        this.save();
+      }
     } catch {
       // 存档损坏时静默回退，绝不让存档问题阻断游戏启动
       this.data = ProgressionSystem.createDefault();
@@ -159,6 +175,14 @@ export class ProgressionSystem {
   unlockAchievement(id: string): boolean {
     if (this.data.meta.achievements.includes(id)) return false;
     this.data.meta.achievements.push(id);
+    this.save();
+    return true;
+  }
+
+  /** T-033：解锁一把武器（幂等）；大刀始终可用不需要调 */
+  unlockWeapon(id: string): boolean {
+    if (this.data.meta.weaponUnlocks.includes(id)) return false;
+    this.data.meta.weaponUnlocks.push(id);
     this.save();
     return true;
   }
@@ -278,7 +302,10 @@ export class ProgressionSystem {
           lazyPickups: 0,
           bestCombo: 0,
           bestAccuracy: 0,
+          multiWeaponRounds: 0,
+          panheadMeleeKills: 0,
         },
+        weaponUnlocks: ['blade'],
       },
       updatedAt: Date.now(),
     };
@@ -293,6 +320,9 @@ export class ProgressionSystem {
       achievements: Array.isArray(meta.achievements) ? meta.achievements.filter((s) => typeof s === 'string') : base.achievements,
       bossesDefeated: Array.isArray(meta.bossesDefeated) ? meta.bossesDefeated.filter((s) => typeof s === 'string') : base.bossesDefeated,
       bestScores: meta.bestScores && typeof meta.bestScores === 'object' ? meta.bestScores : base.bestScores,
+      // 允许空数组通过（load() 的补丁迁移负责按解锁链推导补全）
+      // 缺省/空数组都留给 load() 的补丁迁移按解锁链推导（absent ≠ 显式全解锁）
+      weaponUnlocks: Array.isArray(meta.weaponUnlocks) ? meta.weaponUnlocks.filter((s) => typeof s === 'string') : [],
       totals: {
         kills: Math.max(0, t.kills ?? 0),
         clears: Math.max(0, t.clears ?? 0),
@@ -303,6 +333,8 @@ export class ProgressionSystem {
         lazyPickups: Math.max(0, t.lazyPickups ?? 0),
         bestCombo: Math.max(0, t.bestCombo ?? 0),
         bestAccuracy: Math.max(0, Math.min(1, t.bestAccuracy ?? 0)),
+        multiWeaponRounds: Math.max(0, t.multiWeaponRounds ?? 0),
+        panheadMeleeKills: Math.max(0, t.panheadMeleeKills ?? 0),
       },
     };
   }

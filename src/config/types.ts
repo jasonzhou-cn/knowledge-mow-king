@@ -92,6 +92,8 @@ export interface GameSettings {
   grassCuttingBonusSettings: GrassCuttingBonusSettings;
   /** 防沉迷：连续游玩时长强制休息 */
   playtimeSettings: PlaytimeSettings;
+  /** 武器渐进解锁链（T-033，validator 校验 id 唯一） */
+  weaponUnlockSettings: WeaponUnlockSettings[];
 }
 
 // ──────────────────────────── questionConfig.json ────────────────────────────
@@ -768,12 +770,38 @@ export interface GrassCuttingConfig {
   assistSettings: AssistSettings;
   /** 世界尺寸（相机跟随大地图，T-032） */
   worldSettings: WorldSettings;
+  /** 怪物变体（T-033 武器克制） */
+  monsterVariants?: MonsterVariantSettings[];
 }
 
 // ──────────────────────────── weaponConfig.json ────────────────────────────
 
-/** 武器攻击形态：近战扇形 / 远程单发 / 远程多发散布 */
-export type WeaponAttackType = 'melee_sector' | 'ranged_bolt' | 'ranged_spread';
+/** 武器攻击形态：近战扇形 / 远程单发 / 远程多发散布 / 回旋镖 / 抛掷落地区 / 追踪弹 */
+export type WeaponAttackType =
+  | 'melee_sector'
+  | 'ranged_bolt'
+  | 'ranged_spread'
+  | 'ranged_boomerang'
+  | 'lobbed'
+  | 'ranged_homing';
+
+/** 机关枪过热（T-033：连射过热强制冷却，阻止无脑扫射） */
+export interface WeaponOverheatSettings {
+  /** 多少发子弹触 发过热 */
+  shotsToOverheat: number;
+  /** 未射击时每秒散热 */
+  coolPerSec: number;
+  /** 过热锁定时长（秒） */
+  lockSec: number;
+}
+
+/** 抛掷武器（酸液试管）落地生成的腐蚀区 */
+export interface WeaponImpactZoneSettings {
+  radius: number;
+  damage: number;
+  tickInterval: number;
+  duration: number;
+}
 
 /** 单把武器的全部数值（GDD 1.4：零硬编码，全部来自 JSON） */
 export interface WeaponEntry {
@@ -807,6 +835,20 @@ export interface WeaponEntry {
   hitstopDuration: number;
   /** 击杀时的相机震动强度，受 killFx.cameraShakeEnabled 开关约束 */
   shakeIntensity: number;
+  /** 机关枪专属：过热参数（仅 ranged_bolt 且配置了该段的武器） */
+  overheat?: WeaponOverheatSettings;
+  /** 回旋镖：飞行距离达到 range × 该比例后折返回玩家（双程伤害） */
+  boomerangReturnRatio?: number;
+  /** 抛掷武器：落地生成腐蚀区 */
+  impactZone?: WeaponImpactZoneSettings;
+  /** 追踪弹：每秒最大转向弧度 */
+  homingTurnRate?: number;
+}
+
+/** 换武连携（T-033：击杀后 1.5s 内切武器，下一击伤害加成） */
+export interface WeaponSwitchBonusSettings {
+  windowSec: number;
+  damageMult: number;
 }
 
 /** 自动瞄准设置：锁定最近敌人，避免玩家被「朝向操作」拖住 */
@@ -866,6 +908,51 @@ export interface WeaponConfig {
   autoAim: AutoAimSettings;
   killFx: KillFxSettings;
   weapons: WeaponEntry[];
+  /** 换武连携（可选段，缺省关闭） */
+  switchBonus?: WeaponSwitchBonusSettings;
+}
+
+/**
+ * 怪物变体（T-033 平衡性：不同怪怕不同武器）。
+ * taken = 受到各攻击形态伤害的倍率表（缺省键 = 1.0）。
+ */
+export interface MonsterVariantSettings {
+  /** 变体 id：normal / rusher / bookworm / panhead / splitter */
+  id: string;
+  /** 触发/出场提示文案（空 = 不提示） */
+  label: string;
+  /** 生成权重（按 fromLevel 过滤后加权随机） */
+  weight: number;
+  /** 从该关卡起才可能出现 */
+  fromLevel: number;
+  hpMult: number;
+  speedMult: number;
+  /** 受到伤害倍率表，key = WeaponAttackType */
+  taken: Record<string, number>;
+  /** rusher：每 N 秒朝玩家冲刺 */
+  chargeEverySec?: number;
+  chargeSpeedMult?: number;
+  chargeDurationSec?: number;
+  /** bookworm：与玩家保持距离并投掷腐蚀书 */
+  keepDistance?: number;
+  spitEverySec?: number;
+  spitZoneRadius?: number;
+  spitZoneDamage?: number;
+  spitZoneDuration?: number;
+  /** splitter：死亡分裂 */
+  splitCount?: number;
+  splitHpMult?: number;
+  splitSpeedMult?: number;
+}
+
+/** 武器渐进解锁（T-033：通关 N 关且正确率达标解锁） */
+export interface WeaponUnlockSettings {
+  /** 武器 id */
+  id: string;
+  /** 通关该关后可解锁 */
+  afterLevel: number;
+  /** 该关答题正确率下限 */
+  minAccuracy: number;
 }
 
 // ───────────────────────────── levelConfig.json ─────────────────────────────

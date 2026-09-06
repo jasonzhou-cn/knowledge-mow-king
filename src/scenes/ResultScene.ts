@@ -107,8 +107,28 @@ export class ResultScene extends Phaser.Scene {
       accuracy: payload.quiz.accuracy,
       perfect: payload.quiz.totalQuestions > 0 && payload.quiz.correctCount === payload.quiz.totalQuestions,
       maxCombo: payload.maxCombo,
+      weaponKills: payload.weaponKills,
+      unlockedWeaponCount: payload.unlockedWeaponCount,
     });
     progression.save();
+
+    // T-033 武器渐进解锁：通关 N 关且正确率达标 → 解锁链上的新武器（结算页大字 toast）
+    let weaponUnlockToast = '';
+    if (payload.cleared) {
+      const unlockChain = loader.getConfig('gameSettings').weaponUnlockSettings;
+      const weaponNames = loader.getConfig('weaponConfig').weapons;
+      for (const u of unlockChain) {
+        if (
+          payload.level >= u.afterLevel &&
+          payload.quiz.accuracy >= u.minAccuracy &&
+          !progression.meta.weaponUnlocks.includes(u.id) &&
+          progression.unlockWeapon(u.id)
+        ) {
+          const wname = weaponNames.find((w) => w.id === u.id)?.name ?? u.id;
+          weaponUnlockToast += `🎉 解锁新武器：${wname}！（数字键切换）　`;
+        }
+      }
+    }
 
     const rewardInput = { quiz: payload.quiz, kills: payload.kills, noDamage: payload.noDamage };
     const raw = calculateRewards(rewardInput, rewardConfig);
@@ -161,16 +181,25 @@ export class ResultScene extends Phaser.Scene {
     }
 
     // 成就解锁 toast：紧贴趣味文案下方（金色横条，逐条展示本次新解锁）
+    let toastY = 116 * s + 30 * s;
     if (newlyUnlocked.length > 0) {
       const toast = this.add
         .text(
           w / 2,
-          116 * s + 30 * s,
+          toastY,
           `🏆 成就解锁：${newlyUnlocked.map((a) => a.name).join('　')}`,
           textStyle(Math.round(17 * s), css(Palette.accent.gold), { fontStyle: 'bold' }),
         )
         .setOrigin(0.5, 0);
       pushStagger(toast, true);
+      toastY += 30 * s;
+    }
+    // T-033 武器解锁 toast（青色大字，优先级最高）
+    if (weaponUnlockToast) {
+      const wToast = this.add
+        .text(w / 2, toastY, weaponUnlockToast, textStyle(Math.round(19 * s), css(Palette.accent.secondary), { fontStyle: 'bold' }))
+        .setOrigin(0.5, 0);
+      pushStagger(wToast, true);
     }
 
     // 左栏：答题表现

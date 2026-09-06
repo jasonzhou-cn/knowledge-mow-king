@@ -78,6 +78,11 @@ export interface SectorSweepParams {
   comboMultiplier: number;
   knockback: number;
   monsters: readonly Monster[];
+  /**
+   * 按目标计算伤害（T-033 克制矩阵）：返回值已含宝物/连携乘数，不含 comboMultiplier。
+   * 缺省时所有目标吃同样的 params.damage。
+   */
+  damageFor?: (monster: Monster) => number;
 }
 
 export class CombatSystem {
@@ -134,7 +139,7 @@ export class CombatSystem {
       // 击退沿「施法点 → 小怪」的方向，横扫时自然形成向外的推力
       const result = this.applyHit({
         monster,
-        damage: params.damage,
+        damage: params.damageFor ? params.damageFor(monster) : params.damage,
         comboMultiplier: params.comboMultiplier,
         dirX: dx / len,
         dirY: dy / len,

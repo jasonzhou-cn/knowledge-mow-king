@@ -14,7 +14,7 @@
  */
 
 import Phaser from 'phaser';
-import type { BossSettings, DifficultySettings, ResolvedBossTemplate } from '../config/types';
+import type { BossSettings, DifficultySettings, MonsterVariantSettings, ResolvedBossTemplate } from '../config/types';
 import { Palette } from '../ui/Palette';
 import { clamp01, lerp } from '../utils/MathUtil';
 
@@ -22,6 +22,15 @@ import { clamp01, lerp } from '../utils/MathUtil';
 export interface Monster {
   /** 稳定唯一 id（本局内自增）：弹丸按它做「一枚弹丸 × 一只怪 = 一次命中」去重 */
   uid: number;
+  /** T-033 所属变体（null = 基础怪）；克制矩阵与行为分支都读它 */
+  variant: MonsterVariantSettings | null;
+  /** 分裂小怪标记：true = 死后不再分裂（防无限分裂） */
+  noSplit: boolean;
+  /** rusher 冲刺计时 */
+  chargeTimer: number;
+  charging: number;
+  /** bookworm 吐书计时 */
+  spitTimer: number;
   sprite: Phaser.GameObjects.Image;
   hp: number;
   maxHp: number;
@@ -81,6 +90,12 @@ export interface MonsterSpawnerOptions {
   boss?: BossSettings | ResolvedBossTemplate;
   /** Boss 生成前的同屏小怪上限比例（相对 maxAlive）；缺省 0.25 */
   preBossAliveRatio?: number;
+  /** T-033 怪物变体表（空/缺省 = 全部基础怪，旧行为） */
+  variants?: MonsterVariantSettings[];
+  /** 当前关卡号（变体 fromLevel 门槛） */
+  level?: number;
+  /** 扔书怪吐书回调：场景接到 DoomZone 生成腐蚀书区 */
+  onSpitZone?: (x: number, y: number, radius: number, damage: number, duration: number) => void;
 }
 
 export class MonsterSpawner {
@@ -94,6 +109,9 @@ export class MonsterSpawner {
   private running = false;
   /** 小怪 uid 发号器（reset 时归零；uid 只要求本局内唯一） */
   private uidCounter = 0;
+  private readonly variants: MonsterVariantSettings[];
+  private readonly level: number;
+  private readonly onSpitZone?: (x: number, y: number, radius: number, damage: number, duration: number) => void;
 
   /** Boss 关：Boss 本体（存活时在 activeList 里，isBoss=true） */
   private bossMonster: Monster | null = null;
@@ -119,6 +137,9 @@ export class MonsterSpawner {
   constructor(scene: Phaser.Scene, opts: MonsterSpawnerOptions) {
     this.scene = scene;
     this.opts = opts;
+    this.variants = opts.variants ?? [];
+    this.level = opts.level ?? 1;
+    this.onSpitZone = opts.onSpitZone;
     this.spawnInterval = opts.difficulty.spawnIntervalStart;
     this.batchSize = opts.difficulty.batchSizeStart;
     this.hpMultiplier = opts.difficulty.hpMultiplierStart;
@@ -328,6 +349,11 @@ export class MonsterSpawner {
       this.pool.push({
         sprite,
         uid: 0,
+        variant: null,
+        noSplit: false,
+        chargeTimer: 0,
+        charging: 0,
+        spitTimer: 0,
         hp: 0,
         maxHp: 1,
         damage: 0,
@@ -346,6 +372,20 @@ export class MonsterSpawner {
         corpseSpin: 0,
       });
     }
+  }
+
+  /** T-033：按 fromLevel 过滤后加权随机挑变体；无可选时返回 null（基础怪） */
+  private pickVariant(): MonsterVariantSettings | null {
+    if (this.variants.length === 0) return null;
+    const eligible = this.variants.filter((v) => v.fromLevel <= this.level && v.weight > 0);
+    if (eligible.length === 0) return null;
+    const total = eligible.reduce((sum, v) => sum + v.weight, 0);
+    let roll = Math.random() * Math.max(0.0001, total);
+    for (const v of eligible) {
+      roll -= v.weight;
+      if (roll <= 0) return v;
+    }
+    return eligible[0];
   }
 
   /** 按当前刷怪间隔成批生成，直到达到同屏上限 */
@@ -418,14 +458,24 @@ export class MonsterSpawner {
     monster.isBoss = false;
     monster.isMiniboss = false;
     monster.baseTint = 0;
-    monster.sprite.setTexture('monster');
+    // T-033 变体：按 fromLevel 过滤后加权随机（无变体表 = 基础怪）
+    const variant = this.pickVariant();
+    monster.variant = variant;
+    monster.noSplit = false;
+    monster.sprite.setTexture(variant && variant.id !== 'normal' ? `tex-monster-${variant.id}` : 'monster');
     monster.radius = this.opts.radius;
 
-    // 难度曲线的即时产物：新生成的小怪直接吃到当前的血量与移速倍率
-    monster.hp = this.opts.hp * this.hpMultiplier;
+    // 难度曲线的即时产物：新生成的小怪直接吃到当前的血量与移速倍率（再乘变体倍率）
+    const vHp = variant?.hpMult ?? 1;
+    const vSpeed = variant?.speedMult ?? 1;
+    monster.hp = this.opts.hp * this.hpMultiplier * vHp;
     monster.maxHp = monster.hp;
     monster.damage = this.opts.damage;
-    monster.speed = this.opts.moveSpeed * this.moveSpeedMultiplier;
+    monster.speed = this.opts.moveSpeed * this.moveSpeedMultiplier * vSpeed;
+    // 变体行为计时器（错峰启动，避免同一帧集体冲刺/吐书）
+    monster.chargeTimer = (variant?.chargeEverySec ?? 0) * (0.5 + Math.random() * 0.5);
+    monster.charging = 0;
+    monster.spitTimer = (variant?.spitEverySec ?? 0) * (0.5 + Math.random() * 0.5);
     monster.score = this.opts.scorePerKill;
     monster.alive = true;
     monster.knockbackTime = 0;
@@ -467,6 +517,11 @@ export class MonsterSpawner {
     monster.isBoss = true;
     monster.isMiniboss = false;
     monster.baseTint = 0;
+    monster.variant = null;
+    monster.noSplit = true;
+    monster.chargeTimer = 0;
+    monster.charging = 0;
+    monster.spitTimer = 0;
     monster.uid = ++this.uidCounter;
     monster.radius = b.radius;
     monster.hp = b.hp;
@@ -509,6 +564,11 @@ export class MonsterSpawner {
     monster.isBoss = false;
     monster.isMiniboss = true;
     monster.baseTint = opts.tint;
+    monster.variant = null;
+    monster.noSplit = true;
+    monster.chargeTimer = 0;
+    monster.charging = 0;
+    monster.spitTimer = 0;
     monster.uid = ++this.uidCounter;
     monster.radius = opts.radius;
     monster.hp = opts.hp;
@@ -587,8 +647,40 @@ export class MonsterSpawner {
         const dx = playerX - m.sprite.x;
         const dy = playerY - m.sprite.y;
         const len = Math.sqrt(dx * dx + dy * dy);
-        if (len > 0.001) {
-          const step = m.speed * dt;
+        const v = m.variant;
+
+        // T-033 冲刺怪：计时归零朝玩家猛冲一段（冲刺中速度 × chargeSpeedMult）
+        let speedNow = m.speed;
+        if (v?.chargeEverySec) {
+          if (m.charging > 0) {
+            m.charging -= dt;
+            speedNow *= v.chargeSpeedMult ?? 3;
+          } else {
+            m.chargeTimer -= dt;
+            if (m.chargeTimer <= 0 && len < 560 && len > 40) {
+              m.charging = v.chargeDurationSec ?? 0.5;
+              m.chargeTimer = v.chargeEverySec;
+            }
+          }
+        }
+
+        // T-033 扔书怪：与玩家保持距离，站定后周期性把书砸在玩家当前位置
+        if (v?.keepDistance && this.onSpitZone) {
+          if (len > v.keepDistance && m.charging <= 0) {
+            if (len > 0.001) {
+              const step = speedNow * dt;
+              m.sprite.x += (dx / len) * step;
+              m.sprite.y += (dy / len) * step;
+            }
+          } else {
+            m.spitTimer -= dt;
+            if (m.spitTimer <= 0) {
+              m.spitTimer = v.spitEverySec ?? 3;
+              this.onSpitZone(playerX, playerY, v.spitZoneRadius ?? 90, v.spitZoneDamage ?? 6, v.spitZoneDuration ?? 1.4);
+            }
+          }
+        } else if (len > 0.001) {
+          const step = speedNow * dt;
           m.sprite.x += (dx / len) * step;
           m.sprite.y += (dy / len) * step;
         }
@@ -627,6 +719,42 @@ export class MonsterSpawner {
 
   /** 击杀并回收一只小怪；开启尸体飞散时改为沿当前击退速度飞出去 */
   private kill(monster: Monster): void {
+    // T-033 分裂怪：死亡时一分为二（小体快怪，不再二次分裂；池满则放弃）
+    const splitCount = monster.variant?.splitCount ?? 0;
+    if (splitCount > 0 && !monster.noSplit) {
+      for (let i = 0; i < splitCount; i++) {
+        const mini = this.pool.find((m) => m !== monster && !m.alive && m.corpseTime <= 0);
+        if (!mini) break;
+        mini.uid = ++this.uidCounter;
+        mini.variant = monster.variant;
+        mini.noSplit = true;
+        mini.sprite.setTexture(`tex-monster-${monster.variant?.id ?? 'splitter'}`);
+        mini.sprite.setPosition(monster.sprite.x + (i === 0 ? -18 : 18), monster.sprite.y + (i === 0 ? 10 : -10));
+        mini.sprite.setActive(true).setVisible(true);
+        mini.sprite.setRotation(0);
+        mini.sprite.setAlpha(1);
+        mini.sprite.setDisplaySize(this.opts.radius * 1.4, this.opts.radius * 1.4);
+        mini.radius = this.opts.radius * 0.7;
+        mini.hp = Math.max(1, monster.maxHp * (monster.variant?.splitHpMult ?? 0.35));
+        mini.maxHp = mini.hp;
+        mini.damage = monster.damage;
+        mini.speed = monster.speed * (monster.variant?.splitSpeedMult ?? 1.25);
+        mini.score = Math.ceil(monster.score / 2);
+        mini.alive = true;
+        mini.knockbackTime = 0;
+        mini.knockbackX = (i === 0 ? -1 : 1) * 220;
+        mini.knockbackY = (i === 0 ? 1 : -1) * 120;
+        mini.flashTime = 0;
+        mini.corpseTime = 0;
+        mini.corpseSpin = 0;
+        mini.chargeTimer = 0;
+        mini.charging = 0;
+        mini.spitTimer = 0;
+        this.refreshTint(mini);
+        this.activeList.push(mini);
+      }
+    }
+
     const index = this.activeList.indexOf(monster);
     if (index >= 0) this.activeList.splice(index, 1);
     monster.alive = false;
@@ -663,6 +791,8 @@ export class MonsterSpawner {
   /** 回收到对象池 */
   private release(monster: Monster): void {
     monster.alive = false;
+    monster.variant = null;
+    monster.noSplit = false;
     // 注意：不重置 isBoss！Boss 的 onKill 回调在 release() 之后才执行
     //（CombatSystem.applyHit: kill → onKill），若在这里把 isBoss 清掉，
     // 场景的 onMonsterKilled 会把它当普通小怪处理，Boss 击杀就不触发通关。

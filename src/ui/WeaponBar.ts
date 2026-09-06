@@ -184,9 +184,9 @@ export class WeaponBar {
     return this.topEdge;
   }
 
-  update(ratioOf: (index: number) => number): void {
+  update(ratioOf: (index: number) => number, heatOf?: (index: number) => number): void {
     for (let i = 0; i < this.slots.length; i++) {
-      this.drawSlot(i, clamp01(ratioOf(i)));
+      this.drawSlot(i, clamp01(ratioOf(i)), heatOf ? clamp01(heatOf(i)) : 0);
     }
   }
 
@@ -203,7 +203,7 @@ export class WeaponBar {
 
   // ───────────────────────── 内部实现 ─────────────────────────
 
-  private drawSlot(index: number, ratio: number): void {
+  private drawSlot(index: number, ratio: number, heat = 0): void {
     const slot = this.slots[index];
     const active = index === this.index;
     const g = slot.bg;
@@ -220,6 +220,15 @@ export class WeaponBar {
     if (ratio > 0) {
       g.fillStyle(ratio >= 1 ? Palette.accent.primary : Palette.accent.secondary, 1);
       g.fillRoundedRect(slot.x + 6, barY, (slot.w - 12) * ratio, barH, 2.5);
+    }
+
+    // T-033 过热热量条（冷却条上方一线）：黄→红，打满=锁定散热中
+    if (heat > 0) {
+      const heatY = barY - 7;
+      g.fillStyle(Palette.background.panelSoft, 1);
+      g.fillRoundedRect(slot.x + 6, heatY, slot.w - 12, 4, 2);
+      g.fillStyle(heat >= 1 ? Palette.status.wrong : Palette.accent.gold, 1);
+      g.fillRoundedRect(slot.x + 6, heatY, (slot.w - 12) * heat, 4, 2);
     }
 
     g.lineStyle(active ? 3 : 1.5, active ? Palette.accent.gold : Palette.accent.primaryDark, active ? 1 : 0.5);

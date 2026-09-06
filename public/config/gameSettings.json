@@ -1,5 +1,5 @@
 {
-  "version": "1.1.0",
+  "version": "1.2.0",
   "levelSettings": {
     "maxLevel": 50,
     "levelUpGradeBase": 100,
@@ -49,5 +49,32 @@
     "enabled": true,
     "sessionLimitMin": 30,
     "restMin": 10
-  }
+  },
+  "weaponUnlockSettings": [
+    {
+      "id": "smg",
+      "afterLevel": 2,
+      "minAccuracy": 0.6
+    },
+    {
+      "id": "scatter",
+      "afterLevel": 4,
+      "minAccuracy": 0.6
+    },
+    {
+      "id": "boomerang",
+      "afterLevel": 7,
+      "minAccuracy": 0.6
+    },
+    {
+      "id": "acid",
+      "afterLevel": 10,
+      "minAccuracy": 0.6
+    },
+    {
+      "id": "homing",
+      "afterLevel": 13,
+      "minAccuracy": 0.6
+    }
+  ]
 }

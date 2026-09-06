@@ -181,6 +181,21 @@ export class MenuScene extends Phaser.Scene {
     this.selectedLevel = progression.unlockedLevel;
     this.refreshStats();
 
+    // T-033 武器解锁提示：主菜单告知下一把武器的解锁条件（渐进解锁的引导）
+    try {
+      const chain = ConfigLoader.getInstance().getConfig('gameSettings').weaponUnlockSettings ?? [];
+      const weaponNames = ConfigLoader.getInstance().getConfig('weaponConfig').weapons;
+      const next = chain.find((u) => !progression.meta.weaponUnlocks.includes(u.id));
+      if (next) {
+        const wname = weaponNames.find((w2) => w2.id === next.id)?.name ?? next.id;
+        this.add
+          .text(cx, cy - 40 * s, `下一把武器：${wname}（通关第 ${next.afterLevel} 关且正确率 ≥${Math.round(next.minAccuracy * 100)}% 解锁）`, textStyle(Math.round(14 * s), css(Palette.accent.secondary)))
+          .setOrigin(0.5);
+      }
+    } catch {
+      // 配置异常时静默跳过提示
+    }
+
     // T-025：场景切换 fade 过渡（时长来自配置）
     this.cameras.main.fadeIn(
       ConfigLoader.getInstance().getConfig('grassCuttingConfig').polishSettings.sceneFadeInMs,

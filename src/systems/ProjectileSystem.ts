@@ -14,6 +14,8 @@
 
 import Phaser from 'phaser';
 import { distanceSquared } from '../utils/MathUtil';
+
+const TAU = Math.PI * 2;
 import type { Monster } from './MonsterSpawner';
 
 /** 发射一枚弹丸所需的全部参数（全部来自解析后的武器数值） */
@@ -35,11 +37,31 @@ export interface ProjectileSpawnParams {
   tint: number;
   /** 命中回调透出的来源标识（用于伤害飘字升档与击杀特效配色） */
   weaponId: string;
+  /** 攻击形态（克制矩阵按它查变体 taken 表） */
+  attackType: string;
+  /** 抛掷武器（酸液试管）：不与小怪碰撞，飞行到射程尽头引爆腐蚀区 */
+  noCollide?: boolean;
+  /** 落地区参数（noCollide 时生效） */
+  impact?: ProjectileImpactInfo;
+  /** 回旋镖：飞行距离达到 range × 该比例后折返（双程伤害） */
+  returnAtRatio?: number;
+  /** 追踪弹：每秒最大转向弧度（0 = 不追踪） */
+  homingTurnRate?: number;
+}
+
+/** 抛掷落地区参数（酸液试管 impact） */
+export interface ProjectileImpactInfo {
+  radius: number;
+  damage: number;
+  tickInterval: number;
+  duration: number;
 }
 
 /** 弹丸命中时回传给上层的上下文 */
 export interface ProjectileHitPayload {
   monster: Monster;
+  /** 攻击形态（克制矩阵用） */
+  attackType: string;
   damage: number;
   /** 击退方向单位向量（由飞行方向决定） */
   dirX: number;
@@ -67,6 +89,13 @@ interface Projectile {
   range: number;
   radius: number;
   weaponId: string;
+  attackType: string;
+  noCollide: boolean;
+  impact: ProjectileImpactInfo | null;
+  returnAtRatio: number;
+  homingTurnRate: number;
+  /** 回旋镖是否已进入折返段 */
+  returning: boolean;
   /**
    * 本枚弹丸已命中的小怪 uid 集合。
    * 子步进循环里 reach（弹丸半径 + 怪半径）可达步长的数倍，
@@ -130,6 +159,12 @@ export class ProjectileSystem {
     slot.range = p.range;
     slot.radius = p.radius;
     slot.weaponId = p.weaponId;
+    slot.attackType = p.attackType;
+    slot.noCollide = p.noCollide ?? false;
+    slot.impact = p.impact ?? null;
+    slot.returnAtRatio = p.returnAtRatio ?? 0;
+    slot.homingTurnRate = p.homingTurnRate ?? 0;
+    slot.returning = false;
     slot.hitUids.clear();
 
     slot.sprite.setTexture(p.texture);
@@ -149,7 +184,17 @@ export class ProjectileSystem {
    * @param monsters 当前存活小怪列表
    * @param onHit 命中回调；同一枚弹丸对同一只小怪整个生命周期内只命中一次（hitUids 去重）
    */
-  update(dt: number, monsters: readonly Monster[], onHit: (payload: ProjectileHitPayload) => void): void {
+  update(
+    dt: number,
+    monsters: readonly Monster[],
+    onHit: (payload: ProjectileHitPayload) => void,
+    opts?: {
+      /** 回旋镖的归巢点（当前玩家坐标，世界空间） */
+      home?: { x: number; y: number };
+      /** 抛掷武器落地回调（酸液腐蚀区交给场景的 DoomZone） */
+      onImpact?: (x: number, y: number, impact: ProjectileImpactInfo) => void;
+    },
+  ): void {
     if (this.activeCount === 0) return;
 
     for (const proj of this.pool) {
@@ -162,10 +207,56 @@ export class ProjectileSystem {
       while (remaining > 0 && proj.active) {
         const step = Math.min(remaining, maxStep);
         remaining -= step;
+
+        // 追踪弹：按转向速率朝最近的存活小怪偏转（每子步转 turnRate × 子步秒）
+        if (proj.homingTurnRate > 0 && !proj.returning) {
+          let best: Monster | null = null;
+          let bestD2 = Number.POSITIVE_INFINITY;
+          for (const monster of monsters) {
+            if (!monster.alive) continue;
+            const d2 = distanceSquared(proj.x, proj.y, monster.sprite.x, monster.sprite.y);
+            if (d2 < bestD2) { bestD2 = d2; best = monster; }
+          }
+          if (best) {
+            const target = Math.atan2(best.sprite.y - proj.y, best.sprite.x - proj.x);
+            const current = Math.atan2(proj.dirY, proj.dirX);
+            const maxTurn = proj.homingTurnRate * (step / Math.max(1, proj.speed));
+            let diff = target - current;
+            while (diff > Math.PI) diff -= TAU;
+            while (diff < -Math.PI) diff += TAU;
+            const turned = Math.abs(diff) <= maxTurn ? target : current + Math.sign(diff) * maxTurn;
+            proj.dirX = Math.cos(turned);
+            proj.dirY = Math.sin(turned);
+          }
+        }
+
+        // 回旋镖折返段：每子步朝归巢点（玩家当前位置）飞，靠近即回收
+        if (proj.returning && opts?.home) {
+          const dx = opts.home.x - proj.x;
+          const dy = opts.home.y - proj.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 30) {
+            this.release(proj);
+            break;
+          }
+          proj.dirX = dx / dist;
+          proj.dirY = dy / dist;
+        }
+
         proj.x += proj.dirX * step;
         proj.y += proj.dirY * step;
         proj.traveled += step;
         proj.sprite.setPosition(proj.x, proj.y);
+
+        // 抛掷武器不与小怪碰撞，飞到射程尽头引爆
+        if (proj.noCollide) {
+          if (proj.traveled >= proj.range) {
+            if (proj.impact) opts?.onImpact?.(proj.x, proj.y, proj.impact);
+            this.release(proj);
+            break;
+          }
+          continue;
+        }
 
         for (const monster of monsters) {
           if (!monster.alive) continue;
@@ -179,6 +270,7 @@ export class ProjectileSystem {
           proj.hitUids.add(monster.uid);
           onHit({
             monster,
+            attackType: proj.attackType,
             damage: proj.damage,
             dirX: proj.dirX,
             dirY: proj.dirY,
@@ -198,6 +290,12 @@ export class ProjectileSystem {
           }
         }
 
+        // 回旋镖：飞够折返比例后进入折返段（清空命中表，允许回程再次命中同一只怪）
+        if (!proj.returning && proj.returnAtRatio > 0 && proj.traveled >= proj.range * proj.returnAtRatio) {
+          proj.returning = true;
+          proj.hitUids.clear();
+          continue;
+        }
         if (proj.traveled >= proj.range) {
           this.release(proj);
         }
@@ -252,6 +350,12 @@ export class ProjectileSystem {
         range: 0,
         radius: 4,
         weaponId: '',
+        attackType: '',
+        noCollide: false,
+        impact: null,
+        returnAtRatio: 0,
+        homingTurnRate: 0,
+        returning: false,
         hitUids: new Set<number>(),
       });
     }
@@ -268,6 +372,7 @@ export class ProjectileSystem {
   private release(proj: Projectile): void {
     proj.active = false;
     proj.pierceLeft = 0;
+    proj.returning = false;
     // 复用插槽必须清空命中集合，否则下一次发射会「记得」上一发打过的怪
     proj.hitUids.clear();
     proj.sprite.setActive(false).setVisible(false);

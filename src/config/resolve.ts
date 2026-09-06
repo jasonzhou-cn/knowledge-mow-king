@@ -87,6 +87,14 @@ export interface ResolvedWeapon {
   knockback: number;
   hitstopDuration: number;
   shakeIntensity: number;
+  /** 机关枪过热（仅配置了该段的武器） */
+  overheat?: import('./types').WeaponOverheatSettings;
+  /** 回旋镖折返比例（仅 ranged_boomerang） */
+  boomerangReturnRatio?: number;
+  /** 抛掷落地区参数（仅 lobbed） */
+  impactZone?: import('./types').WeaponImpactZoneSettings;
+  /** 追踪弹转向速率（仅 ranged_homing） */
+  homingTurnRate?: number;
 }
 
 /** 加成计算过程拆解，用于结算面板向玩家透明展示来源（GDD 2.4 奖励规则透明化） */
@@ -188,6 +196,8 @@ export interface ResolvedLevelPackage {
   expToNextLevel: number;
   /** 该等级的加成公式参数（供结算面板复用） */
   bonusSettings: GrassCuttingBonusSettings;
+  /** 换武连携（T-033；未配置时为 undefined = 关闭） */
+  switchBonus?: import('./types').WeaponSwitchBonusSettings;
 }
 
 /** 解析所需的最小配置集合，便于单测直接构造 */
@@ -252,6 +262,10 @@ export function resolveWeapons(
     knockback: w.knockback,
     hitstopDuration: w.hitstopDuration,
     shakeIntensity: w.shakeIntensity,
+    overheat: w.overheat,
+    boomerangReturnRatio: w.boomerangReturnRatio,
+    impactZone: w.impactZone,
+    homingTurnRate: w.homingTurnRate,
   }));
 }
 
@@ -551,6 +565,7 @@ export function resolveLevelPackage(
     boss: resolveBossForLevel(grassCuttingConfig.bossRoster, levelConfig.bossLevels, grassCuttingConfig.bossSettings, level),
     expToNextLevel: resolveExpToNextLevel(gameSettings, level),
     bonusSettings: gameSettings.grassCuttingBonusSettings,
+    switchBonus: weaponConfig.switchBonus,
   };
 }
 

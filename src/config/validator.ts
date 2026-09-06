@@ -500,6 +500,24 @@ function validateGameSettings(raw: unknown): Validator {
     );
   }
 
+  // 武器渐进解锁链（T-033）
+  const wu = v.array(root, 'weaponUnlockSettings', 'gameSettings.weaponUnlockSettings');
+  const unlockIds: string[] = [];
+  wu.forEach((item, index) => {
+    if (!v.isRecord(item)) {
+      v.custom(`gameSettings.weaponUnlockSettings[${index}]`, '解锁条目应为对象');
+      return;
+    }
+    const up = `gameSettings.weaponUnlockSettings[${index}]`;
+    const wid = v.string(item, 'id', `${up}.id`);
+    v.integer(item, 'afterLevel', `${up}.afterLevel`, { min: 1, max: 999 });
+    v.number(item, 'minAccuracy', `${up}.minAccuracy`, { min: 0, max: 1 });
+    if (wid) unlockIds.push(wid);
+  });
+  if (new Set(unlockIds).size !== unlockIds.length) {
+    v.custom('gameSettings.weaponUnlockSettings', '解锁链中武器 id 重复');
+  }
+
   const bs = v.object(root, 'grassCuttingBonusSettings', 'gameSettings.grassCuttingBonusSettings');
   v.number(bs, 'baseBonusGrowthPerLevel', 'gameSettings.grassCuttingBonusSettings.baseBonusGrowthPerLevel', { min: 0, max: 1 });
   v.number(bs, 'accuracyBaseline', 'gameSettings.grassCuttingBonusSettings.accuracyBaseline', { min: 0, max: 1 });
@@ -714,6 +732,58 @@ function validateGrassCuttingConfig(raw: unknown): Validator {
   const ws = v.object(root, 'worldSettings', 'grassCuttingConfig.worldSettings');
   v.number(ws, 'widthScale', 'grassCuttingConfig.worldSettings.widthScale', { min: 1, max: 2.5 });
   v.number(ws, 'heightScale', 'grassCuttingConfig.worldSettings.heightScale', { min: 1, max: 2.5 });
+
+  // 怪物变体（T-033 武器克制）
+  if (Array.isArray(root.monsterVariants)) {
+    const variants = v.array(root, 'monsterVariants', 'grassCuttingConfig.monsterVariants', 1);
+    const allowedVariants = ['normal', 'rusher', 'bookworm', 'panhead', 'splitter'];
+    const allowedAtk = ['melee', 'ranged_bolt', 'ranged_spread', 'ranged_boomerang', 'lobbed', 'ranged_homing'];
+    let variantWeightSum = 0;
+    variants.forEach((item, idx) => {
+      if (!v.isRecord(item)) {
+        v.custom(`grassCuttingConfig.monsterVariants[${idx}]`, '怪物变体应为对象');
+        return;
+      }
+      const vp = `grassCuttingConfig.monsterVariants[${idx}]`;
+      const vid = v.string(item, 'id', `${vp}.id`, allowedVariants);
+      // label 允许为空串（normal 变体不弹提示）
+      if (typeof item.label !== 'string') {
+        v.custom(`${vp}.label`, '应为字符串（可为空）');
+      }
+      const vw = v.number(item, 'weight', `${vp}.weight`, { min: 0 });
+      variantWeightSum += typeof vw === 'number' ? vw : 0;
+      v.integer(item, 'fromLevel', `${vp}.fromLevel`, { min: 1, max: 999 });
+      v.number(item, 'hpMult', `${vp}.hpMult`, { min: 0.1, max: 10 });
+      v.number(item, 'speedMult', `${vp}.speedMult`, { min: 0.2, max: 4 });
+      const taken = v.object(item, 'taken', `${vp}.taken`);
+      for (const atk of allowedAtk) {
+        v.number(taken, atk, `${vp}.taken.${atk}`, { min: 0.05, max: 5 });
+      }
+      if (typeof item.chargeEverySec === 'number') {
+        v.number(item, 'chargeEverySec', `${vp}.chargeEverySec`, { min: 0.5, max: 10 });
+        v.number(item, 'chargeSpeedMult', `${vp}.chargeSpeedMult`, { min: 1, max: 8 });
+        v.number(item, 'chargeDurationSec', `${vp}.chargeDurationSec`, { min: 0.1, max: 3 });
+      }
+      if (typeof item.keepDistance === 'number') {
+        v.number(item, 'keepDistance', `${vp}.keepDistance`, { min: 80, max: 800 });
+        v.number(item, 'spitEverySec', `${vp}.spitEverySec`, { min: 0.5, max: 10 });
+        v.number(item, 'spitZoneRadius', `${vp}.spitZoneRadius`, { min: 30, max: 300 });
+        v.number(item, 'spitZoneDamage', `${vp}.spitZoneDamage`, { min: 0, max: 50 });
+        v.number(item, 'spitZoneDuration', `${vp}.spitZoneDuration`, { min: 0.5, max: 8 });
+      }
+      if (typeof item.splitCount === 'number') {
+        v.integer(item, 'splitCount', `${vp}.splitCount`, { min: 1, max: 4 });
+        v.number(item, 'splitHpMult', `${vp}.splitHpMult`, { min: 0.05, max: 1 });
+        v.number(item, 'splitSpeedMult', `${vp}.splitSpeedMult`, { min: 0.5, max: 3 });
+      }
+      if (vid === 'normal' && idx !== 0) {
+        v.custom(`${vp}.id`, 'normal 变体应放在第 0 位（基础怪兜底）');
+      }
+    });
+    if (variantWeightSum <= 0) {
+      v.custom('grassCuttingConfig.monsterVariants', '变体权重之和必须大于 0');
+    }
+  }
 
   const assistWeightSum =
     Number(ast.accuracyWeight ?? 0) + Number(ast.hpWeight ?? 0) + Number(ast.lossWeight ?? 0);
@@ -1075,6 +1145,12 @@ function validateWeaponConfig(raw: unknown): Validator {
   v.integer(fx, 'comboBigThreshold', 'weaponConfig.killFx.comboBigThreshold', { min: 1 });
   v.integer(fx, 'comboHugeThreshold', 'weaponConfig.killFx.comboHugeThreshold', { min: 1 });
 
+  if (typeof root.switchBonus === 'object' && root.switchBonus !== null) {
+    const sb = v.object(root, 'switchBonus', 'weaponConfig.switchBonus');
+    v.number(sb, 'windowSec', 'weaponConfig.switchBonus.windowSec', { min: 0.3, max: 5 });
+    v.number(sb, 'damageMult', 'weaponConfig.switchBonus.damageMult', { min: 1, max: 3 });
+  }
+
   const list = v.array(root, 'weapons', 'weaponConfig.weapons', 1);
   const ids = new Set<string>();
 
@@ -1091,14 +1167,36 @@ function validateWeaponConfig(raw: unknown): Validator {
       'melee_sector',
       'ranged_bolt',
       'ranged_spread',
+      'ranged_boomerang',
+      'lobbed',
+      'ranged_homing',
     ]);
+    if (typeof item.overheat === 'object' && item.overheat !== null) {
+      const oh = v.object(item, 'overheat', `${p}.overheat`);
+      v.integer(oh, 'shotsToOverheat', `${p}.overheat.shotsToOverheat`, { min: 3, max: 200 });
+      v.number(oh, 'coolPerSec', `${p}.overheat.coolPerSec`, { min: 0.5, max: 60 });
+      v.number(oh, 'lockSec', `${p}.overheat.lockSec`, { min: 0.5, max: 10 });
+    }
+    if (typeof item.boomerangReturnRatio === 'number') {
+      v.number(item, 'boomerangReturnRatio', `${p}.boomerangReturnRatio`, { min: 0.2, max: 0.9 });
+    }
+    if (typeof item.impactZone === 'object' && item.impactZone !== null) {
+      const iz = v.object(item, 'impactZone', `${p}.impactZone`);
+      v.number(iz, 'radius', `${p}.impactZone.radius`, { min: 20, max: 300 });
+      v.number(iz, 'damage', `${p}.impactZone.damage`, { min: 0, max: 50 });
+      v.number(iz, 'tickInterval', `${p}.impactZone.tickInterval`, { min: 0.1, max: 3 });
+      v.number(iz, 'duration', `${p}.impactZone.duration`, { min: 0.5, max: 15 });
+    }
+    if (typeof item.homingTurnRate === 'number') {
+      v.number(item, 'homingTurnRate', `${p}.homingTurnRate`, { min: 0.5, max: 20 });
+    }
     v.number(item, 'damage', `${p}.damage`, { min: 0.1 });
     v.number(item, 'cooldown', `${p}.cooldown`, { min: 0.02 });
     v.number(item, 'range', `${p}.range`, { min: 1 });
     v.number(item, 'sectorAngle', `${p}.sectorAngle`, { min: 0, max: 360 });
     v.number(item, 'projectileSpeed', `${p}.projectileSpeed`, { min: 0 });
     v.number(item, 'projectileRadius', `${p}.projectileRadius`, { min: 0 });
-    v.integer(item, 'pierce', `${p}.pierce`, { min: 0, max: 20 });
+    v.integer(item, 'pierce', `${p}.pierce`, { min: 0, max: 99 });
     v.integer(item, 'pelletCount', `${p}.pelletCount`, { min: 1, max: 32 });
     v.number(item, 'spread', `${p}.spread`, { min: 0, max: 360 });
     v.number(item, 'knockback', `${p}.knockback`, { min: 0 });
@@ -1439,6 +1537,8 @@ function validateAchievementConfig(raw: unknown): Validator {
     'scholar_pickups',
     'lazy_pickups',
     'score_total',
+    'multi_weapon_rounds',
+    'panhead_melee_kills',
   ];
   const list = v.array(root, 'achievements', 'achievementConfig.achievements', 1);
   const ids = new Set<string>();

@@ -1,15 +1,17 @@
 /**
  * 武器系统（src/systems/WeaponSystem.ts）
- * 职责：持有三把武器（数值已在 resolve.ts 解析完毕并乘上答题加成），
- *      负责「自动瞄准 + 手动触发」的出手逻辑与按键切换。
+ * 职责：持有玩家已解锁的武器（数值已在 resolve.ts 解析完毕并乘上答题加成），
+ *      负责「自动瞄准 + 手动触发」的出手逻辑、按键切换与**机关枪过热**状态机。
  *
- * 交互契约（用户拍板）：
+ * 交互契约：
  *  - 瞄准自动：武器自动锁定搜索半径内最近的敌人；没有目标或超出半径时沿用移动朝向；
  *  - 出手手动：只有玩家按下攻击键才触发，系统不自动开火；
- *  - 切换随时：1/2/3 直切、Q/E 循环切，冷却各自独立、互不干扰。
+ *  - 切换随时：数字键直切已解锁的武器、Q/E 循环切，冷却各自独立、互不干扰；
+ *  - 过热（T-033）：机关枪连续射击累计热量，打满强制冷却 lockSec 秒；
+ *    停手/切枪时按 coolPerSec 被动散热——「扫几轮换刀」的节奏由此而来。
  *
  * 数值纪律（GDD 1.4）：本文件不实现任何成长公式，
- *      伤害 / 冷却 / 射程 / 击退 / 顿帧全部来自 ResolvedWeapon。
+ *      伤害 / 冷却 / 射程 / 击退 / 顿帧 / 过热参数全部来自 ResolvedWeapon。
  */
 
 import type { AutoAimSettings } from '../config/types';
@@ -31,18 +33,30 @@ export interface AttackAction {
 export interface WeaponSystemOptions {
   weapons: ResolvedWeapon[];
   autoAim: AutoAimSettings;
+  /** 机枪过热触发回调（飘字/音效用）；只对配置了 overheat 的武器触发 */
+  onOverheat?: (weaponId: string) => void;
 }
 
 export class WeaponSystem {
   private readonly weapons: ResolvedWeapon[];
   private readonly autoAim: AutoAimSettings;
   private readonly cooldowns: number[];
+  private readonly onOverheat?: (weaponId: string) => void;
   private index = 0;
+
+  /** 过热状态（按武器索引）：热量 0..shotsToOverheat、锁定剩余秒 */
+  private readonly heat: number[];
+  private readonly locked: number[];
+  /** 上一帧是否成功出手（出手帧不散热） */
+  private firedSinceLastUpdate = false;
 
   constructor(opts: WeaponSystemOptions) {
     this.weapons = opts.weapons.map((w) => ({ ...w }));
     this.autoAim = opts.autoAim;
     this.cooldowns = this.weapons.map(() => 0);
+    this.heat = this.weapons.map(() => 0);
+    this.locked = this.weapons.map(() => 0);
+    this.onOverheat = opts.onOverheat;
   }
 
   /** 全部武器（只读引用，供武器栏 UI 展示） */
@@ -63,6 +77,23 @@ export class WeaponSystem {
   /** 武器数量 */
   get count(): number {
     return this.weapons.length;
+  }
+
+  /** 武器是否处于过热锁定中（热量保留，切走也继续倒计时） */
+  isLocked(index = this.index): boolean {
+    const weapon = this.weapons[index];
+    if (!weapon?.overheat) return false;
+    return (this.locked[index] ?? 0) > 0;
+  }
+
+  /**
+   * 过热热量比例 0~1（1 = 已打满进入锁定）。
+   * 武器栏用它画热量条；未配置过热的武器恒为 0。
+   */
+  heatRatio(index = this.index): number {
+    const weapon = this.weapons[index];
+    if (!weapon?.overheat) return 0;
+    return Math.max(0, Math.min(1, (this.heat[index] ?? 0) / weapon.overheat.shotsToOverheat));
   }
 
   /**
@@ -97,12 +128,6 @@ export class WeaponSystem {
   /**
    * 自动瞄准：在搜索半径内找最近的存活敌人，把朝向平滑转向它。
    * 找不到目标（或功能关闭、超出半径）时原样返回移动朝向。
-   *
-   * @param playerX / playerY 角色坐标
-   * @param monsters 当前存活小怪
-   * @param moveFacing 玩家的移动朝向（无目标时的兜底朝向）
-   * @param dt 帧间隔（秒）
-   * @returns 本帧武器应指向的弧度
    */
   resolveFacing(
     playerX: number,
@@ -139,30 +164,57 @@ export class WeaponSystem {
     return moveFacing + Math.sign(diff) * step;
   }
 
-  /** 推进全部武器冷却 */
+  /** 推进全部武器冷却 + 过热散热 */
   update(dt: number): void {
     for (let i = 0; i < this.cooldowns.length; i++) {
       if (this.cooldowns[i] > 0) {
         this.cooldowns[i] = Math.max(0, this.cooldowns[i] - dt);
       }
+      const weapon = this.weapons[i];
+      if (!weapon?.overheat) continue;
+
+      // 过热锁定倒计时（无论是否在射击都推进）
+      if (this.locked[i] > 0) this.locked[i] = Math.max(0, this.locked[i] - dt);
+      // 散热：只有「这一帧没有开火」才降温——持续扫射热量只增不减
+      if (!this.firedSinceLastUpdate) {
+        this.heat[i] = Math.max(0, this.heat[i] - weapon.overheat.coolPerSec * dt);
+      }
     }
+    this.firedSinceLastUpdate = false;
   }
 
   /**
-   * 尝试出手。冷却未就绪返回 null。
+   * 尝试出手。冷却未就绪或当前武器过热锁定中返回 null。
    * 命中与否不由本系统判断 —— 近战交给 CombatSystem.sweepSector，远程交给 ProjectileSystem。
    */
   tryAttack(x: number, y: number, facing: number): AttackAction | null {
-    if (this.cooldowns[this.index] > 0) return null;
     const weapon = this.current;
+    if (this.cooldowns[this.index] > 0) return null;
+    if (this.isLocked(this.index)) return null;
+
     this.cooldowns[this.index] = weapon.cooldown;
+    this.firedSinceLastUpdate = true;
+
+    if (weapon.overheat) {
+      const i = this.index;
+      this.heat[i] += 1;
+      if (this.heat[i] >= weapon.overheat.shotsToOverheat) {
+        this.heat[i] = weapon.overheat.shotsToOverheat;
+        this.locked[i] = weapon.overheat.lockSec;
+        this.onOverheat?.(weapon.id);
+      }
+    }
+
     return { weapon, x, y, facing };
   }
 
-  /** 关卡结束时重置冷却 */
+  /** 关卡结束时重置冷却与过热 */
   reset(): void {
     for (let i = 0; i < this.cooldowns.length; i++) this.cooldowns[i] = 0;
+    for (let i = 0; i < this.heat.length; i++) this.heat[i] = 0;
+    for (let i = 0; i < this.locked.length; i++) this.locked[i] = 0;
     this.index = 0;
+    this.firedSinceLastUpdate = false;
   }
 }
 

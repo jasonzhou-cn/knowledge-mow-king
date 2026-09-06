@@ -49,6 +49,7 @@ import { pickDifficultyWeights, questionBank } from '../data/QuestionBank';
 import { applySceneTheme } from '../systems/SceneTheme';
 import { applyAssistToProgress, computeAssistTarget, smoothAssist } from '../systems/DifficultyAssist';
 import { playtime } from '../systems/PlaytimeSystem';
+import { progression } from '../systems/ProgressionSystem';
 import { bgm } from '../systems/BgmController';
 import { achievements } from '../systems/AchievementSystem';
 import { getCanvasMode } from '../config/CanvasMode';
@@ -61,6 +62,7 @@ import { TouchJoystick } from '../ui/TouchJoystick';
 import { WeaponBar } from '../ui/WeaponBar';
 import { clamp } from '../utils/MathUtil';
 import { SWING_TEXTURE_RADIUS, TextureKeys, WEAPON_TEXTURE_PREFIX } from './BootScene';
+// 新武器贴图 key 由 BootScene 的 WEAPON_TEXTURE_PREFIX 约定生成（weapon-boomerang / weapon-acid / weapon-homing）
 import type { GrassCuttingData } from './QuestionScene';
 
 /** 交给结算场景的数据 */
@@ -69,6 +71,10 @@ export interface ResultSceneData {
   quiz: QuizResult;
   bonus: GrassCuttingBonus;
   kills: number;
+  /** T-033：本关各武器击杀数（成就「十八般武艺」用） */
+  weaponKills: Record<string, number>;
+  /** T-033：本关可用（已解锁）武器数 */
+  unlockedWeaponCount: number;
   maxCombo: number;
   score: number;
   /** 时间耗尽且存活 = 通关 */
@@ -210,6 +216,13 @@ export class GrassCuttingScene extends Phaser.Scene {
   /** T-032 大地图：战斗世界尺寸（= 视口 × worldSettings 缩放） */
   private worldW = 0;
   private worldH = 0;
+  /** T-033：本关各武器击杀数（结算时传给成就系统） */
+  private weaponKills: Record<string, number> = {};
+  /** T-033 换武连携：最近一次击杀的时间（elapsed 秒）与武器 id */
+  private lastKillAt = -99;
+  private lastKillWeaponId = '';
+  /** T-033 换武连携：已武装（下一击 ×1.25），出手后消耗 */
+  private switchComboArmed = false;
   /** T-032 宝物：宝箱系统 / 答题浮层 / 生效中的加成 / 加成倒计时文本 */
   private treasure!: TreasureChestSystem;
   private treasureQuiz: TreasureQuizOverlay | null = null;
@@ -319,6 +332,7 @@ export class GrassCuttingScene extends Phaser.Scene {
     this.hp = this.maxHp;
 
     // 本关时长 = 关卡基础时长 + 上轮奖励时间，并受全局上限约束
+    const grassConfig = ConfigLoader.getInstance().getConfig('grassCuttingConfig');
     const otherSettings = ConfigLoader.getInstance().getConfig('gameSettings').otherSettings;
     this.timeLeft = clamp(
       this.packed.gameTime + (incoming.bonusTime ?? 0),
@@ -326,6 +340,15 @@ export class GrassCuttingScene extends Phaser.Scene {
       otherSettings.maxGameTimeLimit,
     );
     this.totalTime = Math.max(1, this.timeLeft);
+
+    // T-033：DoomZone 从「Boss 关专属」改为常驻（扔书怪的腐蚀书 / 酸液试管落地区共用）
+    this.doomZone = new DoomZoneSystem(this, {
+      poolSize: 24,
+      depth: 95,
+      onTickPlayer: (damage) => {
+        if (damage > 0) this.applyDoomZoneDamage(damage);
+      },
+    });
 
     this.combat = new CombatSystem(this, {
       damageCheckFrameInterval: this.packed.performance.damageCheckFrameInterval,
@@ -336,6 +359,14 @@ export class GrassCuttingScene extends Phaser.Scene {
     const m = this.packed.monster;
     this.spawner = new MonsterSpawner(this, {
       hp: m.hp,
+      variants: grassConfig.monsterVariants,
+      level: incoming.level,
+      onSpitZone: (x, y, radius, damage, duration) => {
+        this.doomZone?.spawn(
+          { type: 'doomZone', cooldown: 0, radius, damage, tickInterval: 0.5, duration, color: '#b0a8ff' } as never,
+          x, y,
+        );
+      },
       damage: m.damage,
       moveSpeed: m.moveSpeed,
       maxAlive: m.maxAlive,
@@ -371,9 +402,19 @@ export class GrassCuttingScene extends Phaser.Scene {
       ringPoolSize: this.packed.performance.ringPoolSize,
     });
 
+    // T-033 武器渐进解锁：只装配已解锁的武器（大刀始终可用）
+    const unlocks = progression.meta.weaponUnlocks;
+    const unlockedWeapons = this.packed.weapons.filter((w) => unlocks.includes(w.id));
+    if (unlockedWeapons.length === 0) unlockedWeapons.push(this.packed.weapons[0]);
+
     this.weaponSystem = new WeaponSystem({
-      weapons: this.packed.weapons,
+      weapons: unlockedWeapons,
       autoAim: this.packed.autoAim,
+      onOverheat: (weaponId) => {
+        const name = this.weaponSystem.all.find((w) => w.id === weaponId)?.name ?? weaponId;
+        this.floaters.spawn(this.player.x, this.player.y - 52, name + ' 过热！散热中…', css(Palette.status.warning), '🔥', 22);
+        sfx.play('wrong');
+      },
     });
     // 武器系统就绪后才能确定贴图配色
     this.applyWeaponVisual();
@@ -445,6 +486,7 @@ export class GrassCuttingScene extends Phaser.Scene {
       weapons: this.weaponSystem.all,
       onSelect: (index) => this.switchWeapon(index),
     });
+    void 0;
 
     // T-026：错题弹幕（无错题时零弹幕，不打扰）。
     // T-031：活动带底边动态避开底部 UI（虚拟摇杆 / 武器栏 / 加成文案取最高者再留 24px），
@@ -501,15 +543,7 @@ export class GrassCuttingScene extends Phaser.Scene {
         .setScrollFactor(0);
       this.bossBarBox = { x: bx, y: by, w: barW, h: barH };
 
-      // T-022：创建 DoomZoneSystem 与 BossSkillController
-      this.doomZone = new DoomZoneSystem(this, {
-        poolSize: 24,
-        depth: 95,
-        onTickPlayer: (damage) => {
-          // 持续伤害走无敌帧 + 玩家扣血；跳帧判断交给 CombatSystem.shouldCheckThisFrame()
-          if (damage > 0) this.applyDoomZoneDamage(damage);
-        },
-      });
+      // T-022：BossSkillController（DoomZoneSystem 已在上方常驻创建，T-033 起扔书怪/酸液共用）
       // T-027：考神召唤（fun-event-visual.md §4）：Boss 生成时召唤迷你 Boss 环绕
       this.examSummon = new ExamSummonSystem({
         scene: this,
@@ -663,6 +697,11 @@ export class GrassCuttingScene extends Phaser.Scene {
     this.damageEvents.length = 0;
     this.levelAccuracy = 1;
 
+    // T-033：武器击杀统计与连携状态复位
+    this.weaponKills = {};
+    this.lastKillAt = -99;
+    this.lastKillWeaponId = '';
+    this.switchComboArmed = false;
     // T-032：宝物/陷阱运行时状态复位
     this.treasureQuiz?.destroy();
     this.treasureQuiz = null;
@@ -818,7 +857,24 @@ export class GrassCuttingScene extends Phaser.Scene {
     // T-026：错题弹幕推进
     this.danmaku.update(dt);
 
-    this.projectiles.update(dt, this.spawner.monsters, (payload) => this.onProjectileHit(payload));
+    this.projectiles.update(
+      dt,
+      this.spawner.monsters,
+      (payload) => this.onProjectileHit(payload),
+      {
+        home: { x: this.player.x, y: this.player.y },
+        onImpact: (x, y, impact) => {
+          this.doomZone?.spawn(
+            {
+              type: 'doomZone', cooldown: 0,
+              radius: impact.radius, damage: impact.damage,
+              tickInterval: impact.tickInterval, duration: impact.duration, color: '#9be070',
+            } as never,
+            x, y,
+          );
+        },
+      },
+    );
 
     this.combat.update();
     this.updateContact(dt);
@@ -950,10 +1006,11 @@ export class GrassCuttingScene extends Phaser.Scene {
     const KeyCodes = Phaser.Input.Keyboard.KeyCodes;
     // 攻击键：J / 空格（按住连发，机关枪手感的关键）
     this.attackKeys = [KeyCodes.J, KeyCodes.SPACE].map((code) => keyboard.addKey(code, true, false));
-    // 直切键：1 / 2 / 3
-    this.hotkeys = [KeyCodes.ONE, KeyCodes.TWO, KeyCodes.THREE].map((code) =>
-      keyboard.addKey(code, true, false),
-    );
+    // 直切键：1~6（武器渐进解锁后最多 6 把；未解锁的武器不在栏里，越界切无效）
+    this.hotkeys = [
+      KeyCodes.ONE, KeyCodes.TWO, KeyCodes.THREE,
+      KeyCodes.FOUR, KeyCodes.FIVE, KeyCodes.SIX,
+    ].map((code) => keyboard.addKey(code, true, false));
     // 循环切：Q 上一把 / E 下一把
     this.cycleKeys = [KeyCodes.Q, KeyCodes.E].map((code) => keyboard.addKey(code, true, false));
 
@@ -977,12 +1034,20 @@ export class GrassCuttingScene extends Phaser.Scene {
     }
   }
 
-  /** 切换武器并同步武器栏高亮 */
+  /** 切换武器并同步武器栏高亮（击杀后 1.5s 内切枪 → 下一击连携加成，T-033） */
   private switchWeapon(index: number): void {
-    if (this.weaponSystem.switchTo(index)) {
-      this.weaponBar.setIndex(this.weaponSystem.currentIndex);
-      this.applyWeaponVisual();
+    if (!this.weaponSystem.switchTo(index)) return;
+    const bonus = this.packed.switchBonus;
+    if (
+      bonus && !this.switchComboArmed &&
+      this.elapsed - this.lastKillAt <= bonus.windowSec &&
+      this.weaponSystem.current.id !== this.lastKillWeaponId
+    ) {
+      this.switchComboArmed = true;
+      this.floaters.spawn(this.player.x, this.player.y - 56, '连携！下一击增强', css(Palette.accent.secondary), '⚡', 20);
     }
+    this.weaponBar.setIndex(this.weaponSystem.currentIndex);
+    this.applyWeaponVisual();
   }
 
   /** 攻击键是否处于按下状态（键盘或指针） */
@@ -1306,9 +1371,17 @@ export class GrassCuttingScene extends Phaser.Scene {
     this.performAttack(action);
   }
 
-  /** 落地一次攻击：近战立即结算扇形，远程发射弹丸 */
+  /** T-033 克制矩阵：按目标变体的 taken 表取该攻击形态的伤害倍率 */
+  private effectivenessMult(attackType: string, monster: Monster): number {
+    return monster.variant?.taken?.[attackType] ?? 1;
+  }
+
+  /** 落地一次攻击：近战立即结算扇形，远程发射弹丸（含连携/宝物/克制三重乘数） */
   private performAttack(action: AttackAction): void {
     const w = action.weapon;
+    const comboBonus = this.switchComboArmed ? (this.packed.switchBonus?.damageMult ?? 1) : 1;
+    const baseDamage = w.damage * this.activeTreasureDamageMult * comboBonus;
+    if (this.switchComboArmed) this.switchComboArmed = false;
 
     if (w.attackType === 'melee_sector') {
       const result = this.combat.sweepSector({
@@ -1317,7 +1390,8 @@ export class GrassCuttingScene extends Phaser.Scene {
         facing: action.facing,
         range: w.range * this.activeTreasureRangeMult,
         sectorAngle: w.sectorAngle,
-        damage: w.damage * this.activeTreasureDamageMult,
+        damage: baseDamage,
+        damageFor: (monster) => baseDamage * this.effectivenessMult(w.attackType, monster),
         comboMultiplier: this.combo.damageMultiplier,
         knockback: w.knockback,
         monsters: this.spawner.monsters,
@@ -1328,7 +1402,12 @@ export class GrassCuttingScene extends Phaser.Scene {
     }
 
     const isSpread = w.attackType === 'ranged_spread';
-    const texture = isSpread ? TextureKeys.pellet : TextureKeys.bolt;
+    const texture =
+      w.attackType === 'ranged_boomerang' ? `${WEAPON_TEXTURE_PREFIX}boomerang`
+      : w.attackType === 'lobbed' ? `${WEAPON_TEXTURE_PREFIX}acid`
+      : w.attackType === 'ranged_homing' ? `${WEAPON_TEXTURE_PREFIX}homing`
+      : isSpread ? TextureKeys.pellet
+      : TextureKeys.bolt;
     const dist = this.muzzleDistance();
     const mx = action.x + Math.cos(action.facing) * dist;
     const my = action.y + Math.sin(action.facing) * dist;
@@ -1346,7 +1425,7 @@ export class GrassCuttingScene extends Phaser.Scene {
         y: my,
         angle: action.facing + offset,
         speed: w.projectileSpeed,
-        damage: w.damage * this.activeTreasureDamageMult,
+        damage: baseDamage,
         pierce: w.pierce,
         knockback: w.knockback,
         range: w.range * this.activeTreasureRangeMult,
@@ -1354,6 +1433,11 @@ export class GrassCuttingScene extends Phaser.Scene {
         texture,
         tint: weaponTint(w.attackType),
         weaponId: w.id,
+        attackType: w.attackType,
+        noCollide: w.attackType === 'lobbed',
+        impact: w.impactZone,
+        returnAtRatio: w.boomerangReturnRatio,
+        homingTurnRate: w.homingTurnRate,
       });
     }
 
@@ -1394,11 +1478,11 @@ export class GrassCuttingScene extends Phaser.Scene {
     });
   }
 
-  /** 弹丸命中：统一交给命中结算中心处理 */
+  /** 弹丸命中：按克制矩阵结算真实伤害（飘字显示克制后的数字） */
   private onProjectileHit(payload: ProjectileHitPayload): void {
     this.combat.applyHit({
       monster: payload.monster,
-      damage: payload.damage,
+      damage: payload.damage * this.effectivenessMult(payload.attackType, payload.monster),
       comboMultiplier: this.combo.damageMultiplier,
       dirX: payload.dirX,
       dirY: payload.dirY,
@@ -1483,6 +1567,14 @@ export class GrassCuttingScene extends Phaser.Scene {
     this.score += gained;
     // 成就：累计击杀统计（只动内存，随结算统一落盘）
     achievements.notifyKill();
+    // T-033：武器击杀统计（十八般武艺）+ 铁锅头近战击杀（铁头克星）+ 连携时间窗
+    const killerId = this.weaponSystem.current.id;
+    this.weaponKills[killerId] = (this.weaponKills[killerId] ?? 0) + 1;
+    if (monster.variant?.id === 'panhead' && this.weaponSystem.current.attackType === 'melee_sector') {
+      achievements.notifyPanheadMeleeKill();
+    }
+    this.lastKillAt = this.elapsed;
+    this.lastKillWeaponId = killerId;
 
     const nextCombo = this.combo.current + 1;
     const tier = this.comboTier(nextCombo);
@@ -1762,7 +1854,10 @@ export class GrassCuttingScene extends Phaser.Scene {
     this.hud.updateCombo(this.combo.current);
     // 倒计时告警阈值来自 polishSettings（红线 1 收口）
     this.hud.setTimeWarning(this.timeLeft <= this.packed.polish.timeWarningThresholdSec);
-    this.weaponBar.update(this.cooldownProvider);
+    this.weaponBar.update(
+      this.cooldownProvider,
+      (i) => this.weaponSystem.heatRatio(i),
+    );
     this.updateBossBar();
   }
 
@@ -1834,6 +1929,8 @@ export class GrassCuttingScene extends Phaser.Scene {
       quiz: data0.quiz,
       bonus: data0.bonus,
       kills: this.kills,
+      weaponKills: { ...this.weaponKills },
+      unlockedWeaponCount: this.weaponSystem.count,
       maxCombo: this.combo.max,
       score: this.score,
       cleared,

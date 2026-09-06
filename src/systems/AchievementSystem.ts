@@ -24,6 +24,10 @@ export interface RoundResultSummary {
   perfect: boolean;
   /** 本局最高连击 */
   maxCombo: number;
+  /** T-033：本关各武器击杀数（十八般武艺判定用） */
+  weaponKills?: Record<string, number>;
+  /** T-033：本关可用的已解锁武器数 */
+  unlockedWeaponCount?: number;
 }
 
 class AchievementSystem {
@@ -59,12 +63,23 @@ class AchievementSystem {
     meta.totals.bestAccuracy = Math.max(meta.totals.bestAccuracy, r.accuracy);
     if (r.perfect) meta.totals.perfectRounds++;
     if (r.cleared && r.noDamage) meta.totals.noDamageClears++;
+    // T-033 十八般武艺：单关内「≥min(3, 已解锁数) 把武器各击杀 ≥5」记一次
+    if (r.weaponKills && (r.unlockedWeaponCount ?? 0) > 0) {
+      const need = Math.min(3, r.unlockedWeaponCount ?? 3);
+      const qualified = Object.values(r.weaponKills).filter((n) => n >= 5).length;
+      if (qualified >= need) meta.totals.multiWeaponRounds++;
+    }
     return this.checkAll();
   }
 
   /** 累计击杀 +1（割草场景高频调用：只动内存，随结算统一落盘） */
   notifyKill(): void {
     progression.meta.totals.kills++;
+  }
+
+  /** T-033 铁头克星：近战击杀铁锅头 +1（内存累计，随结算落盘） */
+  notifyPanheadMeleeKill(): void {
+    progression.meta.totals.panheadMeleeKills++;
   }
 
   /** 拾取 BUFF：kind = scholar | lazy（次数低频，直接判定 + 需要时落盘） */
@@ -138,6 +153,10 @@ class AchievementSystem {
         return t.lazyPickups >= value;
       case 'score_total':
         return progression.totalScore >= value;
+      case 'multi_weapon_rounds':
+        return t.multiWeaponRounds >= value;
+      case 'panhead_melee_kills':
+        return t.panheadMeleeKills >= value;
       default:
         return false;
     }

@@ -86,6 +86,9 @@ export const Palette = {
       melee_sector: 0xdaf2ff,
       ranged_bolt: 0xa8f5dc,
       ranged_spread: 0xffd9a8,
+      ranged_boomerang: 0xd6c8ff,
+      lobbed: 0xc4f09b,
+      ranged_homing: 0xffc0e0,
     },
   },
 
@@ -106,9 +109,8 @@ export const Palette = {
 
 /** 按攻击形态取武器剪影的配色；未知形态回落到近战色 */
 export function weaponTint(attackType: string): number {
-  if (attackType === 'ranged_bolt') return Palette.combat.weapon.ranged_bolt;
-  if (attackType === 'ranged_spread') return Palette.combat.weapon.ranged_spread;
-  return Palette.combat.weapon.melee_sector;
+  const table = Palette.combat.weapon as Record<string, number | undefined>;
+  return table[attackType] ?? Palette.combat.weapon.melee_sector;
 }
 
 /** 十六进制数值转 CSS 颜色字符串（用于 Phaser Text 的 color 字段） */
